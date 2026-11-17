@@ -275,18 +275,7 @@
         @yield('content')
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200/80 py-8 text-xs text-slate-500 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <span class="font-extrabold text-slate-900">KHEDMA</span>
-                <span>— Service Marketplace inspired by Spotlight. Connecting clients & verified Moroccan pros.</span>
-            </div>
-            <div>
-                <span>Laravel 13 • Sanctum • MySQL</span>
-            </div>
-        </div>
-    </footer>
+
 
     <!-- Header State & Dropdowns Script -->
     <script>
