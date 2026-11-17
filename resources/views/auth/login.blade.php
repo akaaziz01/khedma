@@ -64,22 +64,22 @@
             </span>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                 <!-- Client Demo -->
-                <button type="button" onclick="fillDemo('client@khedma.ma', 'Password123!')"
+                <button type="button" onclick="fillDemo('client@khedma.tn', 'Password123!')"
                     class="p-2 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 font-medium transition text-left">
                     <div class="font-bold text-[11px]">👤 Client</div>
-                    <div class="text-[9px] text-slate-500 truncate">client@khedma.ma</div>
+                    <div class="text-[9px] text-slate-500 truncate">client@khedma.tn</div>
                 </button>
                 <!-- Provider Demo -->
-                <button type="button" onclick="fillDemo('provider@khedma.ma', 'Password123!')"
+                <button type="button" onclick="fillDemo('provider@khedma.tn', 'Password123!')"
                     class="p-2 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100/50 text-amber-800 font-medium transition text-left">
                     <div class="font-bold text-[11px]">🛠️ Provider</div>
-                    <div class="text-[9px] text-slate-500 truncate">provider@khedma.ma</div>
+                    <div class="text-[9px] text-slate-500 truncate">provider@khedma.tn</div>
                 </button>
                 <!-- Admin Demo -->
-                <button type="button" onclick="fillDemo('admin@khedma.ma', 'AdminPass123!')"
+                <button type="button" onclick="fillDemo('admin@khedma.tn', 'AdminPass123!')"
                     class="p-2 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-100/50 text-red-800 font-medium transition text-left">
                     <div class="font-bold text-[11px]">🛡️ Admin</div>
-                    <div class="text-[9px] text-slate-500 truncate">admin@khedma.ma</div>
+                    <div class="text-[9px] text-slate-500 truncate">admin@khedma.tn</div>
                 </button>
             </div>
         </div>
@@ -100,7 +100,7 @@
             document.getElementById('adminPortalBadge').classList.remove('hidden');
             document.getElementById('loginHeading').textContent = 'Admin Portal Access';
             document.getElementById('loginSub').textContent = 'Secure administration area for authorized platform supervisors.';
-            fillDemo('admin@khedma.ma', 'AdminPass123!');
+            fillDemo('admin@khedma.tn', 'AdminPass123!');
         }
     });
 

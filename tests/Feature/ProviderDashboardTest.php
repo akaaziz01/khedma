@@ -19,13 +19,13 @@ class ProviderDashboardTest extends TestCase
             'email' => 'hassan@example.com',
             'password' => 'Secret123!',
             'role' => UserRole::PROVIDER,
-            'phone' => '+212600112233',
+            'phone' => '+21620011223',
         ]);
         $provider->providerProfile()->create([
             'business_name' => 'Hassan HVAC Solutions',
             'category' => 'HVAC & AC',
-            'hourly_rate' => 180.00,
-            'city' => 'Casablanca',
+            'hourly_rate' => 45.00,
+            'city' => 'Tunis',
             'is_available' => true,
         ]);
 
@@ -44,10 +44,10 @@ class ProviderDashboardTest extends TestCase
             'service_title' => 'AC Cleaning',
             'category' => 'HVAC & AC',
             'status' => 'completed',
-            'total_price' => 300.00,
+            'total_price' => 70.00,
             'scheduled_at' => now()->subDay(),
-            'address' => 'Anfa, Casablanca',
-            'city' => 'Casablanca',
+            'address' => 'Ennasr, Tunis',
+            'city' => 'Tunis',
         ]);
 
         // Add 1 pending lead
@@ -58,10 +58,10 @@ class ProviderDashboardTest extends TestCase
             'service_title' => 'AC Gas Refill',
             'category' => 'HVAC & AC',
             'status' => 'pending',
-            'total_price' => 450.00,
+            'total_price' => 90.00,
             'scheduled_at' => now()->addDay(),
-            'address' => 'Gueliz, Marrakech',
-            'city' => 'Marrakech',
+            'address' => 'Kantaoui, Sousse',
+            'city' => 'Sousse',
         ]);
 
         $token = $provider->createToken('test_token')->plainTextToken;
@@ -70,7 +70,7 @@ class ProviderDashboardTest extends TestCase
             ->getJson('/api/v1/provider/dashboard');
 
         $response->assertStatus(200)
-            ->assertJsonPath('metrics.total_revenue', 300)
+            ->assertJsonPath('metrics.total_revenue', 70)
             ->assertJsonPath('metrics.completed_jobs', 1)
             ->assertJsonPath('metrics.pending_leads', 1)
             ->assertJsonPath('provider.name', 'Hassan Pro')
@@ -105,8 +105,8 @@ class ProviderDashboardTest extends TestCase
             'status' => 'pending',
             'total_price' => 200.00,
             'scheduled_at' => now()->addHours(3),
-            'address' => 'Casablanca',
-            'city' => 'Casablanca',
+            'address' => 'Centre Ville, Tunis',
+            'city' => 'Tunis',
         ]);
 
         $token = $provider->createToken('test_token')->plainTextToken;

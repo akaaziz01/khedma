@@ -34,19 +34,19 @@
                                     Plumbing
                                 </span>
                             </div>
-                            <p id="providerBusinessSub" class="text-sm text-amber-100 font-medium mt-1">Amrani Plumbing & HVAC Services</p>
+                            <p id="providerBusinessSub" class="text-sm text-amber-100 font-medium mt-1">Amrani Plomberie & Chauffage Grand Tunis</p>
                             <div class="mt-2 flex items-center gap-4 text-xs text-amber-100/90 flex-wrap">
                                 <span class="flex items-center gap-1.5" id="providerLocationDisplay">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                    Casablanca
+                                    Tunis
                                 </span>
                                 <span class="flex items-center gap-1.5" id="providerPhoneDisplay">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                                    +212 699887766
+                                    +216 98 998 877
                                 </span>
                                 <span class="flex items-center gap-1.5">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <strong id="providerRateDisplayBanner">150</strong> MAD / hr
+                                    <strong id="providerRateDisplayBanner">35</strong> TND / hr
                                 </span>
                             </div>
                         </div>
@@ -82,12 +82,12 @@
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Revenue</span>
                         <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
-                            MAD
+                            TND
                         </div>
                     </div>
                     <div class="mt-4 flex items-baseline gap-2">
                         <span id="statRevenue" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
-                        <span class="text-xs font-bold text-slate-500">MAD</span>
+                        <span class="text-xs font-bold text-slate-500">TND</span>
                     </div>
                     <p class="text-xs text-emerald-600 font-semibold mt-2 flex items-center gap-1">
                         <span>↑</span> From completed client jobs
@@ -248,7 +248,7 @@
                             <h1 id="clientNameDisplay" class="text-2xl font-extrabold">Fatima Zahra</h1>
                             <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20">Client</span>
                         </div>
-                        <p id="clientEmailDisplay" class="text-xs text-blue-100 mt-1">client@khedma.ma</p>
+                        <p id="clientEmailDisplay" class="text-xs text-blue-100 mt-1">client@khedma.tn</p>
                     </div>
                 </div>
                 <button onclick="handleLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl border border-white/30 transition">
@@ -260,7 +260,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <span class="text-xs font-bold uppercase text-slate-400 block mb-1">My Address</span>
-                    <p id="clientFullAddress" class="text-sm font-semibold text-slate-800 mt-2">Casablanca</p>
+                    <p id="clientFullAddress" class="text-sm font-semibold text-slate-800 mt-2">Tunis</p>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <span class="text-xs font-bold uppercase text-slate-400 block mb-1">Current Active Bookings</span>
@@ -313,8 +313,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Price (MAD) *</label>
-                    <input type="number" id="newServicePrice" required min="10" step="5" placeholder="250"
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Price (TND) *</label>
+                    <input type="number" id="newServicePrice" required min="10" step="5" placeholder="50"
                         class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
             </div>
@@ -414,11 +414,11 @@
             document.getElementById('providerCategoryTag').textContent = provider.profile?.category || 'Provider';
             document.getElementById('providerLocationDisplay').innerHTML = `
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                ${provider.profile?.city || 'Casablanca'}
+                ${provider.profile?.city || 'Tunis'}
             `;
             document.getElementById('providerPhoneDisplay').innerHTML = `
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                ${provider.phone || '+212 600000000'}
+                ${provider.phone || '+216 20 000 000'}
             `;
             document.getElementById('providerRateDisplayBanner').textContent = metrics.hourly_rate ? metrics.hourly_rate.toFixed(0) : '—';
 
@@ -571,7 +571,7 @@
                     <div class="text-xs text-slate-800 font-medium">${formattedDate}</div>
                     <div class="text-[11px] text-slate-400">${b.address}, ${b.city}</div>
                 </td>
-                <td class="py-4 px-6 font-bold text-xs text-slate-900">${parseFloat(b.total_price).toFixed(0)} MAD</td>
+                <td class="py-4 px-6 font-bold text-xs text-slate-900">${parseFloat(b.total_price).toFixed(0)} TND</td>
                 <td class="py-4 px-6">
                     <span class="inline-block px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider ${badgeClass}">
                         ${b.status.replace('_', ' ')}
@@ -641,7 +641,7 @@
                 <div>
                     <div class="flex items-center justify-between gap-2 mb-1.5">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">${s.category}</span>
-                        <span class="text-xs font-black text-slate-900">${parseFloat(s.price).toFixed(0)} MAD</span>
+                        <span class="text-xs font-black text-slate-900">${parseFloat(s.price).toFixed(0)} TND</span>
                     </div>
                     <h4 class="font-extrabold text-sm text-slate-900">${s.title}</h4>
                     <p class="text-xs text-slate-500 mt-1 line-clamp-2">${s.description || 'Professional service.'}</p>
@@ -741,7 +741,7 @@
         document.getElementById('clientNameDisplay').textContent = user.name;
         document.getElementById('clientAvatar').textContent = user.name.charAt(0).toUpperCase();
         document.getElementById('clientEmailDisplay').textContent = user.email;
-        document.getElementById('clientFullAddress').textContent = `${user.client_profile?.address || 'Boulevard d\'Anfa'}, ${user.client_profile?.city || 'Casablanca'}`;
+        document.getElementById('clientFullAddress').textContent = `${user.client_profile?.address || 'Les Berges du Lac 2'}, ${user.client_profile?.city || 'Tunis'}`;
     }
 
     // ── Logout ─────────────────────────────────────────────────────────────────

@@ -125,24 +125,31 @@
                     <label for="phone" class="block text-xs font-semibold text-slate-700 mb-1.5">
                         Phone Number <span id="phoneRequiredMark" class="text-slate-400 font-normal">(Optional)</span>
                     </label>
-                    <input type="tel" id="phone" name="phone" placeholder="+212 600 000 000"
+                    <input type="tel" id="phone" name="phone" placeholder="+216 20 000 000"
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                 </div>
 
                 <div>
                     <label for="city" class="block text-xs font-semibold text-slate-700 mb-1.5">
-                        City / Location
+                        City / Governorate (Gouvernorat)
                     </label>
                     <select id="city" name="city"
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition">
-                        <option value="">Select your city...</option>
-                        <option value="Casablanca">Casablanca</option>
-                        <option value="Rabat">Rabat</option>
-                        <option value="Marrakech">Marrakech</option>
-                        <option value="Tangier">Tangier</option>
-                        <option value="Fes">Fes</option>
-                        <option value="Agadir">Agadir</option>
-                        <option value="Mohammedia">Mohammedia</option>
+                        <option value="">Select your city in Tunisia...</option>
+                        <option value="Tunis">Tunis (تونس)</option>
+                        <option value="Ariana">Ariana (أريانة)</option>
+                        <option value="Ben Arous">Ben Arous (بن عروس)</option>
+                        <option value="Manouba">Manouba (منوبة)</option>
+                        <option value="La Marsa">La Marsa (المرسى)</option>
+                        <option value="Sousse">Sousse (سوسة)</option>
+                        <option value="Sfax">Sfax (صفاقس)</option>
+                        <option value="Monastir">Monastir (المنستير)</option>
+                        <option value="Nabeul">Nabeul / Hammamet (نابل)</option>
+                        <option value="Bizerte">Bizerte (بنزرت)</option>
+                        <option value="Kairouan">Kairouan (القيروان)</option>
+                        <option value="Djerba">Djerba (جربة)</option>
+                        <option value="Gabès">Gabès (قابس)</option>
+                        <option value="Mahdia">Mahdia (المهدية)</option>
                     </select>
                 </div>
             </div>
@@ -153,7 +160,7 @@
                     <label for="address" class="block text-xs font-semibold text-slate-700 mb-1.5">
                         Street Address (Optional)
                     </label>
-                    <input type="text" id="address" name="address" placeholder="e.g. 45 Boulevard d'Anfa, Appt 12"
+                    <input type="text" id="address" name="address" placeholder="e.g. Résidence Les Pins, Les Berges du Lac 2"
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                 </div>
             </div>
@@ -188,7 +195,7 @@
                         <label for="business_name" class="block text-xs font-semibold text-slate-700 mb-1.5">
                             Business / Trade Name (Optional)
                         </label>
-                        <input type="text" id="business_name" name="business_name" placeholder="e.g. Atlas Express Plumbing"
+                        <input type="text" id="business_name" name="business_name" placeholder="e.g. Express Plomberie Tunis"
                             class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition">
                     </div>
                 </div>
@@ -196,12 +203,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                         <label for="hourly_rate" class="block text-xs font-semibold text-slate-700 mb-1.5">
-                            Estimated Base Rate (MAD / hr)
+                            Estimated Base Rate (TND / hr)
                         </label>
                         <div class="relative">
-                            <input type="number" id="hourly_rate" name="hourly_rate" min="0" step="5" placeholder="120"
+                            <input type="number" id="hourly_rate" name="hourly_rate" min="0" step="5" placeholder="35"
                                 class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent pr-14 transition">
-                            <span class="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">MAD</span>
+                            <span class="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">TND</span>
                         </div>
                     </div>
 

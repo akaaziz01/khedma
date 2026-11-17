@@ -18,9 +18,9 @@ class AuthRegistrationTest extends TestCase
             'email' => 'sara@example.com',
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
-            'phone' => '+212600000001',
-            'city' => 'Casablanca',
-            'address' => '123 Boulevard Hassan II',
+            'phone' => '+21620000001',
+            'city' => 'Tunis',
+            'address' => 'Avenue Habib Bourguiba, Tunis',
         ];
 
         $response = $this->postJson('/api/v1/auth/register/client', $payload);
@@ -50,8 +50,8 @@ class AuthRegistrationTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('client_profiles', [
-            'city' => 'Casablanca',
-            'address' => '123 Boulevard Hassan II',
+            'city' => 'Tunis',
+            'address' => 'Avenue Habib Bourguiba, Tunis',
         ]);
     }
 
@@ -62,13 +62,13 @@ class AuthRegistrationTest extends TestCase
             'email' => 'ahmed@example.com',
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
-            'phone' => '+212600000002',
+            'phone' => '+21620000002',
             'category' => 'Electricity',
             'business_name' => 'Ahmed Elec Services',
             'bio' => 'Certified electrician with 7 years of experience.',
             'skills' => ['wiring', 'circuit breakers', 'smart lighting'],
-            'hourly_rate' => 150.00,
-            'city' => 'Rabat',
+            'hourly_rate' => 35.00,
+            'city' => 'Sousse',
         ];
 
         $response = $this->postJson('/api/v1/auth/register/provider', $payload);
@@ -104,7 +104,7 @@ class AuthRegistrationTest extends TestCase
         $this->assertDatabaseHas('provider_profiles', [
             'category' => 'Electricity',
             'business_name' => 'Ahmed Elec Services',
-            'city' => 'Rabat',
+            'city' => 'Sousse',
         ]);
     }
 
@@ -211,8 +211,8 @@ class AuthRegistrationTest extends TestCase
             'role' => UserRole::CLIENT,
         ]);
         $user->clientProfile()->create([
-            'city' => 'Marrakech',
-            'address' => 'Gueliz',
+            'city' => 'Sfax',
+            'address' => 'Route de Téniour',
         ]);
 
         $token = $user->createToken('test_token')->plainTextToken;
@@ -223,7 +223,7 @@ class AuthRegistrationTest extends TestCase
 
         $profileResponse->assertStatus(200)
             ->assertJsonPath('user.email', 'active@example.com')
-            ->assertJsonPath('user.client_profile.city', 'Marrakech');
+            ->assertJsonPath('user.client_profile.city', 'Sfax');
 
         // Logout
         $logoutResponse = $this->withHeader('Authorization', 'Bearer ' . $token)

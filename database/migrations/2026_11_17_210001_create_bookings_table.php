@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2);
             $table->dateTime('scheduled_at');
             $table->string('address');
-            $table->string('city')->default('Casablanca');
+            $table->string('city')->default('Tunis');
             $table->text('client_notes')->nullable();
             $table->text('provider_notes')->nullable();
             $table->dateTime('completed_at')->nullable();

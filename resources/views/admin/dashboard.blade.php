@@ -50,7 +50,7 @@
                                 Logged in as: <strong id="adminNameDisplay" class="text-white">Admin</strong>
                             </span>
                             <span class="text-slate-500">•</span>
-                            <span id="adminEmailDisplay" class="text-slate-400">admin@khedma.ma</span>
+                            <span id="adminEmailDisplay" class="text-slate-400">admin@khedma.tn</span>
                         </div>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Platform GMV (Revenue)</span>
                 <div class="flex items-baseline gap-2 mt-2">
                     <span id="statGMV" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
-                    <span class="text-xs font-bold text-slate-500">MAD</span>
+                    <span class="text-xs font-bold text-slate-500">TND</span>
                 </div>
                 <p class="text-xs text-emerald-600 font-semibold mt-2">Total volume completed</p>
             </div>
@@ -287,7 +287,7 @@
                 ? 'bg-emerald-100 text-emerald-800' 
                 : 'bg-red-100 text-red-800';
 
-            const city = u.client_profile?.city || u.provider_profile?.city || 'Casablanca';
+            const city = u.client_profile?.city || u.provider_profile?.city || 'Tunis';
 
             const adminUser = JSON.parse(localStorage.getItem('khedma_user'));
             const isSelf = adminUser && adminUser.id === u.id;
@@ -386,7 +386,7 @@
                 <td class="py-4 px-6 text-xs font-bold text-slate-900">${b.client?.name || 'Client'}</td>
                 <td class="py-4 px-6 text-xs font-bold text-amber-800">${b.provider?.name || 'Provider'}</td>
                 <td class="py-4 px-6 text-xs text-slate-700">${b.service_title}</td>
-                <td class="py-4 px-6 font-bold text-xs text-slate-900">${parseFloat(b.total_price).toFixed(0)} MAD</td>
+                <td class="py-4 px-6 font-bold text-xs text-slate-900">${parseFloat(b.total_price).toFixed(0)} TND</td>
                 <td class="py-4 px-6">
                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
                         ${b.status}

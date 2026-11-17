@@ -25,9 +25,9 @@ Creates a client account and returns an API Bearer token with `['role:client']` 
   "email": "sara@example.com",
   "password": "SecurePass123!",
   "password_confirmation": "SecurePass123!",
-  "phone": "+212600000001",
-  "city": "Casablanca",
-  "address": "123 Boulevard Hassan II"
+  "phone": "+21620000001",
+  "city": "Tunis",
+  "address": "15 Avenue Habib Bourguiba"
 }
 ```
 
@@ -42,14 +42,14 @@ Creates a client account and returns an API Bearer token with `['role:client']` 
     "name": "Sara Client",
     "email": "sara@example.com",
     "role": "client",
-    "phone": "+212600000001",
+    "phone": "+21620000001",
     "status": "active",
     "email_verified": false,
     "client_profile": {
       "id": 1,
       "user_id": 1,
-      "city": "Casablanca",
-      "address": "123 Boulevard Hassan II"
+      "city": "Tunis",
+      "address": "15 Avenue Habib Bourguiba"
     },
     "created_at": "2026-11-17T19:52:16.000000Z",
     "updated_at": "2026-11-17T19:52:16.000000Z"
@@ -73,13 +73,13 @@ Creates a provider account with professional details and returns a Bearer token 
   "email": "ahmed@example.com",
   "password": "SecurePass123!",
   "password_confirmation": "SecurePass123!",
-  "phone": "+212600000002",
+  "phone": "+21620000002",
   "category": "Electricity",
   "business_name": "Ahmed Elec Services",
-  "bio": "Certified electrician with 7 years of experience.",
+  "bio": "Certified electrician with 7 years of experience in Grand Tunis.",
   "skills": ["wiring", "circuit breakers", "smart lighting"],
-  "hourly_rate": 150.00,
-  "city": "Rabat"
+  "hourly_rate": 45.00,
+  "city": "Tunis"
 }
 ```
 
@@ -94,7 +94,7 @@ Creates a provider account with professional details and returns a Bearer token 
     "name": "Ahmed Electrician",
     "email": "ahmed@example.com",
     "role": "provider",
-    "phone": "+212600000002",
+    "phone": "+21620000002",
     "status": "active",
     "email_verified": false,
     "provider_profile": {
@@ -102,10 +102,10 @@ Creates a provider account with professional details and returns a Bearer token 
       "user_id": 2,
       "business_name": "Ahmed Elec Services",
       "category": "Electricity",
-      "bio": "Certified electrician with 7 years of experience.",
+      "bio": "Certified electrician with 7 years of experience in Grand Tunis.",
       "skills": ["wiring", "circuit breakers", "smart lighting"],
-      "hourly_rate": "150.00",
-      "city": "Rabat",
+      "hourly_rate": "45.00",
+      "city": "Tunis",
       "is_available": true
     },
     "created_at": "2026-11-17T19:52:16.000000Z",

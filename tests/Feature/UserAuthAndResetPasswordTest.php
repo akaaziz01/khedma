@@ -22,7 +22,7 @@ class UserAuthAndResetPasswordTest extends TestCase
             'role' => UserRole::CLIENT,
             'status' => 'active',
         ]);
-        $user->clientProfile()->create(['city' => 'Casablanca']);
+        $user->clientProfile()->create(['city' => 'Tunis']);
 
         $response = $this->postJson('/api/v1/auth/login', [
             'email' => 'sara@khedma.ma',
