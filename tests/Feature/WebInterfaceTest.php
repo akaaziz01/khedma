@@ -41,6 +41,14 @@ class WebInterfaceTest extends TestCase
         $response->assertSee('Dashboard');
     }
 
+    public function test_profile_page_is_accessible(): void
+    {
+        $response = $this->get('/profile');
+        $response->assertStatus(200);
+        $response->assertSee('Manage Profile');
+        $response->assertSee('My Profile');
+    }
+
     public function test_admin_dashboard_has_sidebar_and_no_header_menu(): void
     {
         $response = $this->get('/admin/dashboard');

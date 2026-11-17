@@ -210,6 +210,10 @@
                                 <span class="font-bold text-slate-900 dark:text-white block truncate" id="dropdownUserEmail">user@khedma.tn</span>
                                 <span class="text-[10px] text-slate-400">Authenticated via Sanctum</span>
                             </div>
+                            <a href="/profile" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                <i class="bi bi-person text-sm text-slate-500"></i>
+                                My Profile
+                            </a>
                             <a href="/dashboard" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
                                 <i class="bi bi-speedometer2 text-sm text-slate-500"></i>
                                 My Dashboard
@@ -331,7 +335,12 @@
                     authControls.classList.remove('hidden');
 
                     document.getElementById('headerUserName').textContent = user.name;
-                    document.getElementById('headerUserAvatar').textContent = user.name.charAt(0).toUpperCase();
+                    const avatarEl = document.getElementById('headerUserAvatar');
+                    if (user.avatar_url) {
+                        avatarEl.innerHTML = `<img src="${user.avatar_url}" alt="${user.name}" class="w-full h-full object-cover rounded-full">`;
+                    } else {
+                        avatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
+                    }
                     document.getElementById('dropdownUserEmail').textContent = user.email;
 
                     // Show dashboard links in main nav
@@ -355,16 +364,22 @@
                     }
 
                     if (mobileFooter) {
+                        const mobAvatar = user.avatar_url
+                            ? `<img src="${user.avatar_url}" alt="${user.name}" class="w-8 h-8 rounded-full object-cover">`
+                            : `<div class="w-8 h-8 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center">${(user.name || 'U').charAt(0).toUpperCase()}</div>`;
+
                         mobileFooter.innerHTML = `
                             <div class="flex items-center gap-2 mb-3">
-                                <div class="w-8 h-8 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center">
-                                    ${user.name.charAt(0).toUpperCase()}
-                                </div>
+                                ${mobAvatar}
                                 <div class="truncate">
-                                    <div class="text-xs font-bold text-slate-900">${user.name}</div>
+                                    <div class="text-xs font-bold text-slate-900 dark:text-white">${user.name}</div>
                                     <div class="text-[10px] text-slate-400 truncate">${user.email}</div>
                                 </div>
                             </div>
+                            <a href="/profile" class="w-full mb-2 py-2 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl flex items-center justify-center gap-2">
+                                <i class="bi bi-person"></i>
+                                <span>My Profile</span>
+                            </a>
                             <button onclick="handleLogoutGlobal()" class="w-full py-2 bg-red-50 text-red-600 font-bold text-xs rounded-xl flex items-center justify-center gap-2 border border-red-200">
                                 <span>Logout</span>
                             </button>
