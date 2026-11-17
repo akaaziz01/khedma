@@ -4,16 +4,25 @@
 
 @section('content')
 <div class="py-12 px-4 sm:px-6 lg:px-8 max-w-md mx-auto">
+    <!-- Admin Security Notice if visiting admin portal -->
+    <div id="adminPortalBadge" class="hidden mb-6 p-3 rounded-2xl bg-slate-900 text-white text-xs flex items-center justify-between border border-slate-700 shadow-md">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            <span class="font-bold">Admin Portal Access</span>
+        </div>
+        <span class="text-[10px] text-slate-400">Authorized personnel only</span>
+    </div>
+
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight" id="loginHeading">
             Welcome Back
         </h1>
-        <p class="mt-2 text-sm text-slate-600">
-            Sign in to access your Khedma client or provider account.
+        <p class="mt-2 text-sm text-slate-600" id="loginSub">
+            Sign in to access your Khedma client, provider, or administrator account.
         </p>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 p-6 sm:p-8">
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200 p-6 sm:p-8">
         <!-- Error alert -->
         <div id="errorAlert" class="hidden mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
             <span id="errorMessage">Invalid credentials.</span>
@@ -53,16 +62,24 @@
             <span class="block text-center text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
                 Quick-Fill Demo Accounts
             </span>
-            <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <!-- Client Demo -->
                 <button type="button" onclick="fillDemo('client@khedma.ma', 'Password123!')"
-                    class="p-2.5 rounded-lg border border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 font-medium transition text-left">
-                    <div class="font-bold">👤 Demo Client</div>
-                    <div class="text-[10px] text-slate-500 truncate">client@khedma.ma</div>
+                    class="p-2 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 font-medium transition text-left">
+                    <div class="font-bold text-[11px]">👤 Client</div>
+                    <div class="text-[9px] text-slate-500 truncate">client@khedma.ma</div>
                 </button>
+                <!-- Provider Demo -->
                 <button type="button" onclick="fillDemo('provider@khedma.ma', 'Password123!')"
-                    class="p-2.5 rounded-lg border border-amber-200 bg-amber-50/50 hover:bg-amber-100/50 text-amber-800 font-medium transition text-left">
-                    <div class="font-bold">🛠️ Demo Provider</div>
-                    <div class="text-[10px] text-slate-500 truncate">provider@khedma.ma</div>
+                    class="p-2 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100/50 text-amber-800 font-medium transition text-left">
+                    <div class="font-bold text-[11px]">🛠️ Provider</div>
+                    <div class="text-[9px] text-slate-500 truncate">provider@khedma.ma</div>
+                </button>
+                <!-- Admin Demo -->
+                <button type="button" onclick="fillDemo('admin@khedma.ma', 'AdminPass123!')"
+                    class="p-2 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-100/50 text-red-800 font-medium transition text-left">
+                    <div class="font-bold text-[11px]">🛡️ Admin</div>
+                    <div class="text-[9px] text-slate-500 truncate">admin@khedma.ma</div>
                 </button>
             </div>
         </div>
@@ -77,6 +94,16 @@
 
 @section('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const isAdminPath = window.location.pathname.includes('/admin') || window.location.search.includes('admin=1');
+        if (isAdminPath) {
+            document.getElementById('adminPortalBadge').classList.remove('hidden');
+            document.getElementById('loginHeading').textContent = 'Admin Portal Access';
+            document.getElementById('loginSub').textContent = 'Secure administration area for authorized platform supervisors.';
+            fillDemo('admin@khedma.ma', 'AdminPass123!');
+        }
+    });
+
     function fillDemo(email, password) {
         document.getElementById('email').value = email;
         document.getElementById('password').value = password;
@@ -114,7 +141,13 @@
             if (res.ok && data.access_token) {
                 localStorage.setItem('khedma_token', data.access_token);
                 localStorage.setItem('khedma_user', JSON.stringify(data.user));
-                window.location.href = '/dashboard';
+
+                // If user is Admin, redirect directly to Admin Area!
+                if (data.user.role === 'admin') {
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    window.location.href = '/dashboard';
+                }
             } else {
                 errorMessage.textContent = data.message || 'Invalid email or password.';
                 errorAlert.classList.remove('hidden');

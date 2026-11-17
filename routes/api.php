@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProviderDashboardController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,13 @@ Route::prefix('v1')->group(function () {
             Route::post('/availability', [ProviderDashboardController::class, 'toggleAvailability']);
             Route::post('/services', [ProviderDashboardController::class, 'createService']);
             Route::post('/profile', [ProviderDashboardController::class, 'updateProfile']);
+        });
+
+        // Admin Management Area (Secured with Admin Middleware)
+        Route::middleware('admin')->prefix('admin')->group(function () {
+            Route::get('/dashboard', [AdminController::class, 'data']);
+            Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
+            Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
         });
     });
 });
