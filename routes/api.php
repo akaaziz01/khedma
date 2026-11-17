@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProviderDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/user', [AuthController::class, 'user']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
+
+        // Profile Management API
+        Route::get('/profile', [ProfileController::class, 'show']);
+        Route::post('/profile', [ProfileController::class, 'update']);
+        Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar']);
 
         // Provider Dashboard API (Spotlight inspired with real DB data)
         Route::prefix('provider')->group(function () {
