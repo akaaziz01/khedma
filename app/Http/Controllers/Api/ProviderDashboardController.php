@@ -169,7 +169,12 @@ class ProviderDashboardController extends Controller
     public function updateProfile(Request $request): JsonResponse
     {
         $provider = $request->user();
-        $profile = $provider->providerProfile;
+
+        if (! $provider->isProvider()) {
+            return response()->json([
+                'message' => 'Unauthorized: User is not a provider.',
+            ], 403);
+        }
 
         $validated = $request->validate([
             'business_name' => ['nullable', 'string', 'max:150'],
@@ -186,9 +191,12 @@ class ProviderDashboardController extends Controller
             $provider->save();
         }
 
-        if ($profile) {
-            $profile->update($validated);
-        }
+        $profileData = collect($validated)->except('phone')->toArray();
+
+        $profile = $provider->providerProfile()->updateOrCreate(
+            ['user_id' => $provider->id],
+            $profileData
+        );
 
         return response()->json([
             'message' => 'Profile updated successfully.',
