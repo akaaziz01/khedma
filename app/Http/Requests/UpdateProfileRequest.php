@@ -41,8 +41,8 @@ class UpdateProfileRequest extends FormRequest
         $isClient = $user?->isClient();
 
         $existingCity = $isProvider
-            ? $user->providerProfile?->city
-            : ($isClient ? $user->clientProfile?->city : null);
+            ? $user->providerProfile()->value('city')
+            : ($isClient ? $user->clientProfile()->value('city') : null);
 
         $cityRule = function (string $attribute, mixed $value, \Closure $fail) use ($existingCity) {
             if ($value === null || $value === '') {
