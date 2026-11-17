@@ -52,8 +52,9 @@
 <body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen antialiased">
 
     <!-- ======================================================== -->
-    <!-- SPOTLIGHT FIXED APP HEADER                               -->
+    <!-- SPOTLIGHT FIXED APP HEADER (CLIENT & PROVIDER ONLY)       -->
     <!-- ======================================================== -->
+    @if(!request()->is('admin*'))
     <header class="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-md shadow-xs">
         <div class="mx-auto flex h-16 items-center px-4 md:max-w-7xl justify-between">
 
@@ -226,6 +227,7 @@
 
     <!-- Header Spacer to prevent layout shift under fixed header -->
     <div class="h-16"></div>
+    @endif
 
     <!-- ======================================================== -->
     <!-- SPOTLIGHT MOBILE OFF-CANVAS SHEET DRAWER                 -->

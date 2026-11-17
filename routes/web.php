@@ -14,6 +14,10 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
+Route::get('/admin', function () {
+    return redirect('/admin/dashboard');
+})->name('admin');
+
 Route::get('/admin/login', function () {
     return view('auth.login');
 })->name('admin.login');

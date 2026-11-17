@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Admin Area | Khedma')
+@section('title', 'Admin Operations Console | KHEDMA')
 
 @section('content')
-<div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+<div class="max-w-7xl mx-auto space-y-8">
     <!-- Loading skeleton -->
     <div id="loadingState" class="py-24 text-center">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-red-600 border-t-transparent mb-4"></div>
@@ -240,6 +240,22 @@
             document.getElementById('adminNameDisplay').textContent = adminUser.name;
             document.getElementById('adminEmailDisplay').textContent = adminUser.email;
 
+            // Update dedicated admin sidebar items
+            if (document.getElementById('sidebarUserCountBadge')) {
+                document.getElementById('sidebarUserCountBadge').textContent = metrics.total_users;
+            }
+            if (document.getElementById('sidebarBookingsCountBadge')) {
+                document.getElementById('sidebarBookingsCountBadge').textContent = metrics.total_bookings;
+            }
+            if (document.getElementById('sidebarGMVDisplay')) {
+                document.getElementById('sidebarGMVDisplay').textContent = metrics.platform_gmv.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+            if (document.getElementById('adminSidebarName') && adminUser) {
+                document.getElementById('adminSidebarName').textContent = adminUser.name;
+                document.getElementById('adminSidebarEmail').textContent = adminUser.email;
+                document.getElementById('adminSidebarAvatar').textContent = adminUser.name.charAt(0).toUpperCase();
+            }
+
             renderUsersTable(allUsers);
             renderAdminBookingsTable(allBookings);
 
@@ -249,6 +265,9 @@
             console.error(e);
         }
     }
+
+    window.loadAdminDashboard = loadAdminDashboard;
+    window.switchAdminTab = switchAdminTab;
 
     function switchAdminTab(tab) {
         const uBtn = document.getElementById('tabUsersBtn');
