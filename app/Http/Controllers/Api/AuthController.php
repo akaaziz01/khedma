@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterClientRequest;
 use App\Http\Requests\RegisterProviderRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -149,7 +154,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout and revoke token.
+     * Logout and revoke current token.
      */
     public function logout(Request $request): JsonResponse
     {
@@ -157,6 +162,77 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged out successfully.',
+        ]);
+    }
+
+    /**
+     * Logout and revoke all tokens across all devices.
+     */
+    public function logoutAll(Request $request): JsonResponse
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'message' => 'Logged out from all devices successfully.',
+        ]);
+    }
+
+    /**
+     * Send password reset token / link.
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        // Generate password reset token via Laravel broker
+        $token = Password::broker()->createToken($user);
+
+        // Build reset link
+        $resetUrl = url("/reset-password?token={$token}&email=" . urlencode($user->email));
+
+        return response()->json([
+            'message' => 'Password reset instructions have been generated.',
+            'reset_token' => $token,
+            'reset_url' => $resetUrl,
+        ]);
+    }
+
+    /**
+     * Reset password using token.
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        $status = Password::broker()->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                // Revoke all prior active tokens for security
+                $user->tokens()->delete();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            $user = User::where('email', $request->email)->first();
+            $roleSlug = $user->role instanceof UserRole ? $user->role->value : $user->role;
+            $newToken = $user->createToken('auth_token', ["role:{$roleSlug}"])->plainTextToken;
+
+            return response()->json([
+                'message' => 'Your password has been successfully reset! You can now log in with your new password.',
+                'access_token' => $newToken,
+                'token_type' => 'Bearer',
+                'user' => new UserResource($user),
+            ]);
+        }
+
+        throw ValidationException::withMessages([
+            'email' => [__($status)],
         ]);
     }
 }

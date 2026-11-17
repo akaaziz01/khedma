@@ -33,6 +33,9 @@
                     <label for="password" class="block text-xs font-semibold text-slate-700">
                         Password
                     </label>
+                    <a href="/forgot-password" class="text-xs font-semibold text-blue-600 hover:text-blue-700">
+                        Forgot password?
+                    </a>
                 </div>
                 <input type="password" id="password" name="password" required placeholder="••••••••"
                     class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
