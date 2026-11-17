@@ -37,15 +37,15 @@
                             <p id="providerBusinessSub" class="text-sm text-amber-100 font-medium mt-1">Amrani Plomberie & Chauffage Grand Tunis</p>
                             <div class="mt-2 flex items-center gap-4 text-xs text-amber-100/90 flex-wrap">
                                 <span class="flex items-center gap-1.5" id="providerLocationDisplay">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                                    <i class="bi bi-geo-alt-fill text-amber-200"></i>
                                     Tunis
                                 </span>
                                 <span class="flex items-center gap-1.5" id="providerPhoneDisplay">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                    <i class="bi bi-telephone-fill text-amber-200"></i>
                                     +216 98 998 877
                                 </span>
                                 <span class="flex items-center gap-1.5">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <i class="bi bi-cash-stack text-amber-200"></i>
                                     <strong id="providerRateDisplayBanner">35</strong> TND / hr
                                 </span>
                             </div>
@@ -63,12 +63,13 @@
 
                         <button onclick="openAddServiceModal()"
                             class="px-4 py-2.5 rounded-xl bg-white text-amber-800 hover:bg-amber-50 text-xs font-extrabold transition flex items-center gap-1.5 shadow-md">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            <i class="bi bi-plus-lg text-sm"></i>
                             Add Service
                         </button>
 
                         <button onclick="handleLogout()"
-                            class="px-3.5 py-2.5 rounded-xl bg-black/20 hover:bg-black/30 text-xs font-bold transition text-amber-100 hover:text-white border border-white/20">
+                            class="px-3.5 py-2.5 rounded-xl bg-black/20 hover:bg-black/30 text-xs font-bold transition text-amber-100 hover:text-white border border-white/20 flex items-center gap-1.5">
+                            <i class="bi bi-box-arrow-right text-sm"></i>
                             Logout
                         </button>
                     </div>
@@ -78,90 +79,91 @@
             <!-- 2. Spotlight 4 Stat Metric Cards (Direct from MySQL) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <!-- Total Revenue Card -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Revenue</span>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
-                            TND
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total Revenue</span>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                            <i class="bi bi-cash-coin text-lg"></i>
                         </div>
                     </div>
                     <div class="mt-4 flex items-baseline gap-2">
-                        <span id="statRevenue" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
-                        <span class="text-xs font-bold text-slate-500">TND</span>
+                        <span id="statRevenue" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</span>
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400">TND</span>
                     </div>
-                    <p class="text-xs text-emerald-600 font-semibold mt-2 flex items-center gap-1">
-                        <span>↑</span> From completed client jobs
+                    <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2 flex items-center gap-1">
+                        <i class="bi bi-arrow-up-right"></i> From completed client jobs
                     </p>
                 </div>
 
                 <!-- Active Jobs Card -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Jobs</span>
-                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Active Jobs</span>
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                            <i class="bi bi-hourglass-split text-lg"></i>
                         </div>
                     </div>
                     <div class="mt-4">
-                        <span id="statActiveJobs" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
+                        <span id="statActiveJobs" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</span>
                     </div>
-                    <p class="text-xs text-blue-600 font-semibold mt-2">Accepted & in-progress</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-2">Accepted & in-progress</p>
                 </div>
 
                 <!-- Pending Leads Card -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">New Leads</span>
-                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">New Leads</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center">
+                            <i class="bi bi-bell-fill text-lg"></i>
                         </div>
                     </div>
                     <div class="mt-4">
-                        <span id="statPendingLeads" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
+                        <span id="statPendingLeads" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</span>
                     </div>
-                    <p class="text-xs text-amber-600 font-semibold mt-2">Awaiting your acceptance</p>
+                    <p class="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-2">Awaiting your acceptance</p>
                 </div>
 
                 <!-- Overall Rating Card -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Client Rating</span>
-                        <div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center font-bold">
-                            ★
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Client Rating</span>
+                        <div class="w-10 h-10 rounded-xl bg-yellow-100 dark:bg-yellow-950/60 text-yellow-600 dark:text-yellow-400 flex items-center justify-center font-bold">
+                            <i class="bi bi-star-fill text-base"></i>
                         </div>
                     </div>
                     <div class="mt-4 flex items-baseline gap-2">
-                        <span id="statRating" class="text-3xl font-black text-slate-900 tracking-tight">5.0</span>
-                        <span class="text-xs text-slate-400 font-medium">/ 5.0</span>
+                        <span id="statRating" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">5.0</span>
+                        <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">/ 5.0</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-2 font-medium" id="statReviewCount">Based on real client reviews</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium" id="statReviewCount">Based on real client reviews</p>
                 </div>
             </div>
 
             <!-- 3. Interactive Bookings / Service Requests Table (Real Database Records) -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden transition">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                            <span>📋</span> Client Bookings & Job Inquiries
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                            <i class="bi bi-journal-check text-amber-600 dark:text-amber-400"></i>
+                            <span>Client Bookings & Job Inquiries</span>
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">Live requests from MySQL database `bookings` table.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Live requests from MySQL database `bookings` table.</p>
                     </div>
 
                     <!-- Status Filters (Spotlight Style) -->
-                    <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-bold flex-wrap">
-                        <button onclick="filterBookings('all')" id="filterAll" class="px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-900">All</button>
-                        <button onclick="filterBookings('pending')" id="filterPending" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">Pending</button>
-                        <button onclick="filterBookings('accepted')" id="filterAccepted" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">Accepted</button>
-                        <button onclick="filterBookings('in_progress')" id="filterInProgress" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">In Progress</button>
-                        <button onclick="filterBookings('completed')" id="filterCompleted" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">Completed</button>
+                    <div class="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold flex-wrap border border-transparent dark:border-slate-700/60">
+                        <button onclick="filterBookings('all')" id="filterAll" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white">All</button>
+                        <button onclick="filterBookings('pending')" id="filterPending" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Pending</button>
+                        <button onclick="filterBookings('accepted')" id="filterAccepted" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Accepted</button>
+                        <button onclick="filterBookings('in_progress')" id="filterInProgress" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">In Progress</button>
+                        <button onclick="filterBookings('completed')" id="filterCompleted" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Completed</button>
                     </div>
                 </div>
 
                 <!-- Bookings Table -->
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                    <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                        <thead class="bg-slate-50 dark:bg-slate-800/60 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                             <tr>
                                 <th class="py-3.5 px-6">Booking #</th>
                                 <th class="py-3.5 px-6">Client</th>
@@ -172,7 +174,7 @@
                                 <th class="py-3.5 px-6 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="bookingsTableBody" class="divide-y divide-slate-100">
+                        <tbody id="bookingsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
                             <!-- Populated with real database rows -->
                         </tbody>
                     </table>
@@ -182,16 +184,17 @@
             <!-- 4. Two Columns: Services Catalog & Recent Client Reviews -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Services Catalog (2 cols) -->
-                <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                                <span>🛠️</span> My Service Offerings
+                            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="bi bi-tools text-amber-600 dark:text-amber-400"></i>
+                                <span>My Service Offerings</span>
                             </h3>
-                            <p class="text-xs text-slate-500 mt-1">Real service records currently live in MySQL database.</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Real service records currently live in MySQL database.</p>
                         </div>
-                        <button onclick="openAddServiceModal()" class="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-200 transition">
-                            + Add Service
+                        <button onclick="openAddServiceModal()" class="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 font-bold text-xs border border-amber-200 dark:border-amber-800/60 transition flex items-center gap-1.5">
+                            <i class="bi bi-plus-lg text-xs"></i> Add Service
                         </button>
                     </div>
 
@@ -201,12 +204,13 @@
                 </div>
 
                 <!-- Recent Client Reviews (1 col) -->
-                <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-6">
                     <div>
-                        <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                            <span>⭐</span> Verified Client Reviews
+                        <h3 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="bi bi-chat-square-quote-fill text-amber-500"></i>
+                            <span>Verified Client Reviews</span>
                         </h3>
-                        <p class="text-xs text-slate-500 mt-1">Feedback linked to completed bookings.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Feedback linked to completed bookings.</p>
                     </div>
 
                     <div id="reviewsList" class="space-y-4">
@@ -216,17 +220,18 @@
             </div>
 
             <!-- 5. Provider Profile & Bio Card -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-4">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <span>📝</span> Professional Bio & Specializations
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="bi bi-person-badge-fill text-amber-600 dark:text-amber-400"></i>
+                        <span>Professional Bio & Specializations</span>
                     </h3>
                 </div>
-                <p id="providerBioText" class="text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed italic">
+                <p id="providerBioText" class="text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 leading-relaxed italic">
                     Loading bio...
                 </p>
                 <div>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Registered Skills & Certifications</span>
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2">Registered Skills & Certifications</span>
                     <div id="providerSkillsContainer" class="flex flex-wrap gap-2"></div>
                 </div>
             </div>
@@ -245,32 +250,33 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h1 id="clientNameDisplay" class="text-2xl font-extrabold">Fatima Zahra</h1>
+                            <h1 id="clientNameDisplay" class="text-2xl font-extrabold">Mariem Ben Salem</h1>
                             <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20">Client</span>
                         </div>
                         <p id="clientEmailDisplay" class="text-xs text-blue-100 mt-1">client@khedma.tn</p>
                     </div>
                 </div>
-                <button onclick="handleLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl border border-white/30 transition">
+                <button onclick="handleLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl border border-white/30 transition flex items-center gap-1.5">
+                    <i class="bi bi-box-arrow-right text-xs"></i>
                     Logout
                 </button>
             </div>
 
             <!-- Client Info Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-bold uppercase text-slate-400 block mb-1">My Address</span>
-                    <p id="clientFullAddress" class="text-sm font-semibold text-slate-800 mt-2">Tunis</p>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <span class="text-xs font-bold uppercase text-slate-400 dark:text-slate-500 block mb-1">My Address</span>
+                    <p id="clientFullAddress" class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-2">Tunis</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-bold uppercase text-slate-400 block mb-1">Current Active Bookings</span>
-                    <p class="text-3xl font-black text-slate-900 mt-2">2</p>
-                    <p class="text-xs text-blue-600 mt-1 font-semibold">1 urgent leak repair in progress</p>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <span class="text-xs font-bold uppercase text-slate-400 dark:text-slate-500 block mb-1">Current Active Bookings</span>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white mt-2">2</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-semibold">1 urgent leak repair in progress</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-bold uppercase text-slate-400 block mb-1">Quick Action</span>
-                        <p class="text-sm font-semibold text-slate-800">Find & Hire a Pro</p>
+                        <span class="text-xs font-bold uppercase text-slate-400 dark:text-slate-500 block mb-1">Quick Action</span>
+                        <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Find & Hire a Pro</p>
                     </div>
                     <a href="/register?role=provider" class="mt-4 text-center py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition">
                         Explore Providers
@@ -285,11 +291,13 @@
 <!-- ========================================== -->
 <!-- MODAL: ADD NEW SERVICE                     -->
 <!-- ========================================== -->
-<div id="addServiceModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 sm:p-8 space-y-6">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 class="text-lg font-extrabold text-slate-900">Add New Service Offering</h3>
-            <button onclick="closeAddServiceModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+<div id="addServiceModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 sm:p-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Add New Service Offering</h3>
+            <button onclick="closeAddServiceModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-base font-bold">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
 
         <form onsubmit="handleCreateService(event)" class="space-y-4">

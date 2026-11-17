@@ -34,7 +34,7 @@
             <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-start sm:items-center gap-5">
                     <div class="w-16 h-16 rounded-2xl bg-red-500/20 border border-red-500/30 text-red-400 font-black text-2xl flex items-center justify-center shadow-lg shrink-0">
-                        🛡️
+                        <i class="bi bi-shield-shaded text-2xl text-red-400"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2.5 flex-wrap">
@@ -57,7 +57,7 @@
 
                 <div class="flex items-center gap-3">
                     <button onclick="handleLogoutGlobal()" class="px-4 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 hover:text-white border border-red-500/30 text-xs font-bold transition flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <i class="bi bi-box-arrow-right text-sm"></i>
                         Logout Admin
                     </button>
                 </div>
@@ -67,72 +67,82 @@
         <!-- 2. System KPI Metric Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Platform GMV -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Platform GMV (Revenue)</span>
+            <div class="bg-white dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors duration-200">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mb-1">
+                    <i class="bi bi-cash-stack text-emerald-500"></i> Platform GMV (Revenue)
+                </span>
                 <div class="flex items-baseline gap-2 mt-2">
-                    <span id="statGMV" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
-                    <span class="text-xs font-bold text-slate-500">TND</span>
+                    <span id="statGMV" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</span>
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">TND</span>
                 </div>
-                <p class="text-xs text-emerald-600 font-semibold mt-2">Total volume completed</p>
+                <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2">Total volume completed</p>
             </div>
 
             <!-- Total Users -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Registered Users</span>
+            <div class="bg-white dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors duration-200">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mb-1">
+                    <i class="bi bi-people-fill text-blue-500"></i> Total Registered Users
+                </span>
                 <div class="flex items-baseline gap-2 mt-2">
-                    <span id="statTotalUsers" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
+                    <span id="statTotalUsers" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</span>
                 </div>
-                <p class="text-xs text-slate-500 font-semibold mt-2" id="statUsersBreakdown">0 Clients • 0 Providers</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-2" id="statUsersBreakdown">0 Clients • 0 Providers</p>
             </div>
 
             <!-- Total Bookings -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Bookings</span>
+            <div class="bg-white dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors duration-200">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mb-1">
+                    <i class="bi bi-calendar2-check-fill text-amber-500"></i> Total Bookings
+                </span>
                 <div class="flex items-baseline gap-2 mt-2">
-                    <span id="statTotalBookings" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
+                    <span id="statTotalBookings" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</span>
                 </div>
-                <p class="text-xs text-blue-600 font-semibold mt-2" id="statBookingsBreakdown">0 Completed • 0 Active</p>
+                <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-2" id="statBookingsBreakdown">0 Completed • 0 Active</p>
             </div>
 
             <!-- Active Services -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Active Services Catalog</span>
+            <div class="bg-white dark:bg-slate-950/80 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors duration-200">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mb-1">
+                    <i class="bi bi-tools text-emerald-500"></i> Active Services Catalog
+                </span>
                 <div class="flex items-baseline gap-2 mt-2">
-                    <span id="statServicesCount" class="text-3xl font-black text-slate-900 tracking-tight">0</span>
+                    <span id="statServicesCount" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0</span>
                 </div>
-                <p class="text-xs text-amber-600 font-semibold mt-2">Services offered by pros</p>
+                <p class="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-2">Services offered by pros</p>
             </div>
         </div>
 
         <!-- 3. Navigation Tabs: Users Management vs Platform Bookings -->
-        <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
-            <button onclick="switchAdminTab('users')" id="tabUsersBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-slate-900 text-white shadow-sm transition">
-                👥 Users Management
+        <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <button onclick="switchAdminTab('users')" id="tabUsersBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-slate-900 dark:bg-slate-800 text-white shadow-sm transition flex items-center gap-2">
+                <i class="bi bi-people-fill text-blue-400"></i>
+                <span>Users Management</span>
             </button>
-            <button onclick="switchAdminTab('bookings')" id="tabBookingsBtn" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
-                📋 Platform Bookings
+            <button onclick="switchAdminTab('bookings')" id="tabBookingsBtn" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2">
+                <i class="bi bi-calendar2-check-fill text-amber-400"></i>
+                <span>Platform Bookings</span>
             </button>
         </div>
 
         <!-- 4. Tab 1: Users Management Table -->
-        <div id="sectionUsers" class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div id="sectionUsers" class="bg-white dark:bg-slate-950 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-200">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-lg font-extrabold text-slate-900 tracking-tight">Platform Users & Access Control</h2>
-                    <p class="text-xs text-slate-500 mt-1">Manage user roles, inspect profiles, and suspend/activate accounts.</p>
+                    <h2 class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Platform Users & Access Control</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Manage user roles, inspect profiles, and suspend/activate accounts.</p>
                 </div>
                 <!-- Role filter -->
-                <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-bold">
-                    <button onclick="filterUsers('all')" id="userFilterAll" class="px-3 py-1 rounded-lg bg-white text-slate-900 shadow-xs">All</button>
-                    <button onclick="filterUsers('client')" id="userFilterClient" class="px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900">Clients</button>
-                    <button onclick="filterUsers('provider')" id="userFilterProvider" class="px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900">Providers</button>
-                    <button onclick="filterUsers('admin')" id="userFilterAdmin" class="px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900">Admins</button>
+                <div class="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-bold border border-transparent dark:border-slate-800">
+                    <button onclick="filterUsers('all')" id="userFilterAll" class="px-3 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs">All</button>
+                    <button onclick="filterUsers('client')" id="userFilterClient" class="px-3 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Clients</button>
+                    <button onclick="filterUsers('provider')" id="userFilterProvider" class="px-3 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Providers</button>
+                    <button onclick="filterUsers('admin')" id="userFilterAdmin" class="px-3 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Admins</button>
                 </div>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                    <thead class="bg-slate-50 dark:bg-slate-900/60 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                         <tr>
                             <th class="py-3.5 px-6">User</th>
                             <th class="py-3.5 px-6">Role</th>
@@ -142,7 +152,7 @@
                             <th class="py-3.5 px-6 text-right">Moderation Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="usersTableBody" class="divide-y divide-slate-100">
+                    <tbody id="usersTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/80">
                         <!-- Populated dynamically -->
                     </tbody>
                 </table>
@@ -150,15 +160,15 @@
         </div>
 
         <!-- 5. Tab 2: Platform Bookings Table -->
-        <div id="sectionBookings" class="hidden bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-slate-100">
-                <h2 class="text-lg font-extrabold text-slate-900 tracking-tight">Platform-Wide Service Bookings</h2>
-                <p class="text-xs text-slate-500 mt-1">All service agreements between clients and providers.</p>
+        <div id="sectionBookings" class="hidden bg-white dark:bg-slate-950 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-200">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+                <h2 class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Platform-Wide Service Bookings</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">All service agreements between clients and providers.</p>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                    <thead class="bg-slate-50 dark:bg-slate-900/60 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                         <tr>
                             <th class="py-3.5 px-6">Booking #</th>
                             <th class="py-3.5 px-6">Client</th>
@@ -168,7 +178,7 @@
                             <th class="py-3.5 px-6">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="adminBookingsTableBody" class="divide-y divide-slate-100">
+                    <tbody id="adminBookingsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/80">
                         <!-- Populated dynamically -->
                     </tbody>
                 </table>
@@ -296,15 +306,15 @@
 
         filtered.forEach(u => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50/70 transition';
+            tr.className = 'hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition';
 
-            let roleBadge = 'bg-blue-100 text-blue-800';
-            if (u.role === 'provider') roleBadge = 'bg-amber-100 text-amber-800';
-            if (u.role === 'admin') roleBadge = 'bg-red-100 text-red-800';
+            let roleBadge = 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300';
+            if (u.role === 'provider') roleBadge = 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300';
+            if (u.role === 'admin') roleBadge = 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300';
 
             const statusBadge = u.status === 'active' 
-                ? 'bg-emerald-100 text-emerald-800' 
-                : 'bg-red-100 text-red-800';
+                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300' 
+                : 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300';
 
             const city = u.client_profile?.city || u.provider_profile?.city || 'Tunis';
 
@@ -313,11 +323,11 @@
 
             let actionHtml = '';
             if (isSelf) {
-                actionHtml = '<span class="text-xs text-slate-400 font-semibold italic">Current Admin</span>';
+                actionHtml = '<span class="text-xs text-slate-400 dark:text-slate-500 font-semibold italic">Current Admin</span>';
             } else {
                 const nextStatus = u.status === 'active' ? 'suspended' : 'active';
                 const nextLabel = u.status === 'active' ? 'Suspend' : 'Activate';
-                const nextClass = u.status === 'active' ? 'text-red-600 hover:bg-red-50 border-red-200' : 'text-emerald-700 hover:bg-emerald-50 border-emerald-200';
+                const nextClass = u.status === 'active' ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-200 dark:border-red-900/40' : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40';
                 actionHtml = `
                     <button onclick="toggleUserStatus(${u.id}, '${nextStatus}')" class="px-3 py-1 rounded-lg border text-xs font-bold transition ${nextClass}">
                         ${nextLabel}
@@ -327,8 +337,8 @@
 
             tr.innerHTML = `
                 <td class="py-4 px-6">
-                    <div class="font-extrabold text-xs text-slate-900">${u.name}</div>
-                    <div class="text-[11px] text-slate-400">${u.email}</div>
+                    <div class="font-extrabold text-xs text-slate-900 dark:text-white">${u.name}</div>
+                    <div class="text-[11px] text-slate-400 dark:text-slate-500">${u.email}</div>
                 </td>
                 <td class="py-4 px-6">
                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${roleBadge}">
@@ -340,10 +350,10 @@
                         ${u.status}
                     </span>
                 </td>
-                <td class="py-4 px-6 text-xs text-slate-700">
+                <td class="py-4 px-6 text-xs text-slate-700 dark:text-slate-300">
                     ${city}
                 </td>
-                <td class="py-4 px-6 text-xs text-slate-400">
+                <td class="py-4 px-6 text-xs text-slate-400 dark:text-slate-500">
                     ${new Date(u.created_at).toLocaleDateString()}
                 </td>
                 <td class="py-4 px-6 text-right">
@@ -361,9 +371,9 @@
             const btn = document.getElementById('userFilter' + b.charAt(0).toUpperCase() + b.slice(1));
             if (btn) {
                 if (b === role) {
-                    btn.className = 'px-3 py-1 rounded-lg bg-white text-slate-900 shadow-xs font-bold';
+                    btn.className = 'px-3 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs font-bold';
                 } else {
-                    btn.className = 'px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900';
+                    btn.className = 'px-3 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
                 }
             }
         });
@@ -398,16 +408,16 @@
 
         bookings.forEach(b => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50/70 transition';
+            tr.className = 'hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition';
 
             tr.innerHTML = `
-                <td class="py-4 px-6 font-mono font-bold text-xs text-slate-900">${b.booking_number}</td>
-                <td class="py-4 px-6 text-xs font-bold text-slate-900">${b.client?.name || 'Client'}</td>
-                <td class="py-4 px-6 text-xs font-bold text-amber-800">${b.provider?.name || 'Provider'}</td>
-                <td class="py-4 px-6 text-xs text-slate-700">${b.service_title}</td>
-                <td class="py-4 px-6 font-bold text-xs text-slate-900">${parseFloat(b.total_price).toFixed(0)} TND</td>
+                <td class="py-4 px-6 font-mono font-bold text-xs text-slate-900 dark:text-white">${b.booking_number}</td>
+                <td class="py-4 px-6 text-xs font-bold text-slate-900 dark:text-white">${b.client?.name || 'Client'}</td>
+                <td class="py-4 px-6 text-xs font-bold text-amber-800 dark:text-amber-400">${b.provider?.name || 'Provider'}</td>
+                <td class="py-4 px-6 text-xs text-slate-700 dark:text-slate-300">${b.service_title}</td>
+                <td class="py-4 px-6 font-bold text-xs text-slate-900 dark:text-white">${parseFloat(b.total_price).toFixed(0)} TND</td>
                 <td class="py-4 px-6">
-                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                         ${b.status}
                     </span>
                 </td>

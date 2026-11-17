@@ -6,34 +6,34 @@
 <div class="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
     <!-- Header -->
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">
+        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight sm:text-4xl">
             Join Khedma
         </h1>
-        <p class="mt-2 text-base text-slate-600">
-            Create an account to book top local pros or offer your services to thousands of clients.
+        <p class="mt-2 text-base text-slate-600 dark:text-slate-400">
+            Create an account to book top local pros or offer your services to thousands of clients across Tunisia.
         </p>
     </div>
 
     <!-- Main Card -->
-    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 overflow-hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-200">
         <!-- Step 1: Role Selector -->
-        <div class="p-6 sm:p-8 bg-slate-50/70 border-b border-slate-200">
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+        <div class="p-6 sm:p-8 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
                 Step 1: Choose Your Account Type
             </label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Client Card -->
                 <button type="button" id="roleClientBtn" onclick="selectRole('client')"
-                    class="role-card relative text-left p-5 rounded-xl border-2 transition-all flex items-start gap-4 cursor-pointer bg-white border-blue-600 ring-2 ring-blue-500/20 shadow-sm">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    class="role-card relative text-left p-5 rounded-xl border-2 transition-all flex items-start gap-4 cursor-pointer bg-white dark:bg-slate-900 border-blue-600 ring-2 ring-blue-500/20 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                        <i class="bi bi-person-fill text-2xl"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-900 text-base">I am a Client</span>
+                            <span class="font-bold text-slate-900 dark:text-white text-base">I am a Client</span>
                             <span id="clientBadge" class="text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white px-2 py-0.5 rounded-full">Selected</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                             I want to find, book, and hire verified local service providers for plumbing, repairs, cleaning, and more.
                         </p>
                     </div>
@@ -41,16 +41,16 @@
 
                 <!-- Provider Card -->
                 <button type="button" id="roleProviderBtn" onclick="selectRole('provider')"
-                    class="role-card relative text-left p-5 rounded-xl border-2 transition-all flex items-start gap-4 cursor-pointer bg-white border-slate-200 hover:border-slate-300">
-                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    class="role-card relative text-left p-5 rounded-xl border-2 transition-all flex items-start gap-4 cursor-pointer bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <i class="bi bi-tools text-2xl"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-900 text-base">I am a Provider</span>
+                            <span class="font-bold text-slate-900 dark:text-white text-base">I am a Provider</span>
                             <span id="providerBadge" class="hidden text-[10px] font-bold uppercase tracking-wider bg-amber-600 text-white px-2 py-0.5 rounded-full">Selected</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                             I am a tradesperson, craftsman, or business owner offering professional services to grow my client base.
                         </p>
                     </div>
@@ -59,15 +59,15 @@
         </div>
 
         <!-- Alert messages -->
-        <div id="errorAlert" class="hidden mx-6 sm:mx-8 mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
+        <div id="errorAlert" class="hidden mx-6 sm:mx-8 mt-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 text-red-800 dark:text-red-300 text-sm">
             <div class="font-semibold flex items-center gap-2">
-                <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+                <i class="bi bi-exclamation-triangle-fill text-red-600"></i>
                 <span>Please fix the following issues:</span>
             </div>
             <ul id="errorList" class="mt-2 list-disc list-inside text-xs space-y-1"></ul>
         </div>
 
-        <div id="successAlert" class="hidden mx-6 sm:mx-8 mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
+        <div id="successAlert" class="hidden mx-6 sm:mx-8 mt-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-sm">
             <div class="font-semibold flex items-center gap-2">
                 <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                 <span id="successText">Account created successfully! Redirecting...</span>

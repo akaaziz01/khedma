@@ -13,6 +13,8 @@ class WebInterfaceTest extends TestCase
         $response->assertSee('KHEDMA');
         $response->assertSee('I Need a Service');
         $response->assertSee('I Offer Services');
+        $response->assertSee('bootstrap-icons.min.css');
+        $response->assertSee('toggleTheme()');
     }
 
     public function test_register_page_is_accessible(): void
@@ -49,6 +51,8 @@ class WebInterfaceTest extends TestCase
         $response->assertSee('Admin Operations Console');
         $response->assertSee('Users & Moderation', false);
         $response->assertSee('Platform Bookings');
+        $response->assertSee('bootstrap-icons.min.css');
+        $response->assertSee('toggleTheme()');
 
         // Assert consumer top header menu is NOT present in admin view
         $response->assertDontSee('Become a Provider');
