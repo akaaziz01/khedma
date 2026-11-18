@@ -149,16 +149,17 @@ class ProviderDashboardController extends Controller
         ]);
 
         $service = $provider->services()->create([
-            'title' => $validated['title'],
-            'category' => $validated['category'],
-            'description' => $validated['description'] ?? null,
-            'price' => $validated['price'],
+            'title'          => $validated['title'],
+            'category'       => $validated['category'],
+            'description'    => $validated['description'] ?? null,
+            'price'          => $validated['price'],
             'duration_hours' => $validated['duration_hours'] ?? 1.0,
-            'is_active' => true,
+            'is_active'      => false,      // inactive until admin approves
+            'status'         => 'pending',  // awaits moderation
         ]);
 
         return response()->json([
-            'message' => 'Service added successfully.',
+            'message' => 'Service added successfully. It will be visible after admin approval.',
             'service' => $service,
         ], 201);
     }

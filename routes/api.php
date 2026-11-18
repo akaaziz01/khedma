@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProviderDashboardController;
+use App\Http\Controllers\Api\ServiceCategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -12,6 +13,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+
+    // Public category listing (providers & clients browse categories without auth)
+    Route::get('/categories', [ServiceCategoryController::class, 'index']);
+    Route::get('/categories/{category}', [ServiceCategoryController::class, 'show']);
 
     // Authenticated Sanctum routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -30,9 +35,22 @@ Route::prefix('v1')->group(function () {
 
         // Admin Management Area (Secured with Admin Middleware)
         Route::middleware('admin')->prefix('admin')->group(function () {
+            // Dashboard & user management
             Route::get('/dashboard', [AdminController::class, 'data']);
             Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
             Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+
+            // Service Categories (full CRUD)
+            Route::post('/categories', [ServiceCategoryController::class, 'store']);
+            Route::put('/categories/{category}', [ServiceCategoryController::class, 'update']);
+            Route::patch('/categories/{category}', [ServiceCategoryController::class, 'update']);
+            Route::delete('/categories/{category}', [ServiceCategoryController::class, 'destroy']);
+
+            // Service Moderation
+            Route::get('/services', [AdminController::class, 'listServices']);
+            Route::post('/services/{id}/moderate', [AdminController::class, 'moderateService']);
+            Route::patch('/services/{id}/active', [AdminController::class, 'toggleServiceActive']);
+            Route::delete('/services/{id}', [AdminController::class, 'deleteService']);
         });
     });
 });
