@@ -95,10 +95,21 @@
                 <!-- Discovery / Home -->
                 <div class="relative flex h-full items-center">
                     <a href="/" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ request()->is('/') ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
-                        <i class="bi bi-search text-slate-400 dark:text-slate-500"></i>
-                        Discovery
+                        <i class="bi bi-house-door text-slate-400 dark:text-slate-500"></i>
+                        Home
                     </a>
                     @if(request()->is('/'))
+                        <div class="nav-active-bar bg-blue-600"></div>
+                    @endif
+                </div>
+
+                <!-- Find Services (Guest & Client Search) -->
+                <div class="relative flex h-full items-center">
+                    <a href="/services" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition {{ request()->is('services*') ? 'text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                        <i class="bi bi-search text-blue-500"></i>
+                        Find Services
+                    </a>
+                    @if(request()->is('services*'))
                         <div class="nav-active-bar bg-blue-600"></div>
                     @endif
                 </div>
@@ -276,8 +287,12 @@
             <!-- Drawer Navigation Items -->
             <nav class="space-y-1.5 text-xs font-bold">
                 <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('/') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : '' }}">
-                    <i class="bi bi-search text-slate-500"></i>
-                    Discovery & Services
+                    <i class="bi bi-house-door text-slate-500"></i>
+                    Home
+                </a>
+                <a href="/services" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('services*') ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                    <i class="bi bi-search text-blue-500"></i>
+                    Find Services
                 </a>
                 <a href="/dashboard" id="mobileNavDashboard" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('dashboard*') ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300' : '' }}">
                     <div class="flex items-center gap-3">

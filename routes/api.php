@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProviderDashboardController;
+use App\Http\Controllers\Api\PublicServiceController;
 use App\Http\Controllers\Api\ServiceCategoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,11 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+
+    // Public guest service discovery & search routes
+    Route::get('/services', [PublicServiceController::class, 'index']);
+    Route::get('/services/filters', [PublicServiceController::class, 'filters']);
+    Route::get('/services/{id}', [PublicServiceController::class, 'show']);
 
     // Public category listing (providers & clients browse categories without auth)
     Route::get('/categories', [ServiceCategoryController::class, 'index']);

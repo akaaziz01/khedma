@@ -23,6 +23,59 @@
                 Whether you need an expert plumber to fix an emergency leak, or you are a skilled craftsperson seeking new clients — <strong>KHEDMA</strong> connects you with trusted professionals.
             </p>
 
+            <!-- Search Bar for Guests -->
+            <form action="{{ route('services.index') }}" method="GET" class="w-full max-w-3xl mx-auto p-2 sm:p-2.5 bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-blue-500/10 border border-slate-200 dark:border-slate-800 transition text-left">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <!-- Keyword input -->
+                    <div class="sm:col-span-5 relative flex items-center">
+                        <i class="bi bi-search absolute left-3.5 text-slate-400"></i>
+                        <input type="text" name="keyword" placeholder="What service do you need? (e.g. leak, wiring, AC)..." 
+                            class="w-full pl-10 pr-3 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border-0 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-medium">
+                    </div>
+
+                    <!-- Trade / Category select -->
+                    <div class="sm:col-span-3 relative flex items-center">
+                        <i class="bi bi-tools absolute left-3.5 text-slate-400"></i>
+                        <select name="trade" class="w-full pl-9 pr-7 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border-0 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
+                            <option value="">All Trades</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Electricity">Electricity</option>
+                            <option value="HVAC & Climate">HVAC & Climate</option>
+                            <option value="Cleaning">Cleaning</option>
+                            <option value="Painting">Painting</option>
+                            <option value="Carpentry">Carpentry</option>
+                            <option value="IT & Network">IT & Network</option>
+                            <option value="Appliances">Appliances</option>
+                        </select>
+                        <i class="bi bi-chevron-down absolute right-3 text-[10px] text-slate-400 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Location / City select -->
+                    <div class="sm:col-span-2 relative flex items-center">
+                        <i class="bi bi-geo-alt absolute left-3 text-slate-400"></i>
+                        <select name="location" class="w-full pl-8 pr-6 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border-0 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
+                            <option value="">All Cities</option>
+                            <option value="Tunis">Tunis</option>
+                            <option value="Ariana">Ariana</option>
+                            <option value="Ben Arous">Ben Arous</option>
+                            <option value="Sousse">Sousse</option>
+                            <option value="Sfax">Sfax</option>
+                            <option value="Bizerte">Bizerte</option>
+                            <option value="Nabeul">Nabeul</option>
+                        </select>
+                        <i class="bi bi-chevron-down absolute right-2.5 text-[10px] text-slate-400 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="sm:col-span-2">
+                        <button type="submit" class="w-full h-full py-3 px-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-1.5">
+                            <span>Search</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
             <!-- Dual Role Action Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto pt-4 text-left">
                 <!-- Client Card -->
@@ -66,53 +119,53 @@
             <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Popular Service Categories</h2>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Explore our most requested home and trade services across Tunisia.</p>
         </div>
-        <a href="/register?role=client" class="text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 hidden sm:flex items-center gap-1">
-            <span>View All Categories</span>
+        <a href="{{ route('services.index') }}" class="text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 hidden sm:flex items-center gap-1">
+            <span>Browse All Services</span>
             <i class="bi bi-arrow-right"></i>
         </a>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-wrench-adjustable text-blue-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">Plumbing</h3>
+        <a href="{{ route('services.index', ['trade' => 'Plumbing']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-wrench-adjustable text-blue-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-blue-600 transition">Plumbing</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Pipe repairs, drains, heaters</p>
-        </div>
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-lightning-charge-fill text-amber-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">Electricity</h3>
+        </a>
+        <a href="{{ route('services.index', ['trade' => 'Electricity']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-lightning-charge-fill text-amber-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-amber-600 transition">Electricity</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Wiring, panels, smart lights</p>
-        </div>
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-snow text-cyan-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">HVAC & Climate</h3>
+        </a>
+        <a href="{{ route('services.index', ['trade' => 'HVAC & Climate']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-snow text-cyan-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-cyan-600 transition">HVAC & Climate</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">AC repair, installation</p>
-        </div>
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-stars text-emerald-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">Cleaning</h3>
+        </a>
+        <a href="{{ route('services.index', ['trade' => 'Cleaning']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-stars text-emerald-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-emerald-600 transition">Cleaning</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Home, office, deep clean</p>
-        </div>
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-brush-fill text-purple-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">Painting</h3>
+        </a>
+        <a href="{{ route('services.index', ['trade' => 'Painting']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-brush-fill text-purple-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-purple-600 transition">Painting</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Interior & exterior walls</p>
-        </div>
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-hammer text-orange-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">Carpentry</h3>
+        </a>
+        <a href="{{ route('services.index', ['trade' => 'Carpentry']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-hammer text-orange-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-orange-600 transition">Carpentry</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Furniture, doors, custom work</p>
-        </div>
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-router-fill text-indigo-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">IT & Network</h3>
+        </a>
+        <a href="{{ route('services.index', ['trade' => 'IT & Network']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-router-fill text-indigo-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-indigo-600 transition">IT & Network</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Wi-Fi, computers, cameras</p>
-        </div>
-        <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
-            <i class="bi bi-plug-fill text-rose-500 text-3xl block mb-2"></i>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm">Appliances</h3>
+        </a>
+        <a href="{{ route('services.index', ['trade' => 'Appliances']) }}" class="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition">
+            <i class="bi bi-plug-fill text-rose-500 text-3xl block mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-rose-600 transition">Appliances</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Fridges, washing machines</p>
-        </div>
+        </a>
     </div>
 </section>
 

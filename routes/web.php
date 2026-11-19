@@ -1,10 +1,15 @@
 <?php
 
+use App\Http\Controllers\PublicServiceWebController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Guest & client service search & discovery
+Route::get('/services', [PublicServiceWebController::class, 'index'])->name('services.index');
+Route::get('/services/{id}', [PublicServiceWebController::class, 'show'])->name('services.show');
 
 Route::get('/register', function () {
     return view('auth.register');
