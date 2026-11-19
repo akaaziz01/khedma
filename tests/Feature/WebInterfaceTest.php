@@ -51,12 +51,46 @@ class WebInterfaceTest extends TestCase
         $response->assertSee('Admin Operations Console');
         $response->assertSee('Users & Moderation', false);
         $response->assertSee('Platform Bookings');
+        $response->assertSee('Services Catalog');
         $response->assertSee('bootstrap-icons.min.css');
         $response->assertSee('toggleTheme()');
+        $response->assertSee('/admin/users');
+        $response->assertSee('/admin/bookings');
+        $response->assertSee('/admin/services');
 
         // Assert consumer top header menu is NOT present in admin view
         $response->assertDontSee('Become a Provider');
         $response->assertDontSee('id="navDashboardItem"', false);
+    }
+
+    public function test_admin_users_page_is_accessible(): void
+    {
+        $response = $this->get('/admin/users');
+        $response->assertStatus(200);
+        $response->assertSee('userSearchInput');
+        $response->assertSee('userDetailsModal');
+        $response->assertSee('deleteUserModal');
+        $response->assertSee('toggleUserVerification');
+        $response->assertSee('Users & Moderation', false);
+    }
+
+    public function test_admin_bookings_page_is_accessible(): void
+    {
+        $response = $this->get('/admin/bookings');
+        $response->assertStatus(200);
+        $response->assertSee('metricTotalBookings');
+        $response->assertSee('bookingsTableBody');
+        $response->assertSee('Platform Bookings');
+    }
+
+    public function test_admin_services_page_is_accessible(): void
+    {
+        $response = $this->get('/admin/services');
+        $response->assertStatus(200);
+        $response->assertSee('categoryModal');
+        $response->assertSee('rejectModal');
+        $response->assertSee('categoriesTableBody');
+        $response->assertSee('Services Catalog');
     }
 
     public function test_admin_route_redirects_to_admin_dashboard(): void

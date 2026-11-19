@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ModerateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Models\Booking;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +22,7 @@ class AdminController extends Controller
     public function data(Request $request): JsonResponse
     {
         $users = User::with(['clientProfile', 'providerProfile'])
+            ->withCount(['services', 'clientBookings', 'providerBookings'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -36,6 +38,9 @@ class AdminController extends Controller
         $clientsCount = $users->where('role', UserRole::CLIENT)->count();
         $providersCount = $users->where('role', UserRole::PROVIDER)->count();
         $adminsCount = $users->where('role', UserRole::ADMIN)->count();
+        $verifiedCount = $users->where('is_verified', true)->count();
+        $unverifiedCount = $users->where('is_verified', false)->count();
+        $suspendedCount = $users->where('status', 'suspended')->count();
 
         return response()->json([
             'metrics' => [
@@ -43,6 +48,9 @@ class AdminController extends Controller
                 'clients_count' => $clientsCount,
                 'providers_count' => $providersCount,
                 'admins_count' => $adminsCount,
+                'verified_users_count' => $verifiedCount,
+                'unverified_users_count' => $unverifiedCount,
+                'suspended_users_count' => $suspendedCount,
                 'total_bookings' => $bookings->count(),
                 'completed_bookings' => $completedBookings->count(),
                 'active_bookings' => $bookings->whereIn('status', ['accepted', 'in_progress'])->count(),
@@ -52,6 +60,113 @@ class AdminController extends Controller
             ],
             'users' => $users,
             'bookings' => $bookings,
+        ]);
+    }
+
+    /**
+     * Filter and search users.
+     */
+    public function listUsers(Request $request): JsonResponse
+    {
+        $query = User::with(['clientProfile', 'providerProfile'])
+            ->withCount(['services', 'clientBookings', 'providerBookings'])
+            ->orderBy('created_at', 'desc');
+
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhereHas('clientProfile', fn ($cp) => $cp->where('city', 'like', "%{$search}%"))
+                  ->orWhereHas('providerProfile', fn ($pp) => $pp->where('city', 'like', "%{$search}%")->orWhere('business_name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($role = $request->query('role')) {
+            if ($role !== 'all') {
+                $query->where('role', $role);
+            }
+        }
+
+        if ($status = $request->query('status')) {
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
+        }
+
+        if ($verification = $request->query('verification')) {
+            if ($verification === 'verified') {
+                $query->where('is_verified', true);
+            } elseif ($verification === 'unverified') {
+                $query->where('is_verified', false);
+            }
+        }
+
+        $perPage = min((int) ($request->query('per_page', 50)), 100);
+        $paginated = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => $paginated->items(),
+            'pagination' => [
+                'total' => $paginated->total(),
+                'per_page' => $paginated->perPage(),
+                'current_page' => $paginated->currentPage(),
+                'last_page' => $paginated->lastPage(),
+            ],
+        ]);
+    }
+
+    /**
+     * Get detailed information for a specific user.
+     */
+    public function showUser(Request $request, int $id): JsonResponse
+    {
+        $user = User::with([
+            'clientProfile',
+            'providerProfile',
+            'services.serviceCategory',
+            'clientBookings' => fn ($q) => $q->latest()->limit(5),
+            'providerBookings' => fn ($q) => $q->latest()->limit(5),
+            'providerReviews' => fn ($q) => $q->latest()->limit(5),
+        ])
+        ->withCount(['services', 'clientBookings', 'providerBookings', 'providerReviews'])
+        ->findOrFail($id);
+
+        $avgRating = $user->isProvider() 
+            ? Review::where('provider_id', $user->id)->avg('rating') 
+            : null;
+
+        return response()->json([
+            'user' => $user,
+            'stats' => [
+                'services_count' => $user->services_count,
+                'client_bookings_count' => $user->client_bookings_count,
+                'provider_bookings_count' => $user->provider_bookings_count,
+                'provider_reviews_count' => $user->provider_reviews_count,
+                'average_rating' => $avgRating ? round((float) $avgRating, 1) : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Verify or unverify a user account.
+     */
+    public function verifyUser(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'is_verified' => ['required', 'boolean'],
+        ]);
+
+        $targetUser = User::findOrFail($id);
+        $targetUser->is_verified = $validated['is_verified'];
+        $targetUser->verified_at = $validated['is_verified'] ? now() : null;
+        $targetUser->save();
+
+        $actionWord = $targetUser->is_verified ? 'verified' : 'unverified';
+
+        return response()->json([
+            'message' => "User {$targetUser->name} has been marked as {$actionWord}.",
+            'user' => $targetUser->fresh(['clientProfile', 'providerProfile']),
         ]);
     }
 

@@ -119,14 +119,23 @@
 
             <!-- Sidebar Navigation Menu -->
             <nav class="flex-1 px-4 py-3 space-y-6 text-xs font-semibold">
-                
+                @php
+                    $isOverview = request()->is('admin/dashboard') || request()->is('admin');
+                    $isUsers = request()->is('admin/users*');
+                    $isBookings = request()->is('admin/bookings*');
+                    $isServices = request()->is('admin/services*') || request()->is('admin/catalog*');
+
+                    $activeClass = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 font-bold transition';
+                    $inactiveClass = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition';
+                @endphp
+
                 <!-- Section 1: Main Operations -->
                 <div>
                     <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-2">Main Operations</span>
                     <div class="space-y-1">
                         <!-- Dashboard Overview -->
-                        <a href="/admin/dashboard" onclick="selectAdminSection('overview')" id="navLinkOverview"
-                            class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 font-bold transition">
+                        <a href="/admin/dashboard" id="navLinkOverview"
+                            class="{{ $isOverview ? $activeClass : $inactiveClass }}">
                             <div class="flex items-center gap-3">
                                 <i class="bi bi-speedometer2 text-base text-red-500 dark:text-red-400"></i>
                                 <span>Overview</span>
@@ -135,8 +144,8 @@
                         </a>
 
                         <!-- Users Management -->
-                        <a href="#sectionUsers" onclick="selectAdminSection('users')" id="navLinkUsers"
-                            class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition">
+                        <a href="/admin/users" id="navLinkUsers"
+                            class="{{ $isUsers ? $activeClass : $inactiveClass }}">
                             <div class="flex items-center gap-3">
                                 <i class="bi bi-people-fill text-base text-blue-500"></i>
                                 <span>Users & Moderation</span>
@@ -145,8 +154,8 @@
                         </a>
 
                         <!-- Platform Bookings -->
-                        <a href="#sectionBookings" onclick="selectAdminSection('bookings')" id="navLinkBookings"
-                            class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition">
+                        <a href="/admin/bookings" id="navLinkBookings"
+                            class="{{ $isBookings ? $activeClass : $inactiveClass }}">
                             <div class="flex items-center gap-3">
                                 <i class="bi bi-calendar2-check-fill text-base text-amber-500"></i>
                                 <span>Platform Bookings</span>
@@ -155,8 +164,8 @@
                         </a>
 
                         <!-- Services Catalog -->
-                        <a href="#overview" onclick="selectAdminSection('overview')" id="navLinkServices"
-                            class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition">
+                        <a href="/admin/services" id="navLinkServices"
+                            class="{{ $isServices ? $activeClass : $inactiveClass }}">
                             <div class="flex items-center gap-3">
                                 <i class="bi bi-tools text-base text-emerald-500"></i>
                                 <span>Services Catalog</span>
@@ -307,32 +316,30 @@
             }
         }
 
-        function selectAdminSection(section) {
-            const overviewLink = document.getElementById('navLinkOverview');
-            const usersLink = document.getElementById('navLinkUsers');
-            const bookingsLink = document.getElementById('navLinkBookings');
+        // Keep sidebar metrics synchronized across all admin pages
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('khedma_token');
+            const userStr = localStorage.getItem('khedma_user');
+            if (!token || !userStr) return;
 
-            [overviewLink, usersLink, bookingsLink].forEach(link => {
-                if (link) {
-                    link.className = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition';
+            try {
+                const u = JSON.parse(userStr);
+                if (document.getElementById('adminSidebarName')) document.getElementById('adminSidebarName').textContent = u.name;
+                if (document.getElementById('adminSidebarEmail')) document.getElementById('adminSidebarEmail').textContent = u.email;
+                if (document.getElementById('adminSidebarAvatar')) document.getElementById('adminSidebarAvatar').textContent = (u.name || 'A').charAt(0).toUpperCase();
+
+                const res = await fetch('/api/v1/admin/dashboard', {
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const m = data.metrics || {};
+                    if (document.getElementById('sidebarUserCountBadge')) document.getElementById('sidebarUserCountBadge').textContent = m.total_users ?? 0;
+                    if (document.getElementById('sidebarBookingsCountBadge')) document.getElementById('sidebarBookingsCountBadge').textContent = m.total_bookings ?? 0;
+                    if (document.getElementById('sidebarGMVDisplay')) document.getElementById('sidebarGMVDisplay').textContent = (m.platform_gmv ?? 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
                 }
-            });
-
-            if (section === 'overview' && overviewLink) {
-                overviewLink.className = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 font-bold transition';
-                if (window.switchAdminTab) window.switchAdminTab('users');
-            } else if (section === 'users' && usersLink) {
-                usersLink.className = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 font-bold transition';
-                if (window.switchAdminTab) window.switchAdminTab('users');
-            } else if (section === 'bookings' && bookingsLink) {
-                bookingsLink.className = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 font-bold transition';
-                if (window.switchAdminTab) window.switchAdminTab('bookings');
-            }
-
-            if (window.innerWidth < 1024) {
-                toggleAdminSidebar();
-            }
-        }
+            } catch(e) {}
+        });
 
         async function handleLogoutGlobal() {
             const token = localStorage.getItem('khedma_token');

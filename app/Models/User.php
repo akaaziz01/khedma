@@ -28,6 +28,8 @@ class User extends Authenticatable
         'role',
         'phone',
         'status',
+        'is_verified',
+        'verified_at',
     ];
 
     /**
@@ -51,6 +53,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
+            'is_verified' => 'boolean',
+            'verified_at' => 'datetime',
         ];
     }
 
@@ -97,6 +101,25 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === UserRole::ADMIN;
+    }
+
+    public function isVerified(): bool
+    {
+        return (bool) $this->is_verified;
+    }
+
+    public function markAsVerified(): bool
+    {
+        $this->is_verified = true;
+        $this->verified_at = now();
+        return $this->save();
+    }
+
+    public function markAsUnverified(): bool
+    {
+        $this->is_verified = false;
+        $this->verified_at = null;
+        return $this->save();
     }
 
     public function getActiveProfileAttribute()

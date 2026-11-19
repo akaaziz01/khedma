@@ -37,6 +37,9 @@ Route::prefix('v1')->group(function () {
         Route::middleware('admin')->prefix('admin')->group(function () {
             // Dashboard & user management
             Route::get('/dashboard', [AdminController::class, 'data']);
+            Route::get('/users', [AdminController::class, 'listUsers']);
+            Route::get('/users/{id}', [AdminController::class, 'showUser']);
+            Route::patch('/users/{id}/verify', [AdminController::class, 'verifyUser']);
             Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
             Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
 
