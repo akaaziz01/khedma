@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProviderDashboardController;
+use App\Http\Controllers\Api\PublicProviderController;
 use App\Http\Controllers\Api\PublicServiceController;
 use App\Http\Controllers\Api\ServiceCategoryController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/services/filters', [PublicServiceController::class, 'filters']);
     Route::get('/services/{id}', [PublicServiceController::class, 'show']);
 
+    // Public provider profile for prospective clients & guests
+    Route::get('/providers/{id}', [PublicProviderController::class, 'show']);
+
     // Public category listing (providers & clients browse categories without auth)
     Route::get('/categories', [ServiceCategoryController::class, 'index']);
     Route::get('/categories/{category}', [ServiceCategoryController::class, 'show']);
@@ -27,6 +31,8 @@ Route::prefix('v1')->group(function () {
     // Authenticated Sanctum routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/user', [AuthController::class, 'user']);
+        Route::put('/profile', [AuthController::class, 'updateProfile']);
+        Route::put('/profile/password', [AuthController::class, 'updatePassword']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
 

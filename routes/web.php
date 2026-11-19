@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PublicProviderWebController;
 use App\Http\Controllers\PublicServiceWebController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,9 @@ Route::get('/', function () {
 // Guest & client service search & discovery
 Route::get('/services', [PublicServiceWebController::class, 'index'])->name('services.index');
 Route::get('/services/{id}', [PublicServiceWebController::class, 'show'])->name('services.show');
+
+// Guest & client public provider profile
+Route::get('/providers/{id}', [PublicProviderWebController::class, 'show'])->name('providers.show');
 
 Route::get('/register', function () {
     return view('auth.register');
@@ -30,6 +34,27 @@ Route::get('/reset-password', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::get('/profile', function () {
+    return view('profile');
+})->name('profile');
+
+// Provider dedicated workspace pages
+Route::get('/provider/bookings', function () {
+    return view('provider.bookings');
+})->name('provider.bookings');
+
+Route::get('/dashboard/bookings', function () {
+    return redirect('/provider/bookings');
+});
+
+Route::get('/provider/services', function () {
+    return view('provider.services');
+})->name('provider.services');
+
+Route::get('/dashboard/services', function () {
+    return redirect('/provider/services');
+});
 
 Route::get('/admin', function () {
     return redirect('/admin/dashboard');

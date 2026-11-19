@@ -224,14 +224,14 @@
 
                             <!-- Provider Profile Info Box -->
                             <div class="pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
-                                <div class="flex items-center gap-3">
+                                <a href="{{ $provider ? route('providers.show', $provider->id) : '#' }}" class="group/pro flex items-center gap-3 min-w-0">
                                     <!-- Avatar -->
-                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs">
+                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs group-hover/pro:scale-105 transition-transform">
                                         {{ strtoupper(substr($provider?->name ?? 'P', 0, 1)) }}
                                     </div>
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-1.5 flex-wrap">
-                                            <span class="text-xs font-extrabold text-slate-900 dark:text-white truncate">
+                                            <span class="text-xs font-extrabold text-slate-900 dark:text-white truncate group-hover/pro:text-blue-600 transition">
                                                 {{ $provider?->name ?? 'Service Provider' }}
                                             </span>
                                             @if($provider?->is_verified)
@@ -256,7 +256,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                </div>
+                                </a>
 
                                 @if($profile?->is_available)
                                     <span class="shrink-0 w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100 dark:ring-emerald-950" title="Available for Bookings"></span>

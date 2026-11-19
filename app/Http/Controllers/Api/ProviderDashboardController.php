@@ -179,6 +179,7 @@ class ProviderDashboardController extends Controller
             'city' => ['nullable', 'string', 'max:100'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'skills' => ['nullable', 'array'],
+            'portfolio_photos' => ['nullable', 'array'],
             'phone' => ['nullable', 'string', 'max:20'],
         ]);
 

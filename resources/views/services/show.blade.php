@@ -83,17 +83,24 @@
                     $profile = $provider?->providerProfile;
                 @endphp
                 <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
-                    <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">
-                        Service Provider
-                    </span>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">
+                            Service Provider
+                        </span>
+                        @if($provider)
+                            <a href="{{ route('providers.show', $provider->id) }}" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                                View Profile
+                            </a>
+                        @endif
+                    </div>
 
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-xl flex items-center justify-center shrink-0 shadow-md">
+                    <a href="{{ $provider ? route('providers.show', $provider->id) : '#' }}" class="group/pro flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-xl flex items-center justify-center shrink-0 shadow-md group-hover/pro:scale-105 transition-transform">
                             {{ strtoupper(substr($provider?->name ?? 'P', 0, 1)) }}
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <h3 class="font-extrabold text-base text-slate-900 dark:text-white truncate">
+                                <h3 class="font-extrabold text-base text-slate-900 dark:text-white truncate group-hover/pro:text-blue-600 transition">
                                     {{ $provider?->name }}
                                 </h3>
                             </div>
@@ -109,7 +116,7 @@
                                 </p>
                             @endif
                         </div>
-                    </div>
+                    </a>
 
                     <div class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 pt-2 border-t border-slate-100 dark:border-slate-800">
                         <div class="flex items-center justify-between">

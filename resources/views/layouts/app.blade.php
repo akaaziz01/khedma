@@ -92,8 +92,8 @@
 
             <!-- Middle: Spotlight Navigation Menu with Active Underline Bar -->
             <nav class="hidden lg:flex items-center h-full space-x-1 ml-6">
-                <!-- Discovery / Home -->
-                <div class="relative flex h-full items-center">
+                <!-- Discovery / Home (Hidden for Logged In Users) -->
+                <div class="relative flex h-full items-center" id="navHomeItem">
                     <a href="/" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ request()->is('/') ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
                         <i class="bi bi-house-door text-slate-400 dark:text-slate-500"></i>
                         Home
@@ -103,8 +103,19 @@
                     @endif
                 </div>
 
-                <!-- Find Services (Guest & Client Search) -->
-                <div class="relative flex h-full items-center">
+                <!-- Provider / Client Dynamic Tab 1: Dashboard -->
+                <div class="relative flex h-full items-center" id="navDashboardItem" style="display: none;">
+                    <a href="/dashboard" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ request()->is('dashboard') ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
+                        <i class="bi bi-grid-fill text-slate-400 dark:text-slate-500"></i>
+                        Dashboard
+                    </a>
+                    @if(request()->is('dashboard'))
+                        <div class="nav-active-bar bg-amber-500"></div>
+                    @endif
+                </div>
+
+                <!-- Find Services (Always available for guests, clients, and providers) -->
+                <div class="relative flex h-full items-center" id="navFindServicesItem">
                     <a href="/services" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition {{ request()->is('services*') ? 'text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
                         <i class="bi bi-search text-blue-500"></i>
                         Find Services
@@ -114,32 +125,27 @@
                     @endif
                 </div>
 
-                <!-- Provider / Client Dynamic Tab 1: Dashboard -->
-                <div class="relative flex h-full items-center" id="navDashboardItem" style="display: none;">
-                    <a href="/dashboard" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ request()->is('dashboard*') ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
-                        <i class="bi bi-grid-fill text-slate-400 dark:text-slate-500"></i>
-                        Dashboard
-                    </a>
-                    @if(request()->is('dashboard*'))
-                        <div class="nav-active-bar bg-amber-500"></div>
-                    @endif
-                </div>
-
-                <!-- Provider Dynamic Tab 2: Bookings / Leads -->
+                <!-- Provider Dynamic Tab 2: Bookings & Leads -->
                 <div class="relative flex h-full items-center" id="navBookingsItem" style="display: none;">
-                    <a href="/dashboard#bookingsTableBody" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">
+                    <a href="/provider/bookings" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ (request()->is('provider/bookings*') || request()->is('dashboard/bookings*')) ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
                         <i class="bi bi-calendar-check-fill text-slate-400 dark:text-slate-500"></i>
                         Bookings & Leads
                         <span id="navPendingBadge" class="hidden px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">1</span>
                     </a>
+                    @if(request()->is('provider/bookings*') || request()->is('dashboard/bookings*'))
+                        <div class="nav-active-bar bg-amber-500"></div>
+                    @endif
                 </div>
 
-                <!-- Provider Dynamic Tab 3: Services Catalog -->
+                <!-- Provider Dynamic Tab 3: My Services -->
                 <div class="relative flex h-full items-center" id="navServicesItem" style="display: none;">
-                    <a href="/dashboard#servicesGrid" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">
+                    <a href="/provider/services" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ (request()->is('provider/services*') || request()->is('dashboard/services*')) ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
                         <i class="bi bi-tools text-slate-400 dark:text-slate-500"></i>
                         My Services
                     </a>
+                    @if(request()->is('provider/services*') || request()->is('dashboard/services*'))
+                        <div class="nav-active-bar bg-amber-500"></div>
+                    @endif
                 </div>
 
                 <!-- Guest link: Become a Provider -->
@@ -216,7 +222,7 @@
                         </button>
 
                         <!-- User Dropdown Menu -->
-                        <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-52 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-2 text-xs z-50 space-y-1">
+                        <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-2 text-xs z-50 space-y-1">
                             <div class="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
                                 <span class="font-bold text-slate-900 dark:text-white block truncate" id="dropdownUserEmail">user@khedma.tn</span>
                                 <span class="text-[10px] text-slate-400">Authenticated via Sanctum</span>
@@ -224,6 +230,14 @@
                             <a href="/dashboard" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
                                 <i class="bi bi-speedometer2 text-sm text-slate-500"></i>
                                 My Dashboard
+                            </a>
+                            <a href="/profile" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                <i class="bi bi-person-circle text-sm text-amber-500"></i>
+                                My Profile
+                            </a>
+                            <a id="dropdownPublicProfileLink" href="#" class="hidden flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                <i class="bi bi-eye text-sm text-blue-500"></i>
+                                Public Profile Preview
                             </a>
                             <div class="border-t border-slate-100 dark:border-slate-800 my-1"></div>
                             <button onclick="handleLogoutGlobal()" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 font-bold transition text-left">
@@ -286,21 +300,48 @@
 
             <!-- Drawer Navigation Items -->
             <nav class="space-y-1.5 text-xs font-bold">
-                <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('/') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : '' }}">
+                <!-- Home (Shown for guest, hidden for logged in) -->
+                <a href="/" id="mobileNavHome" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('/') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : '' }}">
                     <i class="bi bi-house-door text-slate-500"></i>
                     Home
                 </a>
-                <a href="/services" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('services*') ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
-                    <i class="bi bi-search text-blue-500"></i>
-                    Find Services
-                </a>
-                <a href="/dashboard" id="mobileNavDashboard" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('dashboard*') ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300' : '' }}">
+
+                <!-- Dashboard (Shown for logged in users) -->
+                <a href="/dashboard" id="mobileNavDashboard" class="hidden flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('dashboard') ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
                     <div class="flex items-center gap-3">
                         <i class="bi bi-grid-fill text-slate-500"></i>
                         Dashboard
                     </div>
+                </a>
+
+                <!-- Find Services (Always available) -->
+                <a href="/services" id="mobileNavServices" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('services*') ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                    <i class="bi bi-search text-blue-500"></i>
+                    Find Services
+                </a>
+
+                <!-- Provider: Bookings & Leads -->
+                <a href="/provider/bookings" id="mobileNavBookings" class="hidden flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ (request()->is('provider/bookings*') || request()->is('dashboard/bookings*')) ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-calendar-check-fill text-slate-500"></i>
+                        Bookings & Leads
+                    </div>
                     <span id="mobilePendingBadge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300">1</span>
                 </a>
+
+                <!-- Provider: My Services -->
+                <a href="/provider/services" id="mobileNavMyServices" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ (request()->is('provider/services*') || request()->is('dashboard/services*')) ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
+                    <i class="bi bi-tools text-slate-500"></i>
+                    My Services
+                </a>
+
+                <!-- My Profile (Shown for logged in users) -->
+                <a href="/profile" id="mobileNavProfile" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('profile*') ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
+                    <i class="bi bi-person-circle text-slate-500"></i>
+                    My Profile
+                </a>
+
+                <!-- Guest: Become a Provider -->
                 <a href="/register?role=provider" id="mobileNavBecomeProvider" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     Become a Provider
@@ -333,10 +374,18 @@
 
             const guestControls = document.getElementById('guestHeaderControls');
             const authControls = document.getElementById('authHeaderControls');
+            const navHome = document.getElementById('navHomeItem');
             const navDashboard = document.getElementById('navDashboardItem');
             const navBookings = document.getElementById('navBookingsItem');
             const navServices = document.getElementById('navServicesItem');
             const navGuestBecomeProvider = document.getElementById('navGuestBecomeProvider');
+
+            const mobileNavHome = document.getElementById('mobileNavHome');
+            const mobileNavDashboard = document.getElementById('mobileNavDashboard');
+            const mobileNavBookings = document.getElementById('mobileNavBookings');
+            const mobileNavMyServices = document.getElementById('mobileNavMyServices');
+            const mobileNavProfile = document.getElementById('mobileNavProfile');
+            const mobileNavBecomeProvider = document.getElementById('mobileNavBecomeProvider');
             const mobileFooter = document.getElementById('mobileDrawerFooter');
 
             if (token && userStr) {
@@ -349,15 +398,40 @@
                     document.getElementById('headerUserAvatar').textContent = user.name.charAt(0).toUpperCase();
                     document.getElementById('dropdownUserEmail').textContent = user.email;
 
-                    // Show dashboard links in main nav
-                    navDashboard.style.display = 'flex';
+                    // Public profile preview link for providers
+                    const pubLink = document.getElementById('dropdownPublicProfileLink');
+                    if (pubLink) {
+                        if (user.role === 'provider' && user.id) {
+                            pubLink.href = '/providers/' + user.id;
+                            pubLink.classList.remove('hidden');
+                        } else {
+                            pubLink.classList.add('hidden');
+                        }
+                    }
+
+                    // Hide Home link from logged in users
+                    if (navHome) navHome.style.display = 'none';
+                    if (mobileNavHome) mobileNavHome.style.display = 'none';
+
+                    // Show Dashboard
+                    if (navDashboard) navDashboard.style.display = 'flex';
+                    if (mobileNavDashboard) mobileNavDashboard.classList.remove('hidden');
+
+                    // Show Profile link in mobile drawer
+                    if (mobileNavProfile) mobileNavProfile.classList.remove('hidden');
 
                     if (user.role === 'provider') {
                         document.getElementById('headerUserRole').textContent = '🛠️ Provider';
                         document.getElementById('headerUserRole').className = 'text-[10px] font-bold text-amber-600 uppercase';
-                        navBookings.style.display = 'flex';
-                        navServices.style.display = 'flex';
-                        navGuestBecomeProvider.style.display = 'none';
+                        
+                        // Show Provider links
+                        if (navBookings) navBookings.style.display = 'flex';
+                        if (navServices) navServices.style.display = 'flex';
+                        if (mobileNavBookings) mobileNavBookings.classList.remove('hidden');
+                        if (mobileNavMyServices) mobileNavMyServices.classList.remove('hidden');
+
+                        if (navGuestBecomeProvider) navGuestBecomeProvider.style.display = 'none';
+                        if (mobileNavBecomeProvider) mobileNavBecomeProvider.style.display = 'none';
 
                         // Badge indicator
                         const badge = document.getElementById('navPendingBadge');
@@ -367,6 +441,15 @@
                     } else {
                         document.getElementById('headerUserRole').textContent = '👤 Client';
                         document.getElementById('headerUserRole').className = 'text-[10px] font-bold text-blue-600 uppercase';
+
+                        // Hide Provider specific tabs for client
+                        if (navBookings) navBookings.style.display = 'none';
+                        if (navServices) navServices.style.display = 'none';
+                        if (mobileNavBookings) mobileNavBookings.classList.add('hidden');
+                        if (mobileNavMyServices) mobileNavMyServices.classList.add('hidden');
+
+                        if (navGuestBecomeProvider) navGuestBecomeProvider.style.display = 'none';
+                        if (mobileNavBecomeProvider) mobileNavBecomeProvider.style.display = 'none';
                     }
 
                     if (mobileFooter) {
@@ -376,11 +459,12 @@
                                     ${user.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div class="truncate">
-                                    <div class="text-xs font-bold text-slate-900">${user.name}</div>
+                                    <div class="text-xs font-bold text-slate-900 dark:text-white">${user.name}</div>
                                     <div class="text-[10px] text-slate-400 truncate">${user.email}</div>
                                 </div>
                             </div>
-                            <button onclick="handleLogoutGlobal()" class="w-full py-2 bg-red-50 text-red-600 font-bold text-xs rounded-xl flex items-center justify-center gap-2 border border-red-200">
+                            <button onclick="handleLogoutGlobal()" class="w-full py-2 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-bold text-xs rounded-xl flex items-center justify-center gap-2 border border-red-200 dark:border-red-900/50">
+                                <i class="bi bi-box-arrow-right"></i>
                                 <span>Logout</span>
                             </button>
                         `;
@@ -391,15 +475,25 @@
             } else {
                 guestControls.classList.remove('hidden');
                 authControls.classList.add('hidden');
-                navDashboard.style.display = 'none';
-                navBookings.style.display = 'none';
-                navServices.style.display = 'none';
-                navGuestBecomeProvider.style.display = 'flex';
+
+                // Show Home for guests
+                if (navHome) navHome.style.display = 'flex';
+                if (mobileNavHome) mobileNavHome.style.display = 'flex';
+
+                if (navDashboard) navDashboard.style.display = 'none';
+                if (mobileNavDashboard) mobileNavDashboard.classList.add('hidden');
+                if (navBookings) navBookings.style.display = 'none';
+                if (mobileNavBookings) mobileNavBookings.classList.add('hidden');
+                if (navServices) navServices.style.display = 'none';
+                if (mobileNavMyServices) mobileNavMyServices.classList.add('hidden');
+                if (mobileNavProfile) mobileNavProfile.classList.add('hidden');
+                if (navGuestBecomeProvider) navGuestBecomeProvider.style.display = 'flex';
+                if (mobileNavBecomeProvider) mobileNavBecomeProvider.style.display = 'flex';
 
                 if (mobileFooter) {
                     mobileFooter.innerHTML = `
                         <div class="grid grid-cols-2 gap-2">
-                            <a href="/login" class="text-center py-2 bg-slate-100 text-slate-800 font-bold text-xs rounded-xl">Sign In</a>
+                            <a href="/login" class="text-center py-2 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl">Sign In</a>
                             <a href="/register" class="text-center py-2 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-xs">Sign Up</a>
                         </div>
                     `;

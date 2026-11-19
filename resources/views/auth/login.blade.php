@@ -83,7 +83,7 @@
                 </button>
             </div>
         </div>
-
+        
         <p class="text-center text-xs text-slate-500 dark:text-slate-400 mt-6">
             Don't have an account yet? 
             <a href="/register" class="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 underline">Create one now</a>

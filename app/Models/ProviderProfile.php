@@ -19,12 +19,14 @@ class ProviderProfile extends Model
         'hourly_rate',
         'city',
         'is_available',
+        'portfolio_photos',
     ];
 
     protected function casts(): array
     {
         return [
             'skills' => 'array',
+            'portfolio_photos' => 'array',
             'hourly_rate' => 'decimal:2',
             'is_available' => 'boolean',
         ];

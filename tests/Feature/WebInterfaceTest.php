@@ -98,4 +98,32 @@ class WebInterfaceTest extends TestCase
         $response = $this->get('/admin');
         $response->assertRedirect('/admin/dashboard');
     }
+
+    public function test_provider_bookings_page_is_accessible(): void
+    {
+        $response = $this->get('/provider/bookings');
+        $response->assertStatus(200);
+        $response->assertSee('Bookings & Leads Management', false);
+        $response->assertSee('bookingsTableBody');
+    }
+
+    public function test_provider_services_page_is_accessible(): void
+    {
+        $response = $this->get('/provider/services');
+        $response->assertStatus(200);
+        $response->assertSee('My Services Catalog');
+        $response->assertSee('servicesGridContainer');
+    }
+
+    public function test_dashboard_bookings_redirects_to_provider_bookings(): void
+    {
+        $response = $this->get('/dashboard/bookings');
+        $response->assertRedirect('/provider/bookings');
+    }
+
+    public function test_dashboard_services_redirects_to_provider_services(): void
+    {
+        $response = $this->get('/dashboard/services');
+        $response->assertRedirect('/provider/services');
+    }
 }

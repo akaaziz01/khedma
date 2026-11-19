@@ -235,4 +235,87 @@ class AuthController extends Controller
             'email' => [__($status)],
         ]);
     }
+
+    /**
+     * Update current authenticated user profile.
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name'             => ['sometimes', 'required', 'string', 'max:255'],
+            'phone'            => ['nullable', 'string', 'max:25'],
+            'city'             => ['nullable', 'string', 'max:100'],
+            'address'          => ['nullable', 'string', 'max:255'],
+            // Provider specific fields
+            'business_name'    => ['nullable', 'string', 'max:150'],
+            'category'         => ['nullable', 'string', 'max:100'],
+            'hourly_rate'      => ['nullable', 'numeric', 'min:0'],
+            'bio'              => ['nullable', 'string', 'max:1000'],
+            'skills'           => ['nullable', 'array'],
+            'is_available'     => ['nullable', 'boolean'],
+            'portfolio_photos' => ['nullable', 'array'],
+        ]);
+
+        if (isset($validated['name'])) {
+            $user->name = $validated['name'];
+        }
+        if (array_key_exists('phone', $validated)) {
+            $user->phone = $validated['phone'];
+        }
+        $user->save();
+
+        if ($user->isClient()) {
+            $clientData = [];
+            if (array_key_exists('city', $validated)) $clientData['city'] = $validated['city'];
+            if (array_key_exists('address', $validated)) $clientData['address'] = $validated['address'];
+            if (!empty($clientData)) {
+                $user->clientProfile()->updateOrCreate(['user_id' => $user->id], $clientData);
+            }
+            $user->load('clientProfile');
+        } elseif ($user->isProvider()) {
+            $providerData = [];
+            foreach (['business_name', 'category', 'hourly_rate', 'city', 'bio', 'skills', 'is_available', 'portfolio_photos'] as $field) {
+                if (array_key_exists($field, $validated)) {
+                    $providerData[$field] = $validated[$field];
+                }
+            }
+            if (!empty($providerData)) {
+                $user->providerProfile()->updateOrCreate(['user_id' => $user->id], $providerData);
+            }
+            $user->load('providerProfile');
+        }
+
+        return response()->json([
+            'message' => 'Profile updated successfully.',
+            'user'    => new UserResource($user),
+        ]);
+    }
+
+    /**
+     * Change current user's password.
+     */
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password'         => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['The provided current password does not match our records.'],
+            ]);
+        }
+
+        $user->password = $validated['password'];
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password updated successfully.',
+        ]);
+    }
 }
