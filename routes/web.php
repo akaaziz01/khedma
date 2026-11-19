@@ -12,7 +12,8 @@ Route::get('/', function () {
 Route::get('/services', [PublicServiceWebController::class, 'index'])->name('services.index');
 Route::get('/services/{id}', [PublicServiceWebController::class, 'show'])->name('services.show');
 
-// Guest & client public provider profile
+// Guest & client public provider discovery & profile
+Route::get('/providers', [PublicProviderWebController::class, 'index'])->name('providers.index');
 Route::get('/providers/{id}', [PublicProviderWebController::class, 'show'])->name('providers.show');
 
 Route::get('/register', function () {

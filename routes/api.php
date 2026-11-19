@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClientFavoriteController;
 use App\Http\Controllers\Api\ProviderDashboardController;
 use App\Http\Controllers\Api\PublicProviderController;
 use App\Http\Controllers\Api\PublicServiceController;
@@ -21,7 +22,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/services/filters', [PublicServiceController::class, 'filters']);
     Route::get('/services/{id}', [PublicServiceController::class, 'show']);
 
-    // Public provider profile for prospective clients & guests
+    // Public provider discovery, search & profile for prospective clients & guests
+    Route::get('/providers', [PublicProviderController::class, 'index']);
+    Route::get('/providers/filters', [PublicProviderController::class, 'filters']);
     Route::get('/providers/{id}', [PublicProviderController::class, 'show']);
 
     // Public category listing (providers & clients browse categories without auth)
@@ -35,6 +38,14 @@ Route::prefix('v1')->group(function () {
         Route::put('/profile/password', [AuthController::class, 'updatePassword']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
+
+        // Client Favorites & Saved Providers API
+        Route::prefix('client')->group(function () {
+            Route::get('/favorites', [ClientFavoriteController::class, 'index']);
+            Route::post('/favorites/{providerId}', [ClientFavoriteController::class, 'store']);
+            Route::delete('/favorites/{providerId}', [ClientFavoriteController::class, 'destroy']);
+            Route::get('/favorites/{providerId}/status', [ClientFavoriteController::class, 'status']);
+        });
 
         // Provider Dashboard API (Spotlight inspired with real DB data)
         Route::prefix('provider')->group(function () {

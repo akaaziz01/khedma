@@ -110,6 +110,20 @@
                             <span class="text-slate-400">—</span>
                             <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Max" class="w-20 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
                         </div>
+
+                        <!-- Availability filter for services -->
+                        <label class="flex items-center gap-2 cursor-pointer bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                            <input type="checkbox" 
+                                   name="available_only" 
+                                   value="1" 
+                                   onchange="this.form.submit()"
+                                   {{ request()->boolean('available_only') ? 'checked' : '' }}
+                                   class="rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5">
+                            <span class="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-200">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Available Pro Now
+                            </span>
+                        </label>
                     </div>
 
                     <div class="flex items-center gap-2">
@@ -148,9 +162,15 @@
                         {{ request('location', request('city')) }}
                     </span>
                 @endif
+                @if(request()->boolean('available_only'))
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Available Now
+                    </span>
+                @endif
             </div>
 
-            @if(request()->hasAny(['keyword', 'q', 'trade', 'category', 'location', 'city', 'min_price', 'max_price']))
+            @if(request()->hasAny(['keyword', 'q', 'trade', 'category', 'location', 'city', 'min_price', 'max_price', 'available_only']))
                 <a href="{{ route('services.index') }}" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
                     Clear all filters
                 </a>

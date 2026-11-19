@@ -278,4 +278,16 @@ class PublicServiceSearchTest extends TestCase
 
         $response->assertNotFound();
     }
+
+    public function test_filter_services_by_provider_availability(): void
+    {
+        $this->createProviderWithService([], ['is_available' => true], ['title' => 'Available Plumber Service']);
+        $this->createProviderWithService([], ['is_available' => false], ['title' => 'Offline Plumber Service']);
+
+        $response = $this->getJson('/api/v1/services?available_only=1');
+
+        $response->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.title', 'Available Plumber Service');
+    }
 }

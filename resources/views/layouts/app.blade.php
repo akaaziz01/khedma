@@ -125,6 +125,17 @@
                     @endif
                 </div>
 
+                <!-- Find Providers (Always available for guests, clients, and providers) -->
+                <div class="relative flex h-full items-center" id="navFindProvidersItem">
+                    <a href="/providers" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition {{ request()->is('providers*') ? 'text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                        <i class="bi bi-people-fill text-indigo-500"></i>
+                        Find Providers
+                    </a>
+                    @if(request()->is('providers*'))
+                        <div class="nav-active-bar bg-blue-600"></div>
+                    @endif
+                </div>
+
                 <!-- Provider Dynamic Tab 2: Bookings & Leads -->
                 <div class="relative flex h-full items-center" id="navBookingsItem" style="display: none;">
                     <a href="/provider/bookings" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ (request()->is('provider/bookings*') || request()->is('dashboard/bookings*')) ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
@@ -231,6 +242,10 @@
                                 <i class="bi bi-speedometer2 text-sm text-slate-500"></i>
                                 My Dashboard
                             </a>
+                            <a href="/dashboard#favorites" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                <i class="bi bi-heart-fill text-sm text-rose-500"></i>
+                                Favorite Providers
+                            </a>
                             <a href="/profile" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
                                 <i class="bi bi-person-circle text-sm text-amber-500"></i>
                                 My Profile
@@ -318,6 +333,12 @@
                 <a href="/services" id="mobileNavServices" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('services*') ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
                     <i class="bi bi-search text-blue-500"></i>
                     Find Services
+                </a>
+
+                <!-- Find Providers (Always available) -->
+                <a href="/providers" id="mobileNavProviders" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('providers*') ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                    <i class="bi bi-people-fill text-indigo-500"></i>
+                    Find Providers
                 </a>
 
                 <!-- Provider: Bookings & Leads -->

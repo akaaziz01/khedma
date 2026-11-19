@@ -14,9 +14,6 @@ class ServiceModerationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
 
     private function admin(): User
     {
@@ -31,9 +28,6 @@ class ServiceModerationTest extends TestCase
         ], $overrides));
     }
 
-    // =========================================================================
-    // List services
-    // =========================================================================
 
     public function test_admin_can_list_all_services(): void
     {
@@ -77,10 +71,6 @@ class ServiceModerationTest extends TestCase
             ->assertForbidden();
     }
 
-    // =========================================================================
-    // Approve
-    // =========================================================================
-
     public function test_admin_can_approve_a_pending_service(): void
     {
         $service = $this->pendingService();
@@ -115,9 +105,6 @@ class ServiceModerationTest extends TestCase
         $this->assertNotNull($service->fresh()->moderated_at);
     }
 
-    // =========================================================================
-    // Reject
-    // =========================================================================
 
     public function test_admin_can_reject_a_service_with_a_reason(): void
     {
@@ -151,9 +138,7 @@ class ServiceModerationTest extends TestCase
             ->assertJsonValidationErrors(['rejection_reason']);
     }
 
-    // =========================================================================
-    // Toggle active
-    // =========================================================================
+
 
     public function test_admin_can_deactivate_an_approved_service(): void
     {
@@ -174,9 +159,7 @@ class ServiceModerationTest extends TestCase
             ->assertUnprocessable();
     }
 
-    // =========================================================================
-    // Delete
-    // =========================================================================
+
 
     public function test_admin_can_delete_a_service_with_no_active_bookings(): void
     {
@@ -217,9 +200,6 @@ class ServiceModerationTest extends TestCase
         $this->assertDatabaseMissing('services', ['id' => $service->id]);
     }
 
-    // =========================================================================
-    // Auth guards
-    // =========================================================================
 
     public function test_guest_cannot_moderate_services(): void
     {

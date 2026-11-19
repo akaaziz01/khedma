@@ -88,9 +88,18 @@
                             Service Provider
                         </span>
                         @if($provider)
-                            <a href="{{ route('providers.show', $provider->id) }}" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
-                                View Profile
-                            </a>
+                            <div class="flex items-center gap-2">
+                                <button type="button" 
+                                        onclick="toggleQuickFavorite({{ $provider->id }})" 
+                                        id="quickFavBtn" 
+                                        class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" 
+                                        title="Save provider to favorites">
+                                    <i id="quickFavIcon" class="bi bi-heart text-sm"></i>
+                                </button>
+                                <a href="{{ route('providers.show', $provider->id) }}" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                                    View Profile
+                                </a>
+                            </div>
                         @endif
                     </div>
 
@@ -187,4 +196,76 @@
 
     </div>
 </div>
+
+<script>
+    let isQuickFav = false;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('khedma_token');
+        const providerId = {{ $provider?->id ?? 'null' }};
+        if (token && providerId) {
+            try {
+                const res = await fetch(`/api/v1/client/favorites/${providerId}/status`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Accept': 'application/json'
+                    }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setQuickFavState(data.is_favorited);
+                }
+            } catch(e) {}
+        }
+    });
+
+    function setQuickFavState(favorited) {
+        isQuickFav = favorited;
+        const icon = document.getElementById('quickFavIcon');
+        const btn = document.getElementById('quickFavBtn');
+        if (!icon || !btn) return;
+
+        if (favorited) {
+            icon.className = 'bi bi-heart-fill text-rose-500 text-sm';
+            btn.title = 'Remove from favorites';
+        } else {
+            icon.className = 'bi bi-heart text-sm';
+            btn.title = 'Save provider to favorites';
+        }
+    }
+
+    async function toggleQuickFavorite(providerId) {
+        const token = localStorage.getItem('khedma_token');
+        if (!token) {
+            if (confirm('Please log in to save providers to your favorites list. Go to login?')) {
+                window.location.href = '/login';
+            }
+            return;
+        }
+
+        try {
+            const method = isQuickFav ? 'DELETE' : 'POST';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            const res = await fetch(`/api/v1/client/favorites/${providerId}`, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                setQuickFavState(data.is_favorited);
+            } else {
+                alert(data.message || 'Action failed.');
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+</script>
 @endsection

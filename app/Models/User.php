@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -86,6 +87,59 @@ class User extends Authenticatable
     public function providerReviews(): HasMany
     {
         return $this->hasMany(Review::class, 'provider_id');
+    }
+
+    /**
+     * Providers saved by this client.
+     */
+    public function favoriteProviders(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'favorite_providers', 'client_id', 'provider_id')
+            ->withPivot('notes')
+            ->withTimestamps();
+    }
+
+    /**
+     * Clients who have favorited this provider.
+     */
+    public function favoritedByClients(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'favorite_providers', 'provider_id', 'client_id')
+            ->withPivot('notes')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if client has saved a given provider.
+     */
+    public function hasFavorited(int|User $provider): bool
+    {
+        $providerId = $provider instanceof User ? $provider->id : $provider;
+        return $this->favoriteProviders()->where('users.id', $providerId)->exists();
+    }
+
+    /**
+     * Save a provider to favorites with optional note.
+     */
+    public function favorite(int|User $provider, ?string $notes = null): FavoriteProvider
+    {
+        $providerId = $provider instanceof User ? $provider->id : $provider;
+
+        return FavoriteProvider::updateOrCreate(
+            ['client_id' => $this->id, 'provider_id' => $providerId],
+            ['notes' => $notes]
+        );
+    }
+
+    /**
+     * Remove a provider from favorites.
+     */
+    public function unfavorite(int|User $provider): bool
+    {
+        $providerId = $provider instanceof User ? $provider->id : $provider;
+        return (bool) FavoriteProvider::where('client_id', $this->id)
+            ->where('provider_id', $providerId)
+            ->delete();
     }
 
     public function isClient(): bool

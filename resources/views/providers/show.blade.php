@@ -112,6 +112,14 @@
                             <i class="bi bi-calendar-plus"></i>
                             <span>Request Booking</span>
                         </button>
+                        <button type="button"
+                                id="favoriteBtn"
+                                onclick="toggleFavorite({{ $provider->id }})"
+                                class="px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-2 shrink-0"
+                                title="{{ ($isFavorited ?? false) ? 'Remove from favorites' : 'Save provider to favorites' }}">
+                            <i id="favoriteIcon" class="bi {{ ($isFavorited ?? false) ? 'bi-heart-fill text-rose-500' : 'bi-heart' }} text-sm transition-transform duration-200"></i>
+                            <span id="favoriteLabel" class="hidden sm:inline">{{ ($isFavorited ?? false) ? 'Saved' : 'Save' }}</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -605,5 +613,85 @@
             closeGuestBookingModal();
         }
     });
+
+    // Favorite / Bookmark Provider
+    let isCurrentlyFavorited = {{ ($isFavorited ?? false) ? 'true' : 'false' }};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('khedma_token');
+        if (token) {
+            try {
+                const res = await fetch('/api/v1/client/favorites/{{ $provider->id }}/status', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Accept': 'application/json'
+                    }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setFavoriteButtonState(data.is_favorited);
+                }
+            } catch(e) {}
+        }
+    });
+
+    function setFavoriteButtonState(favorited) {
+        isCurrentlyFavorited = favorited;
+        const icon = document.getElementById('favoriteIcon');
+        const label = document.getElementById('favoriteLabel');
+        const btn = document.getElementById('favoriteBtn');
+
+        if (!icon || !btn) return;
+
+        if (favorited) {
+            icon.className = 'bi bi-heart-fill text-rose-500 text-sm scale-110';
+            if (label) label.textContent = 'Saved';
+            btn.title = 'Remove from favorites';
+        } else {
+            icon.className = 'bi bi-heart text-sm';
+            if (label) label.textContent = 'Save';
+            btn.title = 'Save provider to favorites';
+        }
+    }
+
+    async function toggleFavorite(providerId) {
+        const token = localStorage.getItem('khedma_token');
+        if (!token) {
+            if (confirm('Please log in to save providers to your favorites list. Go to login?')) {
+                window.location.href = '/login';
+            }
+            return;
+        }
+
+        const icon = document.getElementById('favoriteIcon');
+        if (icon) icon.classList.add('scale-125');
+
+        try {
+            const method = isCurrentlyFavorited ? 'DELETE' : 'POST';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            const res = await fetch(`/api/v1/client/favorites/${providerId}`, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setFavoriteButtonState(data.is_favorited);
+            } else {
+                alert(data.message || 'Action could not be performed.');
+            }
+        } catch(e) {
+            console.error('Error toggling favorite:', e);
+        } finally {
+            if (icon) icon.classList.remove('scale-125');
+        }
+    }
 </script>
 @endsection

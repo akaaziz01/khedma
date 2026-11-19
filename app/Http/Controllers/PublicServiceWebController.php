@@ -73,6 +73,13 @@ class PublicServiceWebController extends Controller
             $query->where('services.price', '<=', (float) $request->input('max_price'));
         }
 
+        // Availability filter (providers who are currently available for jobs)
+        if ($request->boolean('available_only') || $request->input('availability') === 'available' || $request->input('availability') === '1') {
+            $query->whereHas('provider.providerProfile', function (Builder $pq) {
+                $pq->where('is_available', true);
+            });
+        }
+
         $sort = $request->input('sort', 'newest');
         match ($sort) {
             'price_asc'    => $query->orderBy('price', 'asc'),

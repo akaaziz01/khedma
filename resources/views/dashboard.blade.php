@@ -278,9 +278,62 @@
                         <span class="text-xs font-bold uppercase text-slate-400 dark:text-slate-500 block mb-1">Quick Action</span>
                         <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Find & Hire a Pro</p>
                     </div>
-                    <a href="/register?role=provider" class="mt-4 text-center py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition">
-                        Explore Providers
+                    <a href="/services" class="mt-4 text-center py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition">
+                        Explore Verified Pros
                     </a>
+                </div>
+            </div>
+
+            <!-- Client Saved & Favorite Providers Section -->
+            <div id="favorites" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                                <i class="bi bi-heart-fill text-rose-500"></i>
+                                <span>My Saved & Favorite Providers</span>
+                            </h2>
+                            <span id="clientFavoritesCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">
+                                0 Saved
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Quickly access and book your trusted specialists.</p>
+                    </div>
+
+                    <!-- Search Input for Saved Pros -->
+                    <div class="relative w-full sm:w-64">
+                        <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+                        <input type="text" id="favSearchInput" oninput="filterClientFavorites(this.value)" placeholder="Search saved pros..."
+                            class="w-full pl-9 pr-3.5 py-2 rounded-xl text-xs border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition">
+                    </div>
+                </div>
+
+                <!-- Loading spinner for favorites -->
+                <div id="favoritesLoadingState" class="py-12 text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-3 border-rose-500 border-t-transparent mb-2"></div>
+                    <p class="text-xs text-slate-400 font-semibold">Loading your saved providers...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="clientFavoritesEmpty" class="hidden py-12 text-center max-w-sm mx-auto space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-500 flex items-center justify-center mx-auto text-2xl shadow-inner">
+                        <i class="bi bi-bookmark-heart"></i>
+                    </div>
+                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">No Saved Providers Yet</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        When you find skilled professionals you like, click the heart icon on their profile to bookmark them here.
+                    </p>
+                    <div class="pt-2">
+                        <a href="/services" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm">
+                            <i class="bi bi-search"></i>
+                            <span>Browse Verified Pros</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Favorites Grid -->
+                <div id="clientFavoritesGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Populated dynamically via JS -->
                 </div>
             </div>
         </div>
@@ -742,7 +795,9 @@
     }
 
     // ── Render Client Dashboard ────────────────────────────────────────────────
-    function renderClientDashboard(user) {
+    let clientFavoritesList = [];
+
+    async function renderClientDashboard(user) {
         document.getElementById('clientDashboardView').classList.remove('hidden');
         document.getElementById('providerDashboardView').classList.add('hidden');
 
@@ -750,6 +805,164 @@
         document.getElementById('clientAvatar').textContent = user.name.charAt(0).toUpperCase();
         document.getElementById('clientEmailDisplay').textContent = user.email;
         document.getElementById('clientFullAddress').textContent = `${user.client_profile?.address || 'Les Berges du Lac 2'}, ${user.client_profile?.city || 'Tunis'}`;
+
+        const token = localStorage.getItem('khedma_token');
+        if (token) {
+            await loadClientFavorites(token);
+        }
+    }
+
+    async function loadClientFavorites(token) {
+        const loading = document.getElementById('favoritesLoadingState');
+        const empty = document.getElementById('clientFavoritesEmpty');
+        const grid = document.getElementById('clientFavoritesGrid');
+        const badge = document.getElementById('clientFavoritesCountBadge');
+
+        try {
+            const res = await fetch('/api/v1/client/favorites', {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!res.ok) throw new Error('Could not fetch favorites');
+
+            const json = await res.json();
+            clientFavoritesList = json.data || [];
+
+            badge.textContent = `${clientFavoritesList.length} Saved`;
+
+            loading.classList.add('hidden');
+
+            if (clientFavoritesList.length === 0) {
+                empty.classList.remove('hidden');
+                grid.classList.add('hidden');
+            } else {
+                empty.classList.add('hidden');
+                grid.classList.remove('hidden');
+                renderClientFavoritesGrid(clientFavoritesList);
+            }
+        } catch(e) {
+            console.error('Error loading client favorites:', e);
+            loading.classList.add('hidden');
+            empty.classList.remove('hidden');
+        }
+    }
+
+    function renderClientFavoritesGrid(favorites) {
+        const grid = document.getElementById('clientFavoritesGrid');
+        grid.innerHTML = '';
+
+        favorites.forEach(fav => {
+            const card = document.createElement('div');
+            card.className = 'p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 hover:border-rose-300 dark:hover:border-rose-900/60 hover:shadow-md transition bg-white dark:bg-slate-900 flex flex-col justify-between space-y-4';
+
+            const stars = '★'.repeat(Math.round(fav.rating)) + '☆'.repeat(5 - Math.round(fav.rating));
+
+            card.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-amber-500 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-sm">
+                                ${fav.avatar_initial}
+                            </div>
+                            <div class="min-w-0">
+                                <a href="${fav.profile_url}" class="font-extrabold text-sm text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition block truncate">
+                                    ${fav.name}
+                                </a>
+                                <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 block truncate">
+                                    ${fav.trade}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Remove favorite button -->
+                        <button onclick="removeFavoriteFromDashboard(${fav.provider_id}, '${fav.name.replace(/'/g, "\\'")}')" 
+                                class="p-1.5 rounded-lg text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition shrink-0" 
+                                title="Remove from favorites">
+                            <i class="bi bi-trash3 text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Meta information -->
+                    <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                        <span class="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                            <i class="bi bi-geo-alt-fill text-rose-500 text-[10px]"></i>
+                            ${fav.city}
+                        </span>
+                        <span class="text-amber-500 font-bold text-xs flex items-center gap-1">
+                            <i class="bi bi-star-fill text-[10px]"></i>
+                            ${fav.rating.toFixed(1)} <span class="text-[10px] text-slate-400 font-normal">(${fav.reviews_count})</span>
+                        </span>
+                    </div>
+
+                    ${fav.hourly_rate ? `
+                        <div class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            Rate: <strong class="text-slate-900 dark:text-white">${fav.hourly_rate.toFixed(0)} TND</strong> / hr
+                        </div>
+                    ` : ''}
+
+                    ${fav.notes ? `
+                        <div class="p-2 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/50 dark:border-amber-900/30 text-[11px] text-amber-800 dark:text-amber-300 italic">
+                            <i class="bi bi-pin-angle-fill mr-1"></i> "${fav.notes}"
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                    <a href="${fav.profile_url}" class="flex-1 py-2 text-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition">
+                        View Profile
+                    </a>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        });
+    }
+
+    function filterClientFavorites(query) {
+        const q = (query || '').toLowerCase().trim();
+        const filtered = clientFavoritesList.filter(f => 
+            f.name.toLowerCase().includes(q) || 
+            (f.trade && f.trade.toLowerCase().includes(q)) ||
+            (f.city && f.city.toLowerCase().includes(q))
+        );
+        renderClientFavoritesGrid(filtered);
+    }
+
+    async function removeFavoriteFromDashboard(providerId, name) {
+        if (!confirm(`Remove ${name} from your saved providers?`)) return;
+
+        const token = localStorage.getItem('khedma_token');
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await fetch(`/api/v1/client/favorites/${providerId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
+
+            if (res.ok) {
+                // Optimistically remove from list
+                clientFavoritesList = clientFavoritesList.filter(f => f.provider_id !== providerId);
+                document.getElementById('clientFavoritesCountBadge').textContent = `${clientFavoritesList.length} Saved`;
+
+                if (clientFavoritesList.length === 0) {
+                    document.getElementById('clientFavoritesEmpty').classList.remove('hidden');
+                    document.getElementById('clientFavoritesGrid').classList.add('hidden');
+                } else {
+                    renderClientFavoritesGrid(clientFavoritesList);
+                }
+            } else {
+                alert('Could not remove provider.');
+            }
+        } catch(e) {
+            console.error(e);
+        }
     }
 
     // ── Logout ─────────────────────────────────────────────────────────────────
