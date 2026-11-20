@@ -290,14 +290,20 @@
 
                 <!-- 3. PORTFOLIO PHOTOS & PAST PROJECTS GALLERY -->
                 <section class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2">
                             <i class="bi bi-images text-blue-600 text-lg"></i>
                             <h2 class="text-lg font-black text-slate-900 dark:text-white">Portfolio & Past Projects</h2>
                         </div>
-                        <span class="text-xs font-bold text-slate-400">
-                            {{ count($portfolio) }} {{ count($portfolio) === 1 ? 'photo' : 'photos' }}
-                        </span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold text-slate-400">
+                                {{ count($portfolio) }} {{ count($portfolio) === 1 ? 'photo' : 'photos' }}
+                            </span>
+                            <a href="/profile" id="ownerPortfolioUploadBtn" style="display: none;" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black transition flex items-center gap-1 shadow-xs">
+                                <i class="bi bi-cloud-arrow-up-fill text-xs"></i>
+                                <span>Upload Photos</span>
+                            </a>
+                        </div>
                     </div>
 
                     @if(empty($portfolio))
@@ -310,6 +316,12 @@
                             <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                                 {{ $provider->name }} is verified on the Khedma platform. You can check the customer reviews below to see verified client feedback.
                             </p>
+                            <div id="ownerEmptyPortfolioNotice" style="display: none;" class="pt-2">
+                                <a href="/profile" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition shadow-sm">
+                                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                                    <span>Upload Photos of Your Work</span>
+                                </a>
+                            </div>
                         </div>
                     @else
                         <!-- Gallery Grid -->
@@ -710,6 +722,12 @@
 
                 const ownerSidebar = document.getElementById('ownerProfileSidebar');
                 if (ownerSidebar) ownerSidebar.classList.remove('hidden');
+
+                const ownerPortfolioBtn = document.getElementById('ownerPortfolioUploadBtn');
+                if (ownerPortfolioBtn) ownerPortfolioBtn.style.display = 'flex';
+
+                const ownerEmptyNotice = document.getElementById('ownerEmptyPortfolioNotice');
+                if (ownerEmptyNotice) ownerEmptyNotice.style.display = 'block';
 
                 const favBtn = document.getElementById('favoriteBtn');
                 if (favBtn) favBtn.classList.add('hidden');

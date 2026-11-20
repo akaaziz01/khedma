@@ -176,6 +176,42 @@
                         <!-- Dynamic Skills Pills -->
                     </div>
                 </div>
+
+                <!-- Previous Work & Portfolio Photos Section -->
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-4">
+                    <div class="flex items-center justify-between flex-wrap gap-3">
+                        <div>
+                            <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="bi bi-images text-blue-600"></i>
+                                <span>Previous Work & Portfolio Photos</span>
+                            </h3>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                Upload real photos of your past installations, repairs, and projects to prove the quality of your craft.
+                            </p>
+                        </div>
+                        <button type="button" onclick="openUploadPhotoModal()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-sm">
+                            <i class="bi bi-cloud-arrow-up-fill text-sm"></i>
+                            <span>Upload Work Photo</span>
+                        </button>
+                    </div>
+
+                    <!-- Live Portfolio Grid -->
+                    <div id="portfolioGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-1">
+                        <!-- Rendered dynamically -->
+                    </div>
+
+                    <!-- Empty state -->
+                    <div id="portfolioEmptyState" class="hidden p-8 rounded-2xl bg-slate-50 dark:bg-slate-800/40 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 space-y-2">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto text-xl">
+                            <i class="bi bi-camera-fill"></i>
+                        </div>
+                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300">No project photos uploaded yet</p>
+                        <p class="text-[11px] text-slate-400 max-w-sm mx-auto">Upload photos of previous jobs to demonstrate quality and build client confidence.</p>
+                        <button type="button" onclick="openUploadPhotoModal()" class="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-bold hover:opacity-90 transition">
+                            <i class="bi bi-plus-lg"></i> Add First Project Photo
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- SECTION 3: Client Specific Details -->
@@ -239,9 +275,98 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- MODAL: UPLOAD WORK PHOTO                   -->
+<!-- ========================================== -->
+<div id="uploadPhotoModal" style="display: none;" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 sm:p-8 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
+                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Upload Work Photo</h3>
+                    <p class="text-[11px] text-slate-400">Prove the quality of your craft to clients</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeUploadPhotoModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <form id="uploadPhotoForm" onsubmit="submitPortfolioPhoto(event)" class="space-y-4">
+            <!-- File Input / Preview -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Project Photo *</label>
+                <div id="photoDropArea" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-400 rounded-2xl p-4 text-center cursor-pointer transition bg-slate-50 dark:bg-slate-800/40">
+                    <input type="file" id="inputPhotoFile" accept="image/png,image/jpeg,image/webp,image/jpg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewSelectedPhoto(this)">
+                    <div id="photoPrompt">
+                        <i class="bi bi-image text-3xl text-slate-400 mb-1 block"></i>
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200 block">Click to browse or drag & drop photo</span>
+                        <span class="text-[10px] text-slate-400">PNG, JPG, or WEBP (Max 5MB)</span>
+                    </div>
+                    <div id="photoPreviewContainer" style="display: none;" class="relative">
+                        <img id="photoPreviewImg" src="#" alt="Preview" class="max-h-48 mx-auto rounded-xl object-cover shadow-sm">
+                        <button type="button" onclick="clearPhotoSelection(event)" class="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full text-xs hover:bg-red-700 shadow" title="Remove selection">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Alternate option: or via Image URL -->
+                <div class="mt-2 flex items-center gap-2">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase shrink-0">or image URL:</span>
+                    <input type="url" id="inputPhotoUrl" placeholder="https://images.unsplash.com/photo-..." class="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Project / Work Title *</label>
+                <input type="text" id="inputPhotoTitle" required placeholder="e.g. Bathroom Copper Piping & Drain Replacement" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium focus:ring-2 focus:ring-amber-500 text-slate-900 dark:text-white">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Quality Details & Description (Optional)</label>
+                <textarea id="inputPhotoCaption" rows="2" placeholder="e.g. Fitted high-pressure valves and custom manifolds with 2-year warranty." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium focus:ring-2 focus:ring-amber-500 text-slate-900 dark:text-white"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" onclick="closeUploadPhotoModal()" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                    Cancel
+                </button>
+                <button type="submit" id="btnSubmitPhoto" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-1.5">
+                    <i class="bi bi-cloud-arrow-up-fill text-sm"></i>
+                    <span>Upload & Publish</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- LIGHTBOX PREVIEW MODAL                     -->
+<!-- ========================================== -->
+<div id="profilePhotoLightbox" style="display: none;" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="relative max-w-3xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 text-white space-y-4 p-4 sm:p-6">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+                <h4 id="profileLightboxTitle" class="font-extrabold text-base text-white">Project Photo</h4>
+                <p id="profileLightboxCaption" class="text-xs text-slate-400 mt-0.5"></p>
+            </div>
+            <button type="button" onclick="closeProfileLightbox()" class="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/80 transition">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+        </div>
+        <div class="max-h-[70vh] flex items-center justify-center overflow-hidden rounded-2xl bg-black/40">
+            <img id="profileLightboxImg" src="#" alt="Project Photo" class="max-h-[70vh] w-auto max-w-full object-contain rounded-xl">
+        </div>
+    </div>
+</div>
+
 <script>
     let currentUser = null;
     let currentSkills = [];
+    let currentPortfolio = [];
 
     document.addEventListener('DOMContentLoaded', () => {
         fetchUserProfile();
@@ -307,6 +432,9 @@
 
             currentSkills = Array.isArray(profile.skills) ? [...profile.skills] : [];
             renderSkillsPills();
+
+            currentPortfolio = Array.isArray(profile.portfolio_photos) ? [...profile.portfolio_photos] : [];
+            renderPortfolioGrid();
 
             const pubLink = document.getElementById('btnViewPublicProfile');
             pubLink.href = '/providers/' + user.id;
@@ -466,6 +594,200 @@
             btn.disabled = false;
             btn.textContent = 'Update Password';
         }
+    }
+
+    // ==========================================
+    // PORTFOLIO & PREVIOUS WORK MANAGEMENT
+    // ==========================================
+    function renderPortfolioGrid() {
+        const grid = document.getElementById('portfolioGrid');
+        const empty = document.getElementById('portfolioEmptyState');
+        if (!grid || !empty) return;
+
+        if (currentPortfolio.length === 0) {
+            grid.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+
+        empty.classList.add('hidden');
+        grid.innerHTML = currentPortfolio.map((item, idx) => {
+            const photoId = item.id || idx;
+            const url = item.url || '';
+            const title = item.title || 'Work Photo';
+            const caption = item.caption || '';
+            return `
+                <div class="group relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <div class="relative aspect-4/3 overflow-hidden cursor-pointer bg-slate-200 dark:bg-slate-900" onclick="openProfileLightbox('${escapeHtml(url)}', '${escapeHtml(title)}', '${escapeHtml(caption)}')">
+                        <img src="${url}" alt="${escapeHtml(title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/png?text=Photo'">
+                        <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-2.5">
+                            <span class="text-white text-[11px] font-bold truncate flex items-center gap-1">
+                                <i class="bi bi-zoom-in"></i> View Full
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-3 space-y-1">
+                        <h4 class="text-xs font-extrabold text-slate-900 dark:text-white truncate" title="${escapeHtml(title)}">${escapeHtml(title)}</h4>
+                        ${caption ? `<p class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2" title="${escapeHtml(caption)}">${escapeHtml(caption)}</p>` : ''}
+                        <div class="pt-2 flex justify-end">
+                            <button type="button" onclick="confirmDeletePhoto('${photoId}')" class="text-[10px] font-bold text-red-600 hover:text-red-700 dark:text-red-400 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition">
+                                <i class="bi bi-trash"></i>
+                                <span>Remove</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/'/g, '&#39;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    function openUploadPhotoModal() {
+        document.getElementById('uploadPhotoModal').style.display = 'flex';
+        document.getElementById('uploadPhotoForm').reset();
+        clearPhotoSelection();
+    }
+
+    function closeUploadPhotoModal() {
+        document.getElementById('uploadPhotoModal').style.display = 'none';
+    }
+
+    function previewSelectedPhoto(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('photoPreviewImg').src = e.target.result;
+                document.getElementById('photoPrompt').style.display = 'none';
+                document.getElementById('photoPreviewContainer').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearPhotoSelection(e) {
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+        document.getElementById('inputPhotoFile').value = '';
+        document.getElementById('photoPreviewImg').src = '#';
+        document.getElementById('photoPreviewContainer').style.display = 'none';
+        document.getElementById('photoPrompt').style.display = 'block';
+    }
+
+    async function submitPortfolioPhoto(e) {
+        e.preventDefault();
+        const token = localStorage.getItem('khedma_token');
+        if (!token) return;
+
+        const fileInput = document.getElementById('inputPhotoFile');
+        const urlInput = document.getElementById('inputPhotoUrl');
+        const titleInput = document.getElementById('inputPhotoTitle');
+        const captionInput = document.getElementById('inputPhotoCaption');
+
+        const title = titleInput.value.trim();
+        const caption = captionInput.value.trim();
+        const photoUrl = urlInput.value.trim();
+
+        if (!fileInput.files[0] && !photoUrl) {
+            showAlert('error', 'Please select a photo file or enter an image URL.');
+            return;
+        }
+
+        const formData = new FormData();
+        if (fileInput.files[0]) {
+            formData.append('photo', fileInput.files[0]);
+        }
+        if (photoUrl) {
+            formData.append('photo_url', photoUrl);
+        }
+        formData.append('title', title);
+        if (caption) {
+            formData.append('caption', caption);
+        }
+
+        const btn = document.getElementById('btnSubmitPhoto');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Uploading...';
+
+        try {
+            const res = await fetch('/api/v1/provider/portfolio', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                currentPortfolio = data.portfolio_photos || [];
+                renderPortfolioGrid();
+                closeUploadPhotoModal();
+                showAlert('success', 'Work photo published successfully!');
+            } else {
+                showAlert('error', data.message || 'Failed to upload photo.');
+            }
+        } catch (err) {
+            console.error(err);
+            showAlert('error', 'Network error occurred while uploading.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill text-sm"></i><span>Upload & Publish</span>';
+        }
+    }
+
+    async function confirmDeletePhoto(id) {
+        if (!confirm('Are you sure you want to remove this photo from your portfolio?')) {
+            return;
+        }
+
+        const token = localStorage.getItem('khedma_token');
+        if (!token) return;
+
+        try {
+            const res = await fetch('/api/v1/provider/portfolio/' + encodeURIComponent(id), {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                currentPortfolio = data.portfolio_photos || [];
+                renderPortfolioGrid();
+                showAlert('success', 'Photo removed from portfolio.');
+            } else {
+                showAlert('error', data.message || 'Failed to delete photo.');
+            }
+        } catch (err) {
+            console.error(err);
+            showAlert('error', 'Network error occurred while removing photo.');
+        }
+    }
+
+    function openProfileLightbox(url, title, caption) {
+        document.getElementById('profileLightboxImg').src = url;
+        document.getElementById('profileLightboxTitle').textContent = title || 'Work Photo';
+        document.getElementById('profileLightboxCaption').textContent = caption || '';
+        document.getElementById('profilePhotoLightbox').style.display = 'flex';
+    }
+
+    function closeProfileLightbox() {
+        document.getElementById('profilePhotoLightbox').style.display = 'none';
     }
 
     function showAlert(type, message) {

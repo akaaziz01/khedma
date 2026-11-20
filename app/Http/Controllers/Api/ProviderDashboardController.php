@@ -7,6 +7,8 @@ use App\Models\Booking;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ProviderDashboardController extends Controller
@@ -299,6 +301,123 @@ class ProviderDashboardController extends Controller
             'message' => 'Profile updated successfully.',
             'profile' => $profile->fresh(),
             'user' => $provider->fresh(['providerProfile']),
+        ]);
+    }
+
+    /**
+     * Upload a portfolio / past work photo to prove quality of work.
+     */
+    public function uploadPortfolioPhoto(Request $request): JsonResponse
+    {
+        $provider = $request->user();
+
+        if (! $provider->isProvider()) {
+            return response()->json(['message' => 'Unauthorized: User is not a provider.'], 403);
+        }
+
+        $validated = $request->validate([
+            'photo'     => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:5120'],
+            'photo_url' => ['nullable', 'url', 'max:500'],
+            'title'     => ['required', 'string', 'max:150'],
+            'caption'   => ['nullable', 'string', 'max:500'],
+        ]);
+
+        if (! $request->hasFile('photo') && empty($validated['photo_url'])) {
+            return response()->json([
+                'message' => 'Please provide an image file or a valid photo URL.',
+                'errors' => ['photo' => ['An image file or photo URL is required.']],
+            ], 422);
+        }
+
+        $photoUrl = '';
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('portfolio', 'public');
+            $photoUrl = Storage::url($path);
+        } else {
+            $photoUrl = $validated['photo_url'];
+        }
+
+        $profile = $provider->providerProfile ?: $provider->providerProfile()->create([
+            'business_name'    => $provider->name,
+            'category'         => 'Plumbing',
+            'hourly_rate'      => 40.00,
+            'experience_years' => 1,
+            'city'             => 'Tunis',
+            'is_available'     => true,
+        ]);
+
+        $photos = $profile->portfolio_photos ?? [];
+        if (! is_array($photos)) {
+            $photos = [];
+        }
+
+        $newPhoto = [
+            'id'         => (string) Str::uuid(),
+            'url'        => $photoUrl,
+            'title'      => $validated['title'],
+            'caption'    => $validated['caption'] ?? '',
+            'created_at' => now()->toIso8601String(),
+        ];
+
+        $photos[] = $newPhoto;
+        $profile->portfolio_photos = $photos;
+        $profile->save();
+
+        return response()->json([
+            'message'          => 'Work photo uploaded successfully.',
+            'photo'            => $newPhoto,
+            'portfolio_photos' => $photos,
+        ], 201);
+    }
+
+    /**
+     * Delete a portfolio photo by id or index.
+     */
+    public function deletePortfolioPhoto(Request $request, string|int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        if (! $provider->isProvider()) {
+            return response()->json(['message' => 'Unauthorized: User is not a provider.'], 403);
+        }
+
+        $profile = $provider->providerProfile;
+        if (! $profile) {
+            return response()->json(['message' => 'Provider profile not found.'], 404);
+        }
+
+        $photos = $profile->portfolio_photos ?? [];
+        if (! is_array($photos)) {
+            $photos = [];
+        }
+
+        $found = false;
+        $updatedPhotos = [];
+
+        foreach ($photos as $idx => $photo) {
+            $photoId = $photo['id'] ?? (string) $idx;
+            if ($photoId === (string) $id || (is_numeric($id) && (int) $id === $idx)) {
+                $found = true;
+                // Optional: remove file from public storage if it was uploaded locally
+                if (isset($photo['url']) && str_starts_with($photo['url'], '/storage/portfolio/')) {
+                    $relativeFilePath = str_replace('/storage/', '', $photo['url']);
+                    Storage::disk('public')->delete($relativeFilePath);
+                }
+                continue;
+            }
+            $updatedPhotos[] = $photo;
+        }
+
+        if (! $found) {
+            return response()->json(['message' => 'Photo not found in your portfolio.'], 404);
+        }
+
+        $profile->portfolio_photos = $updatedPhotos;
+        $profile->save();
+
+        return response()->json([
+            'message'          => 'Portfolio photo removed successfully.',
+            'portfolio_photos' => $updatedPhotos,
         ]);
     }
 }

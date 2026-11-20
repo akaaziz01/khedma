@@ -59,6 +59,8 @@ Route::prefix('v1')->group(function () {
             Route::put('/services/{id}', [ProviderDashboardController::class, 'updateService']);
             Route::delete('/services/{id}', [ProviderDashboardController::class, 'deleteService']);
             Route::post('/profile', [ProviderDashboardController::class, 'updateProfile']);
+            Route::post('/portfolio', [ProviderDashboardController::class, 'uploadPortfolioPhoto']);
+            Route::delete('/portfolio/{id}', [ProviderDashboardController::class, 'deletePortfolioPhoto']);
         });
 
         // Admin Management Area (Secured with Admin Middleware)
