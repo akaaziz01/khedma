@@ -138,7 +138,19 @@ class PublicProviderSearchTest extends TestCase
         $highRatedPro = $this->createProvider(['name' => '5 Star Pro']);
         $lowRatedPro = $this->createProvider(['name' => '3 Star Pro']);
 
+        $booking1 = \App\Models\Booking::factory()->create([
+            'client_id'   => $client->id,
+            'provider_id' => $highRatedPro->id,
+            'status'      => 'completed',
+        ]);
+        $booking2 = \App\Models\Booking::factory()->create([
+            'client_id'   => $client->id,
+            'provider_id' => $lowRatedPro->id,
+            'status'      => 'completed',
+        ]);
+
         Review::create([
+            'booking_id'  => $booking1->id,
             'client_id'   => $client->id,
             'provider_id' => $highRatedPro->id,
             'rating'      => 5,
@@ -146,6 +158,7 @@ class PublicProviderSearchTest extends TestCase
         ]);
 
         Review::create([
+            'booking_id'  => $booking2->id,
             'client_id'   => $client->id,
             'provider_id' => $lowRatedPro->id,
             'rating'      => 3,

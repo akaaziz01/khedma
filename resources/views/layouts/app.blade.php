@@ -66,7 +66,7 @@
     <!-- SPOTLIGHT FIXED APP HEADER (CLIENT & PROVIDER ONLY)       -->
     <!-- ======================================================== -->
     @if(!request()->is('admin*'))
-    <header class="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/80 dark:border-slate-800 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md shadow-xs transition-colors duration-200">
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/80 dark:border-slate-800 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md shadow-sm transition-colors duration-200">
         <div class="mx-auto flex h-16 items-center px-4 md:max-w-7xl justify-between">
 
             <!-- Left: Mobile Menu Trigger + Brand Logo -->
@@ -94,7 +94,11 @@
             <nav class="hidden lg:flex items-center h-full space-x-1 ml-6">
                 <!-- Discovery / Home (Hidden for Logged In Users) -->
                 <div class="relative flex h-full items-center" id="navHomeItem">
-                    <a href="/" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ request()->is('/') ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
+                    <a href="/" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-slate-900 dark:text-white font-extrabold' => request()->is('/'),
+                        'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white' => !request()->is('/'),
+                    ])>
                         <i class="bi bi-house-door text-slate-400 dark:text-slate-500"></i>
                         Home
                     </a>
@@ -105,7 +109,11 @@
 
                 <!-- Provider / Client Dynamic Tab 1: Dashboard -->
                 <div class="relative flex h-full items-center" id="navDashboardItem" style="display: none;">
-                    <a href="/dashboard" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ request()->is('dashboard') ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
+                    <a href="/dashboard" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-slate-900 dark:text-white font-extrabold' => request()->is('dashboard'),
+                        'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white' => !request()->is('dashboard'),
+                    ])>
                         <i class="bi bi-grid-fill text-slate-400 dark:text-slate-500"></i>
                         Dashboard
                     </a>
@@ -116,7 +124,11 @@
 
                 <!-- Find Services (Always available for guests, clients, and providers) -->
                 <div class="relative flex h-full items-center" id="navFindServicesItem">
-                    <a href="/services" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition {{ request()->is('services*') ? 'text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                    <a href="/services" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('services*'),
+                        'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400' => !request()->is('services*'),
+                    ])>
                         <i class="bi bi-search text-blue-500"></i>
                         Find Services
                     </a>
@@ -127,7 +139,11 @@
 
                 <!-- Find Providers (Always available for guests, clients, and providers) -->
                 <div class="relative flex h-full items-center" id="navFindProvidersItem">
-                    <a href="/providers" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition {{ request()->is('providers*') ? 'text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                    <a href="/providers" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('providers*'),
+                        'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400' => !request()->is('providers*'),
+                    ])>
                         <i class="bi bi-people-fill text-indigo-500"></i>
                         Find Providers
                     </a>
@@ -136,12 +152,32 @@
                     @endif
                 </div>
 
+                <!-- Compare Pros Nav Tab -->
+                <div class="relative flex h-full items-center" id="navCompareItem">
+                    <a href="/compare" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-amber-600 dark:text-amber-400 font-extrabold' => request()->is('compare*'),
+                        'text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400' => !request()->is('compare*'),
+                    ])>
+                        <i class="bi bi-layout-split text-amber-500"></i>
+                        <span>Compare</span>
+                        <span id="navCompareBadge" class="hidden px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-500 text-white">0</span>
+                    </a>
+                    @if(request()->is('compare*'))
+                        <div class="nav-active-bar bg-amber-500"></div>
+                    @endif
+                </div>
+
                 <!-- Provider Dynamic Tab 2: Bookings & Leads -->
                 <div class="relative flex h-full items-center" id="navBookingsItem" style="display: none;">
-                    <a href="/provider/bookings" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ (request()->is('provider/bookings*') || request()->is('dashboard/bookings*')) ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
+                    <a href="/provider/bookings" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-slate-900 dark:text-white font-extrabold' => (request()->is('provider/bookings*') || request()->is('dashboard/bookings*')),
+                        'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white' => !(request()->is('provider/bookings*') || request()->is('dashboard/bookings*')),
+                    ])>
                         <i class="bi bi-calendar-check-fill text-slate-400 dark:text-slate-500"></i>
                         Bookings & Leads
-                        <span id="navPendingBadge" class="hidden px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">1</span>
+                        <span id="navPendingBadge" class="hidden px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">1</span>
                     </a>
                     @if(request()->is('provider/bookings*') || request()->is('dashboard/bookings*'))
                         <div class="nav-active-bar bg-amber-500"></div>
@@ -150,7 +186,11 @@
 
                 <!-- Provider Dynamic Tab 3: My Services -->
                 <div class="relative flex h-full items-center" id="navServicesItem" style="display: none;">
-                    <a href="/provider/services" class="h-full flex items-center gap-2 px-3.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition {{ (request()->is('provider/services*') || request()->is('dashboard/services*')) ? 'text-slate-900 dark:text-white font-extrabold' : '' }}">
+                    <a href="/provider/services" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-slate-900 dark:text-white font-extrabold' => (request()->is('provider/services*') || request()->is('dashboard/services*')),
+                        'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white' => !(request()->is('provider/services*') || request()->is('dashboard/services*')),
+                    ])>
                         <i class="bi bi-tools text-slate-400 dark:text-slate-500"></i>
                         My Services
                     </a>
@@ -173,7 +213,7 @@
                 
                 <!-- LIGHT / DARK MODE TOGGLE BUTTON -->
                 <button type="button" onclick="toggleTheme()" title="Toggle Dark/Light Mode"
-                    class="h-9 w-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer shadow-2xs">
+                    class="h-9 w-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer shadow-sm">
                     <i class="bi bi-sun-fill text-amber-500 theme-icon-sun hidden text-sm"></i>
                     <i class="bi bi-moon-stars-fill text-indigo-400 theme-icon-moon text-sm"></i>
                 </button>
@@ -227,7 +267,7 @@
                                 <span id="headerUserName" class="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[110px]">User</span>
                                 <span id="headerUserRole" class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">Provider</span>
                             </div>
-                            <div id="headerUserAvatar" class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+                            <div id="headerUserAvatar" class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">
                                 Y
                             </div>
                         </button>
@@ -238,21 +278,21 @@
                                 <span class="font-bold text-slate-900 dark:text-white block truncate" id="dropdownUserEmail">user@khedma.tn</span>
                                 <span class="text-[10px] text-slate-400">Authenticated via Sanctum</span>
                             </div>
+                            <a href="/profile" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition">
+                                <i class="bi bi-person-circle text-sm text-amber-500"></i>
+                                My Profile
+                            </a>
                             <a href="/dashboard" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
                                 <i class="bi bi-speedometer2 text-sm text-slate-500"></i>
                                 My Dashboard
                             </a>
-                            <a href="/dashboard#favorites" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
-                                <i class="bi bi-heart-fill text-sm text-rose-500"></i>
-                                Favorite Providers
-                            </a>
-                            <a href="/profile" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
-                                <i class="bi bi-person-circle text-sm text-amber-500"></i>
-                                My Profile
-                            </a>
                             <a id="dropdownPublicProfileLink" href="#" class="hidden flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
                                 <i class="bi bi-eye text-sm text-blue-500"></i>
                                 Public Profile Preview
+                            </a>
+                            <a id="dropdownFavoritesLink" href="/dashboard#favorites" class="hidden flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                <i class="bi bi-heart-fill text-sm text-rose-500"></i>
+                                Favorite Providers
                             </a>
                             <div class="border-t border-slate-100 dark:border-slate-800 my-1"></div>
                             <button onclick="handleLogoutGlobal()" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 font-bold transition text-left">
@@ -274,7 +314,7 @@
                     <a href="/login" class="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-xl transition">
                         Sign In
                     </a>
-                    <a href="/register" class="text-xs font-extrabold bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl shadow-xs shadow-blue-500/20 transition flex items-center gap-1.5">
+                    <a href="/register" class="text-xs font-extrabold bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl shadow-sm shadow-blue-500/20 transition flex items-center gap-1.5">
                         <span>Create Account</span>
                         <i class="bi bi-arrow-right text-xs"></i>
                     </a>
@@ -291,7 +331,7 @@
     <!-- ======================================================== -->
     <!-- SPOTLIGHT MOBILE OFF-CANVAS SHEET DRAWER                 -->
     <!-- ======================================================== -->
-    <div id="mobileDrawerBackdrop" onclick="toggleMobileMenu()" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
+    <div id="mobileDrawerBackdrop" onclick="toggleMobileMenu()" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
     <div id="mobileDrawer" class="fixed top-0 bottom-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 shadow-2xl p-6 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-slate-200 dark:border-slate-800">
         <div class="space-y-6">
             <!-- Drawer Header -->
@@ -307,7 +347,7 @@
                         <i class="bi bi-sun-fill text-amber-500 theme-icon-sun hidden"></i>
                         <i class="bi bi-moon-stars-fill text-indigo-400 theme-icon-moon"></i>
                     </button>
-                    <button onclick="toggleMobileMenu()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <button type="button" onclick="toggleMobileMenu()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                         <i class="bi bi-x-lg text-sm"></i>
                     </button>
                 </div>
@@ -316,13 +356,21 @@
             <!-- Drawer Navigation Items -->
             <nav class="space-y-1.5 text-xs font-bold">
                 <!-- Home (Shown for guest, hidden for logged in) -->
-                <a href="/" id="mobileNavHome" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('/') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : '' }}">
+                <a href="/" id="mobileNavHome" @class([
+                    'flex items-center gap-3 px-3 py-2.5 rounded-xl transition',
+                    'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' => request()->is('/'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('/'),
+                ])>
                     <i class="bi bi-house-door text-slate-500"></i>
                     Home
                 </a>
 
                 <!-- Dashboard (Shown for logged in users) -->
-                <a href="/dashboard" id="mobileNavDashboard" class="hidden flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('dashboard') ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
+                <a href="/dashboard" id="mobileNavDashboard" @class([
+                    'hidden flex items-center justify-between px-3 py-2.5 rounded-xl transition',
+                    'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' => request()->is('dashboard'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('dashboard'),
+                ])>
                     <div class="flex items-center gap-3">
                         <i class="bi bi-grid-fill text-slate-500"></i>
                         Dashboard
@@ -330,19 +378,44 @@
                 </a>
 
                 <!-- Find Services (Always available) -->
-                <a href="/services" id="mobileNavServices" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('services*') ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                <a href="/services" id="mobileNavServices" @class([
+                    'flex items-center gap-3 px-3 py-2.5 rounded-xl transition',
+                    'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('services*'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('services*'),
+                ])>
                     <i class="bi bi-search text-blue-500"></i>
                     Find Services
                 </a>
 
                 <!-- Find Providers (Always available) -->
-                <a href="/providers" id="mobileNavProviders" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('providers*') ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' : '' }}">
+                <a href="/providers" id="mobileNavProviders" @class([
+                    'flex items-center gap-3 px-3 py-2.5 rounded-xl transition',
+                    'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('providers*'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('providers*'),
+                ])>
                     <i class="bi bi-people-fill text-indigo-500"></i>
                     Find Providers
                 </a>
 
+                <!-- Compare Pros (Always available) -->
+                <a href="/compare" id="mobileNavCompare" @class([
+                    'flex items-center justify-between px-3 py-2.5 rounded-xl transition',
+                    'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' => request()->is('compare*'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('compare*'),
+                ])>
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-layout-split text-amber-500"></i>
+                        Compare Pros
+                    </div>
+                    <span id="mobileCompareBadge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">0</span>
+                </a>
+
                 <!-- Provider: Bookings & Leads -->
-                <a href="/provider/bookings" id="mobileNavBookings" class="hidden flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ (request()->is('provider/bookings*') || request()->is('dashboard/bookings*')) ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
+                <a href="/provider/bookings" id="mobileNavBookings" @class([
+                    'hidden flex items-center justify-between px-3 py-2.5 rounded-xl transition',
+                    'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' => (request()->is('provider/bookings*') || request()->is('dashboard/bookings*')),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !(request()->is('provider/bookings*') || request()->is('dashboard/bookings*')),
+                ])>
                     <div class="flex items-center gap-3">
                         <i class="bi bi-calendar-check-fill text-slate-500"></i>
                         Bookings & Leads
@@ -351,13 +424,21 @@
                 </a>
 
                 <!-- Provider: My Services -->
-                <a href="/provider/services" id="mobileNavMyServices" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ (request()->is('provider/services*') || request()->is('dashboard/services*')) ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
+                <a href="/provider/services" id="mobileNavMyServices" @class([
+                    'hidden flex items-center gap-3 px-3 py-2.5 rounded-xl transition',
+                    'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' => (request()->is('provider/services*') || request()->is('dashboard/services*')),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !(request()->is('provider/services*') || request()->is('dashboard/services*')),
+                ])>
                     <i class="bi bi-tools text-slate-500"></i>
                     My Services
                 </a>
 
                 <!-- My Profile (Shown for logged in users) -->
-                <a href="/profile" id="mobileNavProfile" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition {{ request()->is('profile*') ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' : '' }}">
+                <a href="/profile" id="mobileNavProfile" @class([
+                    'hidden flex items-center gap-3 px-3 py-2.5 rounded-xl transition',
+                    'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-extrabold' => request()->is('profile*'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('profile*'),
+                ])>
                     <i class="bi bi-person-circle text-slate-500"></i>
                     My Profile
                 </a>
@@ -381,6 +462,32 @@
         @yield('content')
     </main>
 
+    <!-- ======================================================== -->
+    <!-- FLOATING CLIENT COMPARISON DOCK                          -->
+    <!-- ======================================================== -->
+    <div id="floatingCompareBar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-lg bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white p-3.5 rounded-3xl shadow-2xl border border-slate-700/60 transition-all duration-300">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div id="compareBarAvatars" class="flex items-center -space-x-2 shrink-0">
+                    <!-- Dynamic avatars -->
+                </div>
+                <div class="min-w-0">
+                    <span class="text-xs font-black block truncate" id="compareBarTitle">Comparing Providers</span>
+                    <span class="text-[10px] text-slate-300 block truncate" id="compareBarSub">Select up to 4 pros</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="clearCompareList()" class="px-2.5 py-1.5 rounded-xl text-slate-400 hover:text-white text-xs font-bold transition">
+                    Clear
+                </button>
+                <a id="btnGoCompare" href="/compare" class="px-4 py-2 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-md transition flex items-center gap-1.5">
+                    <span>Compare Now</span>
+                    <span id="compareBarCountPill" class="w-4 h-4 rounded-full bg-slate-950 text-white text-[9px] flex items-center justify-center font-bold">2</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
 
 
     <!-- Header State & Dropdowns Script -->
@@ -397,12 +504,16 @@
             const authControls = document.getElementById('authHeaderControls');
             const navHome = document.getElementById('navHomeItem');
             const navDashboard = document.getElementById('navDashboardItem');
+            const navFindProviders = document.getElementById('navFindProvidersItem');
+            const navCompare = document.getElementById('navCompareItem');
             const navBookings = document.getElementById('navBookingsItem');
             const navServices = document.getElementById('navServicesItem');
             const navGuestBecomeProvider = document.getElementById('navGuestBecomeProvider');
 
             const mobileNavHome = document.getElementById('mobileNavHome');
             const mobileNavDashboard = document.getElementById('mobileNavDashboard');
+            const mobileNavProviders = document.getElementById('mobileNavProviders');
+            const mobileNavCompare = document.getElementById('mobileNavCompare');
             const mobileNavBookings = document.getElementById('mobileNavBookings');
             const mobileNavMyServices = document.getElementById('mobileNavMyServices');
             const mobileNavProfile = document.getElementById('mobileNavProfile');
@@ -430,6 +541,16 @@
                         }
                     }
 
+                    // Favorites link for clients
+                    const favLink = document.getElementById('dropdownFavoritesLink');
+                    if (favLink) {
+                        if (user.role === 'client') {
+                            favLink.classList.remove('hidden');
+                        } else {
+                            favLink.classList.add('hidden');
+                        }
+                    }
+
                     // Hide Home link from logged in users
                     if (navHome) navHome.style.display = 'none';
                     if (mobileNavHome) mobileNavHome.style.display = 'none';
@@ -451,6 +572,12 @@
                         if (mobileNavBookings) mobileNavBookings.classList.remove('hidden');
                         if (mobileNavMyServices) mobileNavMyServices.classList.remove('hidden');
 
+                        // Hide Compare and Find Providers for providers
+                        if (navFindProviders) navFindProviders.style.display = 'none';
+                        if (navCompare) navCompare.style.display = 'none';
+                        if (mobileNavProviders) mobileNavProviders.classList.add('hidden');
+                        if (mobileNavCompare) mobileNavCompare.classList.add('hidden');
+
                         if (navGuestBecomeProvider) navGuestBecomeProvider.style.display = 'none';
                         if (mobileNavBecomeProvider) mobileNavBecomeProvider.style.display = 'none';
 
@@ -462,6 +589,12 @@
                     } else {
                         document.getElementById('headerUserRole').textContent = '👤 Client';
                         document.getElementById('headerUserRole').className = 'text-[10px] font-bold text-blue-600 uppercase';
+
+                        // Show Find Providers and Compare for clients
+                        if (navFindProviders) navFindProviders.style.display = 'flex';
+                        if (navCompare) navCompare.style.display = 'flex';
+                        if (mobileNavProviders) mobileNavProviders.classList.remove('hidden');
+                        if (mobileNavCompare) mobileNavCompare.classList.remove('hidden');
 
                         // Hide Provider specific tabs for client
                         if (navBookings) navBookings.style.display = 'none';
@@ -497,9 +630,13 @@
                 guestControls.classList.remove('hidden');
                 authControls.classList.add('hidden');
 
-                // Show Home for guests
+                // Show Home, Find Providers, and Compare for guests
                 if (navHome) navHome.style.display = 'flex';
                 if (mobileNavHome) mobileNavHome.style.display = 'flex';
+                if (navFindProviders) navFindProviders.style.display = 'flex';
+                if (navCompare) navCompare.style.display = 'flex';
+                if (mobileNavProviders) mobileNavProviders.classList.remove('hidden');
+                if (mobileNavCompare) mobileNavCompare.classList.remove('hidden');
 
                 if (navDashboard) navDashboard.style.display = 'none';
                 if (mobileNavDashboard) mobileNavDashboard.classList.add('hidden');
@@ -515,7 +652,7 @@
                     mobileFooter.innerHTML = `
                         <div class="grid grid-cols-2 gap-2">
                             <a href="/login" class="text-center py-2 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl">Sign In</a>
-                            <a href="/register" class="text-center py-2 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-xs">Sign Up</a>
+                            <a href="/register" class="text-center py-2 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-sm">Sign Up</a>
                         </div>
                     `;
                 }
@@ -583,8 +720,118 @@
             document.querySelectorAll('.theme-icon-moon').forEach(el => el.classList.toggle('hidden', isDark));
         }
 
+        // ==========================================
+        // CLIENT SIDE COMPARISON DOCK MANAGEMENT
+        // ==========================================
+        function getCompareList() {
+            try {
+                return JSON.parse(localStorage.getItem('khedma_compare') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function setCompareList(list) {
+            localStorage.setItem('khedma_compare', JSON.stringify(list));
+            updateCompareDockUI();
+            if (typeof updateCardCompareButtons === 'function') {
+                updateCardCompareButtons();
+            }
+        }
+
+        function toggleCompareProvider(id, name, initial, category, rate) {
+            let list = getCompareList();
+            const numericId = parseInt(id, 10);
+            const idx = list.findIndex(p => parseInt(p.id, 10) === numericId);
+
+            if (idx >= 0) {
+                list.splice(idx, 1);
+            } else {
+                if (list.length >= 4) {
+                    alert('You can compare a maximum of 4 providers at a time.');
+                    return;
+                }
+                list.push({
+                    id: numericId,
+                    name: name,
+                    initial: initial || name.charAt(0).toUpperCase(),
+                    category: category || 'Contractor',
+                    rate: rate || ''
+                });
+            }
+            setCompareList(list);
+        }
+
+        function clearCompareList() {
+            setCompareList([]);
+        }
+
+        function updateCompareDockUI() {
+            // Providers never see comparison dock or badges
+            try {
+                const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+                if (user && user.role === 'provider') {
+                    const bar = document.getElementById('floatingCompareBar');
+                    if (bar) bar.classList.add('hidden');
+                    const navBadge = document.getElementById('navCompareBadge');
+                    if (navBadge) navBadge.classList.add('hidden');
+                    const mobileBadge = document.getElementById('mobileCompareBadge');
+                    if (mobileBadge) mobileBadge.classList.add('hidden');
+                    return;
+                }
+            } catch(e) {}
+
+            const list = getCompareList();
+            const bar = document.getElementById('floatingCompareBar');
+            const navBadge = document.getElementById('navCompareBadge');
+            const mobileBadge = document.getElementById('mobileCompareBadge');
+
+            if (navBadge) {
+                navBadge.textContent = list.length;
+                navBadge.classList.toggle('hidden', list.length === 0);
+            }
+            if (mobileBadge) {
+                mobileBadge.textContent = list.length;
+                mobileBadge.classList.toggle('hidden', list.length === 0);
+            }
+
+            if (!bar) return;
+
+            if (list.length === 0) {
+                bar.classList.add('hidden');
+                return;
+            }
+
+            bar.classList.remove('hidden');
+            const avatarContainer = document.getElementById('compareBarAvatars');
+            if (avatarContainer) {
+                avatarContainer.innerHTML = list.map(p => `
+                    <div title="${p.name} (${p.category})" class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-orange-600 text-white font-black text-xs flex items-center justify-center border-2 border-slate-900 shadow">
+                        ${p.initial || p.name.charAt(0).toUpperCase()}
+                    </div>
+                `).join('');
+            }
+
+            const countPill = document.getElementById('compareBarCountPill');
+            if (countPill) countPill.textContent = list.length;
+
+            const title = document.getElementById('compareBarTitle');
+            if (title) title.textContent = `Comparing ${list.length} Provider${list.length > 1 ? 's' : ''}`;
+
+            const sub = document.getElementById('compareBarSub');
+            if (sub) {
+                sub.textContent = list.length < 2 ? 'Select at least 1 more to compare' : 'Ready to evaluate side-by-side!';
+            }
+
+            const btnGo = document.getElementById('btnGoCompare');
+            if (btnGo) {
+                btnGo.href = `/compare?ids=${list.map(p => p.id).join(',')}`;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             updateThemeIcons();
+            updateCompareDockUI();
         });
     </script>
     @yield('scripts')

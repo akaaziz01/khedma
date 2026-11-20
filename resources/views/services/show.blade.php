@@ -169,8 +169,74 @@
                     @endif
                 </div>
 
-                <!-- Booking Action Box -->
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/20 space-y-4">
+                <!-- Owner Provider View (When the owner views their own service) -->
+                <div id="ownerServiceBox" class="hidden bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 rounded-3xl p-6 text-white shadow-xl shadow-amber-600/20 space-y-4">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-black uppercase tracking-wider">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Your Service Listing</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-amber-200 font-bold uppercase tracking-wider block">Your Price</span>
+                        <div class="text-3xl font-black mt-1">
+                            {{ number_format($service->price, 2) }} <span class="text-base font-bold text-amber-200">TND</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-2xl bg-black/25 text-xs text-amber-100 space-y-1">
+                        <p class="font-bold flex items-center gap-1.5 text-white">
+                            <i class="bi bi-info-circle-fill text-amber-300"></i>
+                            <span>Self-Booking Disabled</span>
+                        </p>
+                        <p class="text-[11px] leading-relaxed text-amber-100/90">
+                            As the provider offering this service, you cannot book it yourself. Clients browse and request appointments directly from this page.
+                        </p>
+                    </div>
+
+                    <div class="pt-2 space-y-2">
+                        <a href="/provider/services" class="w-full py-3 px-4 rounded-2xl bg-white text-slate-950 hover:bg-amber-50 font-black text-xs text-center shadow-md transition flex items-center justify-center gap-2">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Manage Service in Dashboard</span>
+                        </a>
+                        @if($provider)
+                            <a href="{{ route('providers.show', $provider->id) }}" class="w-full py-2.5 px-4 rounded-2xl bg-black/20 hover:bg-black/30 text-white font-bold text-xs text-center border border-white/20 transition block">
+                                View Your Public Profile
+                            </a>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Other Provider View (When another provider views this service) -->
+                <div id="otherProviderServiceBox" class="hidden bg-slate-900 dark:bg-slate-900 rounded-3xl p-6 text-white shadow-xl border border-slate-800 space-y-4">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-[11px] font-black uppercase tracking-wider">
+                        <i class="bi bi-tools"></i>
+                        <span>Provider Account</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Service Price</span>
+                        <div class="text-3xl font-black mt-1 text-white">
+                            {{ number_format($service->price, 2) }} <span class="text-base font-bold text-slate-400">TND</span>
+                        </div>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-slate-800/80 text-xs text-slate-300 space-y-1 border border-slate-700">
+                        <p class="font-bold text-white flex items-center gap-1.5">
+                            <i class="bi bi-exclamation-triangle-fill text-amber-400"></i>
+                            <span>Client Account Required</span>
+                        </p>
+                        <p class="text-[11px] leading-relaxed text-slate-400">
+                            You are signed in as a Provider. Bookings can only be requested from Client accounts.
+                        </p>
+                    </div>
+                    @if($provider)
+                        <div class="pt-2">
+                            <a href="{{ route('providers.show', $provider->id) }}" class="w-full py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center border border-slate-700 transition block">
+                                View Provider Profile
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Booking Action Box (For Guests and Clients) -->
+                <div id="guestClientBookingBox" class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/20 space-y-4">
                     <div>
                         <span class="text-xs text-blue-200 font-bold uppercase tracking-wider block">Service Price</span>
                         <div class="text-3xl font-black mt-1">
@@ -201,6 +267,30 @@
     let isQuickFav = false;
 
     document.addEventListener('DOMContentLoaded', async () => {
+        // Check if current user owns this service or is a provider
+        try {
+            const userStr = localStorage.getItem('khedma_user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const serviceProviderId = {{ (int) ($service->provider_id ?? 0) }};
+                const guestBox = document.getElementById('guestClientBookingBox');
+                const ownerBox = document.getElementById('ownerServiceBox');
+                const otherProviderBox = document.getElementById('otherProviderServiceBox');
+
+                if (user.id === serviceProviderId) {
+                    if (guestBox) guestBox.classList.add('hidden');
+                    if (otherProviderBox) otherProviderBox.classList.add('hidden');
+                    if (ownerBox) ownerBox.classList.remove('hidden');
+                } else if (user.role === 'provider') {
+                    if (guestBox) guestBox.classList.add('hidden');
+                    if (ownerBox) ownerBox.classList.add('hidden');
+                    if (otherProviderBox) otherProviderBox.classList.remove('hidden');
+                }
+            }
+        } catch(e) {
+            console.error(e);
+        }
+
         const token = localStorage.getItem('khedma_token');
         const providerId = {{ $provider?->id ?? 'null' }};
         if (token && providerId) {

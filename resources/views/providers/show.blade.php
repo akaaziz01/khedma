@@ -107,11 +107,30 @@
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <button type="button" 
+                                id="heroBookingBtn"
                                 onclick="openGuestBookingModal('{{ addslashes($provider->name) }}', '{{ $profile?->hourly_rate ? number_format($profile->hourly_rate, 2) . ' TND/hr' : 'Custom Quote' }}', {{ $provider->is_verified ? 'true' : 'false' }})" 
                                 class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2">
                             <i class="bi bi-calendar-plus"></i>
                             <span>Request Booking</span>
                         </button>
+
+                        <!-- Provider Owner Actions (Shown when viewing own profile) -->
+                        <a href="/profile" id="ownerHeroEditBtn" class="hidden w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Edit Your Profile</span>
+                        </a>
+                        <a href="/provider/services" id="ownerHeroServicesBtn" class="hidden w-full sm:w-auto px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700">
+                            <i class="bi bi-tools"></i>
+                            <span>Manage Services</span>
+                        </a>
+
+                        <a href="{{ route('providers.compare', ['ids' => $provider->id, 'category' => $profile?->category]) }}" 
+                           id="profileCompareBtn"
+                           class="px-4 py-3 rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-300 font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-1.5 shrink-0"
+                           title="Compare {{ $provider->name }} with other {{ $profile?->category ?? 'service' }} professionals">
+                            <i class="bi bi-layout-split text-sm"></i>
+                            <span class="hidden sm:inline">Compare</span>
+                        </a>
                         <button type="button"
                                 id="favoriteBtn"
                                 onclick="toggleFavorite({{ $provider->id }})"
@@ -256,8 +275,9 @@
                                                 View
                                             </a>
                                             <button type="button" 
+                                                    data-service-book-btn
                                                     onclick="openGuestBookingModal('{{ addslashes($provider->name) }}', '{{ number_format($service->price, 2) }} TND ({{ addslashes($service->title) }})', {{ $provider->is_verified ? 'true' : 'false' }})" 
-                                                    class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold transition">
+                                                    class="pro-service-book-btn px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold transition">
                                                 Book
                                             </button>
                                         </div>
@@ -432,7 +452,47 @@
             <!-- RIGHT 1 COLUMN: STICKY HIRE / BOOKING SIDEBAR CARD -->
             <div class="space-y-6">
                 
-                <div class="sticky top-24 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none space-y-6">
+                <!-- Provider Owner Sidebar View (When viewing own profile) -->
+                <div id="ownerProfileSidebar" class="hidden sticky top-24 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border-2 border-amber-500/30 dark:border-amber-500/20 shadow-xl space-y-6">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-black uppercase tracking-wider">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Your Public Profile</span>
+                        </span>
+                        <h3 class="text-xl font-black text-slate-900 dark:text-white mt-2">
+                            {{ $provider->name }} (You)
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            This preview displays exactly how clients see your profile, rates, and reviews.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-900/40 text-xs space-y-1.5">
+                        <div class="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span>Self-Booking Disabled</span>
+                        </div>
+                        <p class="text-[11px] text-amber-800 dark:text-amber-400 leading-relaxed">
+                            As a provider, you cannot book your own services. Clients browse and request appointments directly from this page.
+                        </p>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <a href="/profile" class="w-full py-3.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs text-center shadow-md transition flex items-center justify-center gap-2">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Edit Profile & Rates</span>
+                        </a>
+                        <a href="/provider/services" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
+                            Manage Listed Services
+                        </a>
+                        <a href="/dashboard" class="w-full py-2.5 px-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 text-slate-600 dark:text-slate-300 font-bold text-xs text-center transition block">
+                            Go to Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Client / Guest Booking Box -->
+                <div id="clientBookingBox" class="sticky top-24 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none space-y-6">
                     <div>
                         <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
                             Direct Booking Request
@@ -599,6 +659,18 @@
 
     // Booking Modal
     function openGuestBookingModal(name, rate, isVerified) {
+        try {
+            const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+            if (user.id === {{ (int) $provider->id }}) {
+                alert('You cannot book your own service.');
+                return;
+            }
+            if (user.role === 'provider') {
+                alert('You are logged in as a Provider. To book services, please use a Client account.');
+                return;
+            }
+        } catch(e) {}
+
         document.getElementById('bookingModalProviderName').textContent = name;
         document.getElementById('bookingModalRate').textContent = rate;
         document.getElementById('providerBookingModal').classList.remove('hidden');
@@ -618,6 +690,47 @@
     let isCurrentlyFavorited = {{ ($isFavorited ?? false) ? 'true' : 'false' }};
 
     document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+            const targetProviderId = {{ (int) $provider->id }};
+
+            if (user.id === targetProviderId) {
+                // Owner provider viewing their own profile
+                const heroBooking = document.getElementById('heroBookingBtn');
+                if (heroBooking) heroBooking.classList.add('hidden');
+
+                const ownerEdit = document.getElementById('ownerHeroEditBtn');
+                if (ownerEdit) ownerEdit.classList.remove('hidden');
+
+                const ownerServices = document.getElementById('ownerHeroServicesBtn');
+                if (ownerServices) ownerServices.classList.remove('hidden');
+
+                const clientBox = document.getElementById('clientBookingBox');
+                if (clientBox) clientBox.classList.add('hidden');
+
+                const ownerSidebar = document.getElementById('ownerProfileSidebar');
+                if (ownerSidebar) ownerSidebar.classList.remove('hidden');
+
+                const favBtn = document.getElementById('favoriteBtn');
+                if (favBtn) favBtn.classList.add('hidden');
+
+                // Hide individual booking buttons on their services
+                document.querySelectorAll('.pro-service-book-btn').forEach(b => b.classList.add('hidden'));
+            } else if (user.role === 'provider') {
+                // Another provider is viewing
+                const favBtn = document.getElementById('favoriteBtn');
+                if (favBtn) favBtn.classList.add('hidden');
+                document.querySelectorAll('.pro-service-book-btn').forEach(b => b.classList.add('hidden'));
+            }
+
+            if (user && user.role === 'provider') {
+                const compareBtn = document.getElementById('profileCompareBtn');
+                if (compareBtn) compareBtn.classList.add('hidden');
+            }
+        } catch(e) {
+            console.error(e);
+        }
+
         const token = localStorage.getItem('khedma_token');
         if (token) {
             try {

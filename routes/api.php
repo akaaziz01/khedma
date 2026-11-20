@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientFavoriteController;
+use App\Http\Controllers\Api\ProviderCompareController;
 use App\Http\Controllers\Api\ProviderDashboardController;
 use App\Http\Controllers\Api\PublicProviderController;
 use App\Http\Controllers\Api\PublicServiceController;
@@ -22,9 +23,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/services/filters', [PublicServiceController::class, 'filters']);
     Route::get('/services/{id}', [PublicServiceController::class, 'show']);
 
-    // Public provider discovery, search & profile for prospective clients & guests
+    // Public provider discovery, search & side-by-side comparison
     Route::get('/providers', [PublicProviderController::class, 'index']);
     Route::get('/providers/filters', [PublicProviderController::class, 'filters']);
+    Route::get('/providers/compare', [ProviderCompareController::class, 'compare']);
     Route::get('/providers/{id}', [PublicProviderController::class, 'show']);
 
     // Public category listing (providers & clients browse categories without auth)

@@ -150,5 +150,40 @@ class UserProfileTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Personal Information');
         $response->assertSee('Security & Password', false);
+        $response->assertSee('My Profile');
+    }
+
+    public function test_provider_can_update_experience_years_on_profile(): void
+    {
+        $provider = User::factory()->create([
+            'role'   => UserRole::PROVIDER,
+            'status' => 'active',
+        ]);
+
+        ProviderProfile::create([
+            'user_id'          => $provider->id,
+            'business_name'    => 'Khedma Electrical',
+            'category'         => 'Electricity',
+            'city'             => 'Tunis',
+            'hourly_rate'      => 40.00,
+            'experience_years' => 3,
+            'is_available'     => true,
+        ]);
+
+        Sanctum::actingAs($provider);
+
+        $response = $this->putJson('/api/v1/profile', [
+            'name'             => $provider->name,
+            'experience_years' => 9,
+            'hourly_rate'      => 55.00,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('provider_profiles', [
+            'user_id'          => $provider->id,
+            'experience_years' => 9,
+            'hourly_rate'      => 55.00,
+        ]);
     }
 }

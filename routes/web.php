@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProviderCompareWebController;
 use App\Http\Controllers\PublicProviderWebController;
 use App\Http\Controllers\PublicServiceWebController;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,12 @@ Route::get('/', function () {
 // Guest & client service search & discovery
 Route::get('/services', [PublicServiceWebController::class, 'index'])->name('services.index');
 Route::get('/services/{id}', [PublicServiceWebController::class, 'show'])->name('services.show');
+
+// Provider side-by-side comparison (Rates, Experience, Reviews)
+Route::get('/compare', [ProviderCompareWebController::class, 'index'])->name('providers.compare');
+Route::get('/providers/compare', function () {
+    return redirect('/compare' . (request()->getQueryString() ? '?' . request()->getQueryString() : ''));
+});
 
 // Guest & client public provider discovery & profile
 Route::get('/providers', [PublicProviderWebController::class, 'index'])->name('providers.index');

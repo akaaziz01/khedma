@@ -252,6 +252,7 @@ class AuthController extends Controller
             'business_name'    => ['nullable', 'string', 'max:150'],
             'category'         => ['nullable', 'string', 'max:100'],
             'hourly_rate'      => ['nullable', 'numeric', 'min:0'],
+            'experience_years' => ['nullable', 'integer', 'min:0', 'max:60'],
             'bio'              => ['nullable', 'string', 'max:1000'],
             'skills'           => ['nullable', 'array'],
             'is_available'     => ['nullable', 'boolean'],
@@ -276,7 +277,7 @@ class AuthController extends Controller
             $user->load('clientProfile');
         } elseif ($user->isProvider()) {
             $providerData = [];
-            foreach (['business_name', 'category', 'hourly_rate', 'city', 'bio', 'skills', 'is_available', 'portfolio_photos'] as $field) {
+            foreach (['business_name', 'category', 'hourly_rate', 'experience_years', 'city', 'bio', 'skills', 'is_available', 'portfolio_photos'] as $field) {
                 if (array_key_exists($field, $validated)) {
                     $providerData[$field] = $validated[$field];
                 }

@@ -290,8 +290,10 @@
                                 Details
                             </a>
                             <button type="button" 
-                                    onclick="openBookingModal('{{ $service->id }}', '{{ addslashes($service->title) }}', '{{ number_format($service->price, 2) }}', '{{ addslashes($provider?->name ?? 'Provider') }}', {{ $provider?->is_verified ? 'true' : 'false' }})" 
-                                    class="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold text-center shadow-xs transition flex items-center justify-center gap-1">
+                                    data-service-book-btn="{{ $service->id }}"
+                                    data-provider-id="{{ $service->provider_id }}"
+                                    onclick="openBookingModal('{{ $service->id }}', '{{ addslashes($service->title) }}', '{{ number_format($service->price, 2) }}', '{{ addslashes($provider?->name ?? 'Provider') }}', {{ $provider?->is_verified ? 'true' : 'false' }}, {{ (int) $service->provider_id }})" 
+                                    class="service-book-cta flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold text-center shadow-xs transition flex items-center justify-center gap-1">
                                 <span>Book Now</span>
                                 <i class="bi bi-calendar-plus text-xs"></i>
                             </button>
@@ -368,7 +370,19 @@
 </div>
 
 <script>
-    function openBookingModal(serviceId, title, price, providerName, isVerified) {
+    function openBookingModal(serviceId, title, price, providerName, isVerified, providerId) {
+        try {
+            const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+            if (providerId && user.id === parseInt(providerId, 10)) {
+                alert('As a provider, you cannot book your own service.');
+                return;
+            }
+            if (user.role === 'provider') {
+                alert('You are logged in as a Provider. To book services, please use a Client account.');
+                return;
+            }
+        } catch(e) {}
+
         document.getElementById('modalServiceTitle').textContent = title;
         document.getElementById('modalServicePrice').textContent = price + ' TND';
         document.getElementById('modalProviderName').textContent = providerName;
@@ -393,6 +407,24 @@
         if (e.target === this) {
             closeBookingModal();
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+            if (user.id) {
+                document.querySelectorAll('[data-service-book-btn]').forEach(btn => {
+                    const proId = parseInt(btn.getAttribute('data-provider-id'), 10);
+                    if (user.id === proId) {
+                        btn.outerHTML = `
+                            <a href="/provider/services" class="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black text-center shadow-xs transition flex items-center justify-center gap-1">
+                                <span>Your Service</span>
+                            </a>
+                        `;
+                    }
+                });
+            }
+        } catch(e) {}
     });
 </script>
 @endsection

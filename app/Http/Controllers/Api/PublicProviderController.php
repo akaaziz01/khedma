@@ -81,7 +81,12 @@ class PublicProviderController extends Controller
         // 5. Minimum Rating
         if ($request->filled('min_rating') && is_numeric($request->input('min_rating'))) {
             $minRating = (float) $request->input('min_rating');
-            $query->having('provider_reviews_avg_rating', '>=', $minRating);
+            $query->whereIn('users.id', function ($sub) use ($minRating) {
+                $sub->select('provider_id')
+                    ->from('reviews')
+                    ->groupBy('provider_id')
+                    ->havingRaw('AVG(rating) >= ' . (float) $minRating);
+            });
         }
 
         // 6. Availability filter

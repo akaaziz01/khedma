@@ -347,10 +347,18 @@
 
                         <!-- Card Action Buttons -->
                         <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                            <button type="button" 
+                                    data-compare-id="{{ $pro->id }}"
+                                    onclick="toggleCompareProvider({{ $pro->id }}, '{{ addslashes($pro->name) }}', '{{ strtoupper(substr($pro->name, 0, 1)) }}', '{{ addslashes($profile?->category ?? 'Provider') }}', '{{ $profile?->hourly_rate ? number_format($profile->hourly_rate, 0) . ' TND/hr' : '' }}')" 
+                                    class="compare-card-btn px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 shrink-0"
+                                    title="Add to side-by-side comparison">
+                                <i class="bi bi-layout-split compare-card-icon"></i>
+                                <span class="compare-card-text">Compare</span>
+                            </button>
                             <a href="{{ route('providers.show', $pro->id) }}" class="flex-1 py-2.5 text-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-xs transition">
                                 View Profile
                             </a>
-                            <a href="{{ route('providers.show', $pro->id) }}#booking" class="px-4 py-2.5 text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-sm transition">
+                            <a href="{{ route('providers.show', $pro->id) }}#booking" data-pro-card-hire="{{ $pro->id }}" class="pro-hire-btn px-4 py-2.5 text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-sm transition">
                                 Hire
                             </a>
                         </div>
@@ -428,5 +436,60 @@
             console.error(e);
         }
     }
+
+    function updateCardCompareButtons() {
+        try {
+            const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+            if (user && user.role === 'provider') {
+                document.querySelectorAll('.compare-card-btn').forEach(btn => btn.style.display = 'none');
+                return;
+            }
+        } catch(e) {}
+
+        if (typeof getCompareList !== 'function') return;
+        const list = getCompareList();
+        const activeIds = list.map(p => parseInt(p.id, 10));
+
+        document.querySelectorAll('[data-compare-id]').forEach(btn => {
+            const id = parseInt(btn.getAttribute('data-compare-id'), 10);
+            const isSelected = activeIds.includes(id);
+            const icon = btn.querySelector('.compare-card-icon');
+            const text = btn.querySelector('.compare-card-text');
+
+            if (isSelected) {
+                btn.className = 'compare-card-btn px-3 py-2.5 rounded-xl border border-amber-500 bg-amber-500 text-slate-950 font-black text-xs shadow-sm transition flex items-center gap-1.5 shrink-0';
+                if (icon) icon.className = 'bi bi-check-circle-fill compare-card-icon text-slate-950';
+                if (text) text.textContent = 'Comparing';
+                btn.title = 'Remove from comparison';
+            } else {
+                btn.className = 'compare-card-btn px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 shrink-0';
+                if (icon) icon.className = 'bi bi-layout-split compare-card-icon';
+                if (text) text.textContent = 'Compare';
+                btn.title = 'Add to side-by-side comparison';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCardCompareButtons();
+
+        try {
+            const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+            if (user && user.role === 'provider') {
+                document.querySelectorAll('[data-pro-card-hire]').forEach(btn => {
+                    const id = parseInt(btn.getAttribute('data-pro-card-hire'), 10);
+                    if (user.id === id) {
+                        btn.outerHTML = `
+                            <a href="/profile" class="px-3.5 py-2.5 text-center rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-sm transition">
+                                Your Profile
+                            </a>
+                        `;
+                    } else {
+                        btn.classList.add('hidden');
+                    }
+                });
+            }
+        } catch(e) {}
+    });
 </script>
 @endsection

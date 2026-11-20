@@ -138,6 +138,14 @@
                         </div>
                     </div>
 
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Years of Experience *</label>
+                        <div class="relative">
+                            <input type="number" min="0" max="60" id="inputExperienceYears" placeholder="5" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500">
+                            <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Years</span>
+                        </div>
+                    </div>
+
                     <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                         <div>
                             <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Available for New Bookings</span>
@@ -292,6 +300,7 @@
             document.getElementById('inputBusinessName').value = profile.business_name || '';
             if (profile.category) document.getElementById('inputCategory').value = profile.category;
             document.getElementById('inputHourlyRate').value = profile.hourly_rate || '';
+            document.getElementById('inputExperienceYears').value = profile.experience_years ?? 0;
             if (profile.city) document.getElementById('inputCity').value = profile.city;
             document.getElementById('inputIsAvailable').checked = profile.is_available !== false;
             document.getElementById('inputBio').value = profile.bio || '';
@@ -361,6 +370,7 @@
             payload.business_name = document.getElementById('inputBusinessName').value;
             payload.category = document.getElementById('inputCategory').value;
             payload.hourly_rate = parseFloat(document.getElementById('inputHourlyRate').value) || 0;
+            payload.experience_years = parseInt(document.getElementById('inputExperienceYears').value) || 0;
             payload.is_available = document.getElementById('inputIsAvailable').checked;
             payload.bio = document.getElementById('inputBio').value;
             payload.skills = currentSkills;

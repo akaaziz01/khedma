@@ -79,8 +79,13 @@ class FavoriteProviderTest extends TestCase
         $provider2 = $this->createProvider(['name' => 'Sami Electrician'], ['category' => 'Electricity']);
 
         // Add a review to provider1
+        $booking = \App\Models\Booking::factory()->create([
+            'client_id'   => $client->id,
+            'provider_id' => $provider1->id,
+            'status'      => 'completed',
+        ]);
         Review::create([
-            'booking_id'  => null,
+            'booking_id'  => $booking->id,
             'client_id'   => $client->id,
             'provider_id' => $provider1->id,
             'rating'      => 5,

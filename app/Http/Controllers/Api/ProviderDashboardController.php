@@ -176,6 +176,7 @@ class ProviderDashboardController extends Controller
             'business_name' => ['nullable', 'string', 'max:150'],
             'category' => ['nullable', 'string', 'max:100'],
             'hourly_rate' => ['nullable', 'numeric', 'min:0'],
+            'experience_years' => ['nullable', 'integer', 'min:0', 'max:60'],
             'city' => ['nullable', 'string', 'max:100'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'skills' => ['nullable', 'array'],

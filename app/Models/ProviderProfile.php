@@ -17,6 +17,7 @@ class ProviderProfile extends Model
         'bio',
         'skills',
         'hourly_rate',
+        'experience_years',
         'city',
         'is_available',
         'portfolio_photos',
@@ -28,6 +29,7 @@ class ProviderProfile extends Model
             'skills' => 'array',
             'portfolio_photos' => 'array',
             'hourly_rate' => 'decimal:2',
+            'experience_years' => 'integer',
             'is_available' => 'boolean',
         ];
     }

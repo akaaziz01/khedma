@@ -61,6 +61,12 @@
                             <span id="availabilityText">Available for Jobs</span>
                         </button>
 
+                        <a href="/profile"
+                            class="px-4 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-xs font-bold transition flex items-center gap-1.5 shadow-sm text-white">
+                            <i class="bi bi-person-circle text-sm"></i>
+                            <span>My Profile</span>
+                        </a>
+
                         <button onclick="openAddServiceModal()"
                             class="px-4 py-2.5 rounded-xl bg-white text-amber-800 hover:bg-amber-50 text-xs font-extrabold transition flex items-center gap-1.5 shadow-md">
                             <i class="bi bi-plus-lg text-sm"></i>
@@ -256,10 +262,16 @@
                         <p id="clientEmailDisplay" class="text-xs text-blue-100 mt-1">client@khedma.tn</p>
                     </div>
                 </div>
-                <button onclick="handleLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl border border-white/30 transition flex items-center gap-1.5">
-                    <i class="bi bi-box-arrow-right text-xs"></i>
-                    Logout
-                </button>
+                <div class="flex items-center gap-2">
+                    <a href="/profile" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl border border-white/30 transition flex items-center gap-1.5">
+                        <i class="bi bi-person-circle text-xs"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <button onclick="handleLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl border border-white/30 transition flex items-center gap-1.5">
+                        <i class="bi bi-box-arrow-right text-xs"></i>
+                        Logout
+                    </button>
+                </div>
             </div>
 
             <!-- Client Info Cards -->
