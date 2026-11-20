@@ -140,6 +140,10 @@ class ProviderDashboardController extends Controller
     {
         $provider = $request->user();
 
+        if (! $provider->isProvider()) {
+            return response()->json(['message' => 'Unauthorized: User is not a provider.'], 403);
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
@@ -148,9 +152,12 @@ class ProviderDashboardController extends Controller
             'duration_hours' => ['nullable', 'numeric', 'min:0.5', 'max:24'],
         ]);
 
+        $category = \App\Models\ServiceCategory::where('name', $validated['category'])->first();
+
         $service = $provider->services()->create([
             'title'          => $validated['title'],
             'category'       => $validated['category'],
+            'category_id'    => $category?->id,
             'description'    => $validated['description'] ?? null,
             'price'          => $validated['price'],
             'duration_hours' => $validated['duration_hours'] ?? 1.0,
@@ -162,6 +169,101 @@ class ProviderDashboardController extends Controller
             'message' => 'Service added successfully. It will be visible after admin approval.',
             'service' => $service,
         ], 201);
+    }
+
+    /**
+     * Get a single service owned by the authenticated provider.
+     */
+    public function getService(Request $request, int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        if (! $provider->isProvider()) {
+            return response()->json(['message' => 'Unauthorized: User is not a provider.'], 403);
+        }
+
+        $service = $provider->services()->where('id', $id)->firstOrFail();
+
+        return response()->json([
+            'service' => $service,
+        ]);
+    }
+
+    /**
+     * Update an existing service offering and its rate.
+     */
+    public function updateService(Request $request, int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        if (! $provider->isProvider()) {
+            return response()->json(['message' => 'Unauthorized: User is not a provider.'], 403);
+        }
+
+        $service = $provider->services()->where('id', $id)->firstOrFail();
+
+        $validated = $request->validate([
+            'title'          => ['required', 'string', 'max:255'],
+            'category'       => ['required', 'string', 'max:100'],
+            'description'    => ['nullable', 'string', 'max:1000'],
+            'price'          => ['required', 'numeric', 'min:0'],
+            'duration_hours' => ['nullable', 'numeric', 'min:0.5', 'max:24'],
+            'is_active'      => ['nullable', 'boolean'],
+        ]);
+
+        $updateData = [
+            'title'          => $validated['title'],
+            'category'       => $validated['category'],
+            'description'    => $validated['description'] ?? null,
+            'price'          => $validated['price'],
+            'duration_hours' => $validated['duration_hours'] ?? $service->duration_hours ?? 1.0,
+        ];
+
+        if (array_key_exists('is_active', $validated)) {
+            $updateData['is_active'] = (bool) $validated['is_active'];
+        }
+
+        $category = \App\Models\ServiceCategory::where('name', $validated['category'])->first();
+        if ($category) {
+            $updateData['category_id'] = $category->id;
+        }
+
+        $service->update($updateData);
+
+        return response()->json([
+            'message' => 'Service updated successfully with new rates and details.',
+            'service' => $service->fresh(),
+        ]);
+    }
+
+    /**
+     * Delete a service offering owned by the authenticated provider.
+     */
+    public function deleteService(Request $request, int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        if (! $provider->isProvider()) {
+            return response()->json(['message' => 'Unauthorized: User is not a provider.'], 403);
+        }
+
+        $service = $provider->services()->where('id', $id)->firstOrFail();
+
+        $hasActiveBookings = $service->bookings()
+            ->whereIn('status', ['pending', 'accepted', 'in_progress'])
+            ->exists();
+
+        if ($hasActiveBookings) {
+            return response()->json([
+                'message' => 'Cannot delete service with active bookings. Please complete or cancel those bookings first.',
+            ], 422);
+        }
+
+        $service->delete();
+
+        return response()->json([
+            'message' => 'Service deleted successfully from your catalog.',
+        ]);
     }
 
     /**

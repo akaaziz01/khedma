@@ -55,6 +55,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/bookings/{id}/status', [ProviderDashboardController::class, 'updateBookingStatus']);
             Route::post('/availability', [ProviderDashboardController::class, 'toggleAvailability']);
             Route::post('/services', [ProviderDashboardController::class, 'createService']);
+            Route::get('/services/{id}', [ProviderDashboardController::class, 'getService']);
+            Route::put('/services/{id}', [ProviderDashboardController::class, 'updateService']);
+            Route::delete('/services/{id}', [ProviderDashboardController::class, 'deleteService']);
             Route::post('/profile', [ProviderDashboardController::class, 'updateProfile']);
         });
 

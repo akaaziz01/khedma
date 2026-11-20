@@ -719,9 +719,12 @@
                     <h4 class="font-extrabold text-sm text-slate-900">${s.title}</h4>
                     <p class="text-xs text-slate-500 mt-1 line-clamp-2">${s.description || 'Professional service.'}</p>
                 </div>
-                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                    <span>⏱ ~${s.duration_hours || 1.0} hrs</span>
-                    <span class="text-emerald-600 font-bold">Active in Catalog</span>
+                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                    <span class="text-slate-400">⏱ ~${s.duration_hours || 1.0} hrs</span>
+                    <a href="/provider/services" class="text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1 hover:underline">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>Edit Rate</span>
+                    </a>
                 </div>
             `;
             grid.appendChild(card);

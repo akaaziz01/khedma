@@ -103,6 +103,41 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Seed realistic services for Provider Khedma
+        \App\Models\Service::updateOrCreate(
+            ['provider_id' => $provider->id, 'title' => 'Emergency Pipe Leak Repair'],
+            [
+                'category' => 'Plumbing',
+                'description' => 'Fast on-site diagnostic and repair for water leaks, burst pipes, and drain overflow.',
+                'price' => 50.00,
+                'duration_hours' => 1.5,
+                'status' => 'approved',
+                'is_active' => true,
+            ]
+        );
+        \App\Models\Service::updateOrCreate(
+            ['provider_id' => $provider->id, 'title' => 'Water Heater Diagnostics & Repair'],
+            [
+                'category' => 'Plumbing',
+                'description' => 'Electric and gas water heater maintenance, thermostat replacement, and descaling.',
+                'price' => 80.00,
+                'duration_hours' => 2.0,
+                'status' => 'approved',
+                'is_active' => true,
+            ]
+        );
+        \App\Models\Service::updateOrCreate(
+            ['provider_id' => $provider->id, 'title' => 'Sanitary & Faucet Replacement'],
+            [
+                'category' => 'Plumbing',
+                'description' => 'Modern kitchen and bathroom mixer taps, sink fittings, and toilet tank valve replacement.',
+                'price' => 45.00,
+                'duration_hours' => 1.0,
+                'status' => 'approved',
+                'is_active' => true,
+            ]
+        );
+
         // Official Provider Account 2: Sami Trabelsi (Ariana, 35 TND/hr, 12 yrs, Lowest Rate)
         $provider2 = User::updateOrCreate(
             ['email' => 'sami.pro@khedma.tn'],
