@@ -168,6 +168,36 @@
                     @endif
                 </div>
 
+                <!-- How It Works (visible for everyone) -->
+                <div class="relative hidden xl:flex h-full items-center">
+                    <a href="{{ route('how-it-works') }}" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('how-it-works'),
+                        'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400' => !request()->is('how-it-works'),
+                    ])>
+                        <i class="bi bi-lightbulb text-amber-500"></i>
+                        How It Works
+                    </a>
+                    @if(request()->is('how-it-works'))
+                        <div class="nav-active-bar bg-blue-600"></div>
+                    @endif
+                </div>
+
+                <!-- FAQ (visible for everyone) -->
+                <div class="relative hidden xl:flex h-full items-center">
+                    <a href="{{ route('faq') }}" @class([
+                        'h-full flex items-center gap-2 px-3.5 text-xs font-bold transition',
+                        'text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('faq'),
+                        'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400' => !request()->is('faq'),
+                    ])>
+                        <i class="bi bi-question-circle text-indigo-500"></i>
+                        FAQ
+                    </a>
+                    @if(request()->is('faq'))
+                        <div class="nav-active-bar bg-blue-600"></div>
+                    @endif
+                </div>
+
                 <!-- Provider Dynamic Tab 2: Bookings & Leads -->
                 <div class="relative flex h-full items-center" id="navBookingsItem" style="display: none;">
                     <a href="/provider/bookings" @class([
@@ -408,6 +438,26 @@
                         Compare Pros
                     </div>
                     <span id="mobileCompareBadge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">0</span>
+                </a>
+
+                <!-- How It Works (Always available) -->
+                <a href="{{ route('how-it-works') }}" @class([
+                    'flex items-center gap-3 px-3 py-2.5 rounded-xl transition',
+                    'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('how-it-works'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('how-it-works'),
+                ])>
+                    <i class="bi bi-lightbulb text-amber-500"></i>
+                    How It Works
+                </a>
+
+                <!-- FAQ (Always available) -->
+                <a href="{{ route('faq') }}" @class([
+                    'flex items-center gap-3 px-3 py-2.5 rounded-xl transition',
+                    'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold' => request()->is('faq'),
+                    'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' => !request()->is('faq'),
+                ])>
+                    <i class="bi bi-question-circle text-indigo-500"></i>
+                    FAQ
                 </a>
 
                 <!-- Provider: Bookings & Leads -->
