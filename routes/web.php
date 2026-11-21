@@ -9,6 +9,15 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Platform information pages (How it works & FAQ)
+Route::get('/how-it-works', function () {
+    return view('pages.how-it-works');
+})->name('how-it-works');
+
+Route::get('/faq', function () {
+    return view('pages.faq');
+})->name('faq');
+
 // Guest & client service search & discovery
 Route::get('/services', [PublicServiceWebController::class, 'index'])->name('services.index');
 Route::get('/services/{id}', [PublicServiceWebController::class, 'show'])->name('services.show');
