@@ -197,14 +197,47 @@
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Review requests in your trade and send the client your price, delivery time, and message.</p>
                     </div>
-                    <button type="button" onclick="loadProviderJobRequests(localStorage.getItem('khedma_token'))"
+                    <button type="button" onclick="loadProviderJobRequests(localStorage.getItem('khedma_token'), providerJobRequestsPage)"
                         class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                         <i class="bi bi-arrow-clockwise mr-1"></i> Refresh
                     </button>
                 </div>
+                <form id="providerJobRequestFilters" onsubmit="applyProviderJobRequestFilters(event)" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+                    <input id="jobRequestSearchFilter" type="search" maxlength="100" placeholder="Search title or description"
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <input id="jobRequestCategoryFilter" type="text" placeholder="Trade / category"
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <input id="jobRequestCityFilter" type="text" placeholder="City"
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <select id="jobRequestUrgencyFilter"
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">All urgency levels</option>
+                        <option value="low">Low urgency</option>
+                        <option value="medium">Medium urgency</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="emergency">Emergency</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold transition">
+                            <i class="bi bi-funnel-fill mr-1"></i> Filter
+                        </button>
+                        <button type="button" onclick="clearProviderJobRequestFilters()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                            Clear
+                        </button>
+                    </div>
+                </form>
                 <div id="providerJobRequestsLoading" class="py-8 text-center text-xs text-slate-400">Loading service requests...</div>
                 <div id="providerJobRequestsEmpty" class="hidden py-8 text-center text-xs text-slate-400">No matching service requests are available right now.</div>
                 <div id="providerJobRequestsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+                <div id="providerJobRequestsPagination" class="hidden flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+                    <button type="button" id="providerJobRequestsPrevious" onclick="changeProviderJobRequestsPage(-1)" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold disabled:opacity-40">
+                        <i class="bi bi-chevron-left mr-1"></i> Previous
+                    </button>
+                    <span id="providerJobRequestsPageLabel" class="text-xs text-slate-500 dark:text-slate-400"></span>
+                    <button type="button" id="providerJobRequestsNext" onclick="changeProviderJobRequestsPage(1)" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold disabled:opacity-40">
+                        Next <i class="bi bi-chevron-right ml-1"></i>
+                    </button>
+                </div>
             </section>
 
             <!-- 4. Two Columns: Services Catalog & Recent Client Reviews -->
@@ -1038,6 +1071,8 @@
 <script>
     let globalBookings = [];
     let providerJobRequests = [];
+    let providerJobRequestsPage = 1;
+    let providerJobRequestsLastPage = 1;
     let currentFilter = 'all';
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -1133,6 +1168,7 @@
             renderReviews(data.reviews || []);
 
             // 6. Load service requests for provider proposals
+            document.getElementById('jobRequestCategoryFilter').value = provider.profile?.category || '';
             await loadProviderJobRequests(token);
 
             // 7. Bio & Skills
@@ -1156,27 +1192,43 @@
         }
     }
 
-    async function loadProviderJobRequests(token) {
+    async function loadProviderJobRequests(token, page = 1) {
         const loading = document.getElementById('providerJobRequestsLoading');
         const empty = document.getElementById('providerJobRequestsEmpty');
         const grid = document.getElementById('providerJobRequestsGrid');
+        const pagination = document.getElementById('providerJobRequestsPagination');
 
         if (!token) {
             loading?.classList.add('hidden');
             empty?.classList.remove('hidden');
+            pagination?.classList.add('hidden');
             if (empty) empty.textContent = 'Sign in as a provider to view service requests.';
             return;
         }
 
+        providerJobRequestsPage = page;
         if (loading) {
             loading.textContent = 'Loading service requests...';
             loading.classList.remove('hidden');
         }
         empty?.classList.add('hidden');
         grid?.classList.add('hidden');
+        pagination?.classList.add('hidden');
 
         try {
-            const response = await fetch('/api/v1/provider/job-requests', {
+            const params = new URLSearchParams({
+                category: document.getElementById('jobRequestCategoryFilter').value.trim(),
+                page: String(page),
+                per_page: '12'
+            });
+            const search = document.getElementById('jobRequestSearchFilter').value.trim();
+            const city = document.getElementById('jobRequestCityFilter').value.trim();
+            const urgency = document.getElementById('jobRequestUrgencyFilter').value;
+            if (search) params.set('q', search);
+            if (city) params.set('city', city);
+            if (urgency) params.set('urgency', urgency);
+
+            const response = await fetch(`/api/v1/provider/job-requests?${params.toString()}`, {
                 headers: {
                     'Authorization': 'Bearer ' + token,
                     'Accept': 'application/json'
@@ -1188,7 +1240,10 @@
             }
 
             providerJobRequests = result.data || [];
-            document.getElementById('providerJobRequestsCount').textContent = result.meta?.total ?? providerJobRequests.length;
+            providerJobRequestsPage = result.meta?.current_page ?? page;
+            providerJobRequestsLastPage = result.meta?.last_page ?? 1;
+            const total = result.meta?.total ?? providerJobRequests.length;
+            document.getElementById('providerJobRequestsCount').textContent = total;
             loading?.classList.add('hidden');
 
             if (providerJobRequests.length === 0) {
@@ -1198,12 +1253,37 @@
             }
 
             renderProviderJobRequests();
+            document.getElementById('providerJobRequestsPageLabel').textContent =
+                `Page ${providerJobRequestsPage} of ${providerJobRequestsLastPage} · ${total} request${total === 1 ? '' : 's'}`;
+            document.getElementById('providerJobRequestsPrevious').disabled = providerJobRequestsPage <= 1;
+            document.getElementById('providerJobRequestsNext').disabled = providerJobRequestsPage >= providerJobRequestsLastPage;
+            pagination?.classList.toggle('hidden', providerJobRequestsLastPage <= 1);
         } catch (error) {
             console.error('Error loading provider service requests:', error);
             loading?.classList.add('hidden');
             empty?.classList.remove('hidden');
+            pagination?.classList.add('hidden');
             if (empty) empty.textContent = error.message || 'Could not load service requests. Please try again.';
         }
+    }
+
+    function applyProviderJobRequestFilters(event) {
+        event.preventDefault();
+        loadProviderJobRequests(localStorage.getItem('khedma_token'), 1);
+    }
+
+    function clearProviderJobRequestFilters() {
+        document.getElementById('jobRequestSearchFilter').value = '';
+        document.getElementById('jobRequestCategoryFilter').value = '';
+        document.getElementById('jobRequestCityFilter').value = '';
+        document.getElementById('jobRequestUrgencyFilter').value = '';
+        loadProviderJobRequests(localStorage.getItem('khedma_token'), 1);
+    }
+
+    function changeProviderJobRequestsPage(offset) {
+        const nextPage = providerJobRequestsPage + offset;
+        if (nextPage < 1 || nextPage > providerJobRequestsLastPage) return;
+        loadProviderJobRequests(localStorage.getItem('khedma_token'), nextPage);
     }
 
     function renderProviderJobRequests() {

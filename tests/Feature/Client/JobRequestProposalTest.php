@@ -20,7 +20,7 @@ class JobRequestProposalTest extends TestCase
     private function createClient(array $attributes = []): User
     {
         return User::factory()->create(array_merge([
-            'role'   => UserRole::CLIENT,
+            'role' => UserRole::CLIENT,
             'status' => 'active',
         ], $attributes));
     }
@@ -28,20 +28,20 @@ class JobRequestProposalTest extends TestCase
     private function createProvider(array $userAttributes = [], array $profileAttributes = []): User
     {
         $provider = User::factory()->create(array_merge([
-            'role'        => UserRole::PROVIDER,
-            'status'      => 'active',
+            'role' => UserRole::PROVIDER,
+            'status' => 'active',
             'is_verified' => true,
         ], $userAttributes));
 
         ProviderProfile::create(array_merge([
-            'user_id'       => $provider->id,
+            'user_id' => $provider->id,
             'business_name' => 'Expert Craft',
-            'category'      => 'Plumbing',
-            'city'          => 'Tunis',
-            'hourly_rate'   => 45.00,
-            'bio'           => 'Licensed professional with certified expertise.',
-            'skills'        => ['Plumbing', 'Piping'],
-            'is_available'  => true,
+            'category' => 'Plumbing',
+            'city' => 'Tunis',
+            'hourly_rate' => 45.00,
+            'bio' => 'Licensed professional with certified expertise.',
+            'skills' => ['Plumbing', 'Piping'],
+            'is_available' => true,
         ], $profileAttributes));
 
         return $provider;
@@ -57,13 +57,13 @@ class JobRequestProposalTest extends TestCase
         Sanctum::actingAs($client);
 
         $payload = [
-            'title'          => 'Emergency pipe leak in kitchen',
-            'category'       => 'Plumbing',
-            'description'    => 'Water leaking under the main kitchen sink. Needs immediate repair and pipe sealing.',
-            'budget'         => 120.00,
-            'city'           => 'Tunis',
-            'address'        => '12 Rue Habib Bourguiba, Tunis',
-            'urgency'        => 'urgent',
+            'title' => 'Emergency pipe leak in kitchen',
+            'category' => 'Plumbing',
+            'description' => 'Water leaking under the main kitchen sink. Needs immediate repair and pipe sealing.',
+            'budget' => 120.00,
+            'city' => 'Tunis',
+            'address' => '12 Rue Habib Bourguiba, Tunis',
+            'urgency' => 'urgent',
             'preferred_date' => now()->addDay()->format('Y-m-d H:i:s'),
         ];
 
@@ -77,9 +77,9 @@ class JobRequestProposalTest extends TestCase
 
         $this->assertDatabaseHas('job_requests', [
             'client_id' => $client->id,
-            'title'     => 'Emergency pipe leak in kitchen',
-            'city'      => 'Tunis',
-            'status'    => 'open',
+            'title' => 'Emergency pipe leak in kitchen',
+            'city' => 'Tunis',
+            'status' => 'open',
         ]);
     }
 
@@ -89,13 +89,13 @@ class JobRequestProposalTest extends TestCase
         Sanctum::actingAs($client);
 
         $response = $this->postJson('/api/v1/client/job-requests', [
-            'title'       => 'Install an air conditioner',
-            'category'    => 'HVAC',
+            'title' => 'Install an air conditioner',
+            'category' => 'HVAC',
             'description' => 'Install a split air conditioner in the living room.',
-            'budget'      => 650,
-            'location'    => 'Sousse, Hammam Sousse',
-            'address'     => 'Rue des Palmiers',
-            'deadline'    => now()->addWeek()->format('Y-m-d H:i:s'),
+            'budget' => 650,
+            'location' => 'Sousse, Hammam Sousse',
+            'address' => 'Rue des Palmiers',
+            'deadline' => now()->addWeek()->format('Y-m-d H:i:s'),
         ]);
 
         $response->assertStatus(201)
@@ -104,9 +104,9 @@ class JobRequestProposalTest extends TestCase
 
         $this->assertDatabaseHas('job_requests', [
             'client_id' => $client->id,
-            'location'  => 'Sousse, Hammam Sousse',
-            'budget'    => 650,
-            'status'    => 'open',
+            'location' => 'Sousse, Hammam Sousse',
+            'budget' => 650,
+            'status' => 'open',
         ]);
     }
 
@@ -116,11 +116,11 @@ class JobRequestProposalTest extends TestCase
         Sanctum::actingAs($client);
 
         $response = $this->postJson('/api/v1/client/job-requests', [
-            'title'       => 'Repair an electrical outlet',
-            'category'    => 'Electricity',
+            'title' => 'Repair an electrical outlet',
+            'category' => 'Electricity',
             'description' => 'The outlet does not work and needs professional repair.',
-            'budget'      => 0,
-            'deadline'    => now()->subDay()->format('Y-m-d H:i:s'),
+            'budget' => 0,
+            'deadline' => now()->subDay()->format('Y-m-d H:i:s'),
         ]);
 
         $response->assertStatus(422)
@@ -133,10 +133,10 @@ class JobRequestProposalTest extends TestCase
         Sanctum::actingAs($client);
 
         $response = $this->postJson('/api/v1/client/job-requests', [
-            'title'       => '',
-            'category'    => '',
+            'title' => '',
+            'category' => '',
             'description' => 'Too short',
-            'city'        => '',
+            'city' => '',
         ]);
 
         $response->assertStatus(422)
@@ -149,10 +149,10 @@ class JobRequestProposalTest extends TestCase
         Sanctum::actingAs($provider);
 
         $response = $this->postJson('/api/v1/client/job-requests', [
-            'title'       => 'Some test job',
-            'category'    => 'Plumbing',
+            'title' => 'Some test job',
+            'category' => 'Plumbing',
             'description' => 'Valid length description of the job needing doing.',
-            'city'        => 'Tunis',
+            'city' => 'Tunis',
         ]);
 
         $response->assertStatus(403);
@@ -167,20 +167,20 @@ class JobRequestProposalTest extends TestCase
         $client = $this->createClient();
         $job = JobRequest::factory()->create([
             'client_id' => $client->id,
-            'category'  => 'Plumbing',
-            'city'      => 'Tunis',
-            'status'    => 'open',
+            'category' => 'Plumbing',
+            'city' => 'Tunis',
+            'status' => 'open',
         ]);
 
         $provider = $this->createProvider();
         Sanctum::actingAs($provider);
 
         $payload = [
-            'price'                    => 95.00,
-            'delivery_time'            => '1 day',
-            'delivery_days'            => 1,
+            'price' => 95.00,
+            'delivery_time' => '1 day',
+            'delivery_days' => 1,
             'estimated_duration_hours' => 2.5,
-            'message'                  => 'I can come tomorrow morning at 9am with all required copper pipe replacement parts.',
+            'message' => 'I can come tomorrow morning at 9am with all required copper pipe replacement parts.',
         ];
 
         $response = $this->postJson("/api/v1/provider/job-requests/{$job->id}/proposals", $payload);
@@ -194,9 +194,9 @@ class JobRequestProposalTest extends TestCase
 
         $this->assertDatabaseHas('proposals', [
             'job_request_id' => $job->id,
-            'provider_id'    => $provider->id,
-            'price'          => 95.00,
-            'status'         => 'pending',
+            'provider_id' => $provider->id,
+            'price' => 95.00,
+            'status' => 'pending',
         ]);
 
         // Job status moves to in_review
@@ -211,18 +211,18 @@ class JobRequestProposalTest extends TestCase
 
         $proposal = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $provider->id,
-            'price'          => 150.00,
-            'status'         => 'pending',
+            'provider_id' => $provider->id,
+            'price' => 150.00,
+            'status' => 'pending',
         ]);
 
         Sanctum::actingAs($provider);
 
         $response = $this->postJson("/api/v1/provider/job-requests/{$job->id}/proposals", [
-            'price'         => 120.00,
+            'price' => 120.00,
             'delivery_time' => 'Same day',
             'delivery_days' => 1,
-            'message'       => 'Updated price to offer a discount.',
+            'message' => 'Updated price to offer a discount.',
         ]);
 
         $response->assertStatus(201)
@@ -237,15 +237,15 @@ class JobRequestProposalTest extends TestCase
         $client = $this->createClient();
         $job = JobRequest::factory()->create([
             'client_id' => $client->id,
-            'status'    => 'awarded',
+            'status' => 'awarded',
         ]);
         $provider = $this->createProvider();
         Sanctum::actingAs($provider);
 
         $response = $this->postJson("/api/v1/provider/job-requests/{$job->id}/proposals", [
-            'price'         => 100.00,
+            'price' => 100.00,
             'delivery_time' => '2 days',
-            'message'       => 'I can do this.',
+            'message' => 'I can do this.',
         ]);
 
         $response->assertStatus(422);
@@ -259,9 +259,9 @@ class JobRequestProposalTest extends TestCase
         Sanctum::actingAs($provider);
 
         $response = $this->postJson("/api/v1/provider/job-requests/{$job->id}/proposals", [
-            'price'         => 0,
+            'price' => 0,
             'delivery_time' => '',
-            'message'       => 'Short',
+            'message' => 'Short',
         ]);
 
         $response->assertStatus(422)
@@ -286,43 +286,43 @@ class JobRequestProposalTest extends TestCase
         $providerA = $this->createProvider(['name' => 'Provider Cheaper']);
         $propA = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $providerA->id,
-            'price'          => 60.00,
-            'delivery_time'  => '3 days',
-            'delivery_days'  => 3,
-            'status'         => 'pending',
+            'provider_id' => $providerA->id,
+            'price' => 60.00,
+            'delivery_time' => '3 days',
+            'delivery_days' => 3,
+            'status' => 'pending',
         ]);
 
         // Provider B: Fastest delivery (1 day), 110 TND, 4.0 rating
         $providerB = $this->createProvider(['name' => 'Provider Fast']);
         Review::factory()->create([
             'provider_id' => $providerB->id,
-            'client_id'   => $client->id,
-            'rating'      => 4,
+            'client_id' => $client->id,
+            'rating' => 4,
         ]);
         $propB = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $providerB->id,
-            'price'          => 110.00,
-            'delivery_time'  => '1 day',
-            'delivery_days'  => 1,
-            'status'         => 'pending',
+            'provider_id' => $providerB->id,
+            'price' => 110.00,
+            'delivery_time' => '1 day',
+            'delivery_days' => 1,
+            'status' => 'pending',
         ]);
 
         // Provider C: Top rated (5.0 rating), 90 TND, 2 days delivery
         $providerC = $this->createProvider(['name' => 'Provider Top']);
         Review::factory()->create([
             'provider_id' => $providerC->id,
-            'client_id'   => $client->id,
-            'rating'      => 5,
+            'client_id' => $client->id,
+            'rating' => 5,
         ]);
         $propC = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $providerC->id,
-            'price'          => 90.00,
-            'delivery_time'  => '2 days',
-            'delivery_days'  => 2,
-            'status'         => 'pending',
+            'provider_id' => $providerC->id,
+            'price' => 90.00,
+            'delivery_time' => '2 days',
+            'delivery_days' => 2,
+            'status' => 'pending',
         ]);
 
         Sanctum::actingAs($client);
@@ -360,17 +360,17 @@ class JobRequestProposalTest extends TestCase
         $p1 = $this->createProvider();
         Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $p1->id,
-            'price'          => 50.00,
-            'delivery_days'  => 5,
+            'provider_id' => $p1->id,
+            'price' => 50.00,
+            'delivery_days' => 5,
         ]);
 
         $p2 = $this->createProvider();
         Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $p2->id,
-            'price'          => 120.00,
-            'delivery_days'  => 1,
+            'provider_id' => $p2->id,
+            'price' => 120.00,
+            'delivery_days' => 1,
         ]);
 
         Sanctum::actingAs($client);
@@ -392,30 +392,30 @@ class JobRequestProposalTest extends TestCase
         $client = $this->createClient();
         $job = JobRequest::factory()->create([
             'client_id' => $client->id,
-            'title'     => 'Fix water heater leak',
-            'category'  => 'Plumbing',
-            'city'      => 'Tunis',
-            'status'    => 'open',
+            'title' => 'Fix water heater leak',
+            'category' => 'Plumbing',
+            'city' => 'Tunis',
+            'status' => 'open',
         ]);
 
         $winningProvider = $this->createProvider();
         $winningProp = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $winningProvider->id,
-            'price'          => 80.00,
-            'delivery_time'  => 'Tomorrow',
-            'delivery_days'  => 1,
-            'status'         => 'pending',
+            'provider_id' => $winningProvider->id,
+            'price' => 80.00,
+            'delivery_time' => 'Tomorrow',
+            'delivery_days' => 1,
+            'status' => 'pending',
         ]);
 
         $competingProvider = $this->createProvider();
         $competingProp = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $competingProvider->id,
-            'price'          => 130.00,
-            'delivery_time'  => '4 days',
-            'delivery_days'  => 4,
-            'status'         => 'pending',
+            'provider_id' => $competingProvider->id,
+            'price' => 130.00,
+            'delivery_time' => '4 days',
+            'delivery_days' => 4,
+            'status' => 'pending',
         ]);
 
         Sanctum::actingAs($client);
@@ -444,13 +444,13 @@ class JobRequestProposalTest extends TestCase
 
         // Booking record was automatically generated
         $this->assertDatabaseHas('bookings', [
-            'id'            => $freshJob->booking_id,
-            'client_id'     => $client->id,
-            'provider_id'   => $winningProvider->id,
+            'id' => $freshJob->booking_id,
+            'client_id' => $client->id,
+            'provider_id' => $winningProvider->id,
             'service_title' => 'Fix water heater leak',
-            'category'      => 'Plumbing',
-            'status'        => 'confirmed',
-            'total_price'   => 80.00,
+            'category' => 'Plumbing',
+            'status' => 'confirmed',
+            'total_price' => 80.00,
         ]);
     }
 
@@ -463,8 +463,8 @@ class JobRequestProposalTest extends TestCase
         $provider = $this->createProvider();
         $proposal = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $provider->id,
-            'status'         => 'pending',
+            'provider_id' => $provider->id,
+            'status' => 'pending',
         ]);
 
         Sanctum::actingAs($clientB);
@@ -481,8 +481,8 @@ class JobRequestProposalTest extends TestCase
         $provider = $this->createProvider();
         $proposal = Proposal::factory()->create([
             'job_request_id' => $job->id,
-            'provider_id'    => $provider->id,
-            'status'         => 'pending',
+            'provider_id' => $provider->id,
+            'status' => 'pending',
         ]);
 
         Sanctum::actingAs($client);
@@ -508,17 +508,17 @@ class JobRequestProposalTest extends TestCase
         $client = $this->createClient();
         $job = JobRequest::factory()->create([
             'client_id' => $client->id,
-            'category'  => 'Plumbing',
-            'city'      => 'Tunis',
-            'location'  => 'Tunis, La Marsa',
-            'deadline'  => now()->addWeek(),
-            'status'    => 'open',
+            'category' => 'Plumbing',
+            'city' => 'Tunis',
+            'location' => 'Tunis, La Marsa',
+            'deadline' => now()->addWeek(),
+            'status' => 'open',
         ]);
         JobRequest::factory()->create([
             'client_id' => $client->id,
-            'category'  => 'Painting',
-            'city'      => 'Tunis',
-            'status'    => 'open',
+            'category' => 'Painting',
+            'city' => 'Tunis',
+            'status' => 'open',
         ]);
 
         $provider = $this->createProvider([], ['category' => 'Plumbing']);
@@ -542,6 +542,57 @@ class JobRequestProposalTest extends TestCase
             ->assertJsonPath('data.0.has_applied', true)
             ->assertJsonPath('data.0.my_proposal_delivery_time', '3 days')
             ->assertJsonPath('data.0.my_proposal_message', 'I can complete the installation within three business days.');
+    }
+
+    public function test_provider_can_filter_job_feed_by_category_city_urgency_and_search(): void
+    {
+        $client = $this->createClient();
+        JobRequest::factory()->create([
+            'client_id' => $client->id,
+            'title' => 'Plumbing work',
+            'description' => 'The kitchen drain is leaking and needs repair.',
+            'category' => 'Plumbing',
+            'city' => 'Tunis',
+            'urgency' => 'urgent',
+            'status' => 'open',
+        ]);
+        JobRequest::factory()->create([
+            'client_id' => $client->id,
+            'title' => 'Plumbing work in Sousse',
+            'category' => 'Plumbing',
+            'city' => 'Sousse',
+            'urgency' => 'low',
+            'status' => 'open',
+        ]);
+        JobRequest::factory()->create([
+            'client_id' => $client->id,
+            'title' => 'Paint the living room',
+            'category' => 'Painting',
+            'city' => 'Tunis',
+            'urgency' => 'urgent',
+            'status' => 'open',
+        ]);
+
+        $provider = $this->createProvider([], ['category' => 'Plumbing']);
+        Sanctum::actingAs($provider);
+
+        $this->getJson('/api/v1/provider/job-requests?category=Plumbing&city=Tunis&urgency=urgent&q=drain')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.title', 'Plumbing work');
+
+        $this->getJson('/api/v1/provider/job-requests?category=')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function test_provider_search_rejects_queries_longer_than_100_characters(): void
+    {
+        Sanctum::actingAs($this->createProvider());
+
+        $this->getJson('/api/v1/provider/job-requests?q='.str_repeat('a', 101))
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.q.0', 'The q field must not be greater than 100 characters.');
     }
 
     public function test_client_cannot_view_provider_job_request_feed(): void

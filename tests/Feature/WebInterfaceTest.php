@@ -39,13 +39,15 @@ class WebInterfaceTest extends TestCase
         $response = $this->get('/dashboard');
         $response->assertStatus(200);
         $response->assertSee('Dashboard');
+        $response->assertSee('providerJobRequestFilters', false);
+        $response->assertSee('jobRequestUrgencyFilter', false);
     }
 
     public function test_admin_dashboard_has_sidebar_and_no_header_menu(): void
     {
         $response = $this->get('/admin/dashboard');
         $response->assertStatus(200);
-        
+
         // Assert dedicated Admin sidebar exists
         $response->assertSee('id="adminSidebar"', false);
         $response->assertSee('Admin Operations Console');

@@ -30,8 +30,8 @@ class JobRequestController extends Controller
         if ($search = trim((string) $request->input('q', ''))) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('category', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -42,9 +42,9 @@ class JobRequestController extends Controller
             'data' => JobRequestResource::collection($requests->items()),
             'meta' => [
                 'current_page' => $requests->currentPage(),
-                'last_page'    => $requests->lastPage(),
-                'per_page'     => $requests->perPage(),
-                'total'        => $requests->total(),
+                'last_page' => $requests->lastPage(),
+                'per_page' => $requests->perPage(),
+                'total' => $requests->total(),
             ],
         ]);
     }
@@ -60,23 +60,23 @@ class JobRequestController extends Controller
 
         $jobRequest = JobRequest::create([
             'request_number' => JobRequest::generateRequestNumber(),
-            'client_id'      => $client->id,
-            'title'          => $request->input('title'),
-            'category'       => $request->input('category'),
-            'description'    => $request->input('description'),
-            'budget'         => $request->input('budget'),
-            'location'       => $location,
-            'city'           => $request->input('city') ?: $location,
-            'address'        => $request->input('address'),
-            'urgency'        => $request->input('urgency', 'medium'),
-            'deadline'       => $deadline,
+            'client_id' => $client->id,
+            'title' => $request->input('title'),
+            'category' => $request->input('category'),
+            'description' => $request->input('description'),
+            'budget' => $request->input('budget'),
+            'location' => $location,
+            'city' => $request->input('city') ?: $location,
+            'address' => $request->input('address'),
+            'urgency' => $request->input('urgency', 'medium'),
+            'deadline' => $deadline,
             'preferred_date' => $deadline,
-            'status'         => 'open',
+            'status' => 'open',
         ]);
 
         return response()->json([
             'message' => 'Your job request has been published successfully. Providers in your trade will be notified.',
-            'data'    => new JobRequestResource($jobRequest),
+            'data' => new JobRequestResource($jobRequest),
         ], 201);
     }
 
@@ -138,15 +138,15 @@ class JobRequestController extends Controller
         if ($proposals->isEmpty()) {
             return response()->json([
                 'job_request' => new JobRequestResource($jobRequest),
-                'summary'     => [
-                    'proposals_count'    => 0,
-                    'lowest_price'       => null,
-                    'highest_price'      => null,
-                    'average_price'      => null,
-                    'fastest_days'       => null,
-                    'top_rating'         => null,
+                'summary' => [
+                    'proposals_count' => 0,
+                    'lowest_price' => null,
+                    'highest_price' => null,
+                    'average_price' => null,
+                    'fastest_days' => null,
+                    'top_rating' => null,
                 ],
-                'proposals'   => [],
+                'proposals' => [],
             ]);
         }
 
@@ -176,9 +176,9 @@ class JobRequestController extends Controller
 
             $resource = new ProposalResource($prop);
             $resource->setComparisonFlags([
-                'is_lowest_price'     => $isLowestPrice,
+                'is_lowest_price' => $isLowestPrice,
                 'is_fastest_delivery' => $isFastestDelivery,
-                'is_top_rated'        => $isTopRated,
+                'is_top_rated' => $isTopRated,
             ]);
 
             return $resource->toArray($request);
@@ -200,17 +200,17 @@ class JobRequestController extends Controller
 
         return response()->json([
             'job_request' => new JobRequestResource($jobRequest),
-            'summary'     => [
-                'proposals_count'    => $proposals->count(),
-                'lowest_price'       => $minPrice,
-                'lowest_price_formatted' => number_format($minPrice, 2) . ' TND',
-                'highest_price'      => $maxPrice,
-                'average_price'      => $avgPrice,
-                'average_price_formatted' => number_format($avgPrice, 2) . ' TND',
-                'fastest_days'       => $minDays,
-                'top_rating'         => $maxRating,
+            'summary' => [
+                'proposals_count' => $proposals->count(),
+                'lowest_price' => $minPrice,
+                'lowest_price_formatted' => number_format($minPrice, 2).' TND',
+                'highest_price' => $maxPrice,
+                'average_price' => $avgPrice,
+                'average_price_formatted' => number_format($avgPrice, 2).' TND',
+                'fastest_days' => $minDays,
+                'top_rating' => $maxRating,
             ],
-            'proposals'   => $sortedCollection,
+            'proposals' => $sortedCollection,
         ]);
     }
 
@@ -223,6 +223,10 @@ class JobRequestController extends Controller
         if (! $provider->isProvider()) {
             return response()->json(['message' => 'Only providers can view the service request feed.'], 403);
         }
+
+        $request->validate([
+            'q' => ['sometimes', 'nullable', 'string', 'max:100'],
+        ]);
 
         $profile = $provider->providerProfile;
 
@@ -247,29 +251,38 @@ class JobRequestController extends Controller
             $query->where('urgency', $urgency);
         }
 
+        if ($search = trim((string) $request->input('q', ''))) {
+            $query->where(function ($searchQuery) use ($search) {
+                $searchQuery->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('request_number', 'like', "%{$search}%");
+            });
+        }
+
         $perPage = min(max((int) $request->input('per_page', 12), 1), 50);
         $requests = $query->paginate($perPage);
 
         $items = collect($requests->items())->map(function ($req) use ($provider) {
             $myProposal = $req->proposals->firstWhere('provider_id', $provider->id);
+
             return [
-                'id'                  => $req->id,
-                'request_number'      => $req->request_number,
-                'title'               => $req->title,
-                'category'            => $req->category,
-                'description'         => $req->description,
-                'budget'              => $req->budget !== null ? (float) $req->budget : null,
-                'budget_formatted'    => $req->budget !== null ? number_format((float) $req->budget, 2) . ' TND' : 'Flexible',
-                'location'            => $req->location ?: ($req->address ?: $req->city),
-                'city'                => $req->city,
-                'address'             => $req->address,
-                'urgency'             => $req->urgency,
-                'deadline'            => ($req->deadline ?: $req->preferred_date)?->toISOString(),
-                'preferred_date'      => $req->preferred_date?->format('M d, Y'),
-                'created_at_human'    => $req->created_at?->diffForHumans(),
-                'has_applied'         => (bool) $myProposal,
-                'my_proposal_status'  => $myProposal?->status,
-                'my_proposal_price'   => $myProposal ? (float) $myProposal->price : null,
+                'id' => $req->id,
+                'request_number' => $req->request_number,
+                'title' => $req->title,
+                'category' => $req->category,
+                'description' => $req->description,
+                'budget' => $req->budget !== null ? (float) $req->budget : null,
+                'budget_formatted' => $req->budget !== null ? number_format((float) $req->budget, 2).' TND' : 'Flexible',
+                'location' => $req->location ?: ($req->address ?: $req->city),
+                'city' => $req->city,
+                'address' => $req->address,
+                'urgency' => $req->urgency,
+                'deadline' => ($req->deadline ?: $req->preferred_date)?->toISOString(),
+                'preferred_date' => $req->preferred_date?->format('M d, Y'),
+                'created_at_human' => $req->created_at?->diffForHumans(),
+                'has_applied' => (bool) $myProposal,
+                'my_proposal_status' => $myProposal?->status,
+                'my_proposal_price' => $myProposal ? (float) $myProposal->price : null,
                 'my_proposal_delivery_time' => $myProposal?->delivery_time,
                 'my_proposal_delivery_days' => $myProposal?->delivery_days,
                 'my_proposal_message' => $myProposal?->message,
@@ -280,9 +293,9 @@ class JobRequestController extends Controller
             'data' => $items,
             'meta' => [
                 'current_page' => $requests->currentPage(),
-                'last_page'    => $requests->lastPage(),
-                'per_page'     => $requests->perPage(),
-                'total'        => $requests->total(),
+                'last_page' => $requests->lastPage(),
+                'per_page' => $requests->perPage(),
+                'total' => $requests->total(),
             ],
         ]);
     }
