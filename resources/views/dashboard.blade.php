@@ -1219,6 +1219,9 @@
                 : proposalStatus
                     ? `<span class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold">Proposal ${escapeJobRequestHtml(proposalStatus)}</span>`
                     : `<button type="button" onclick="openProposalModal(${Number(request.id)})" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold transition"><i class="bi bi-send-fill mr-1"></i> Send Proposal</button>`;
+            const chatAction = request.client_id
+                ? `<button type="button" onclick="startChatWithUser(${Number(request.client_id)}, '', ${Number(request.id)})" class="px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-400 font-bold text-xs transition flex items-center gap-1"><i class="bi bi-chat-dots-fill"></i> Message Client</button>`
+                : '';
 
             return `
                 <article class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
@@ -1238,7 +1241,10 @@
                     </div>
                     <div class="flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800 pt-3">
                         <span class="text-xs text-slate-500">Client: ${escapeJobRequestHtml(request.client_name || 'Khedma client')}</span>
-                        ${proposalAction}
+                        <div class="flex items-center gap-2">
+                            ${chatAction}
+                            ${proposalAction}
+                        </div>
                     </div>
                 </article>
             `;
@@ -2059,7 +2065,7 @@
     }
 
     // ── Direct Chat Helper ─────────────────────────────────────────────────────
-    async function startChatWithUser(recipientId, initialMessage = '') {
+    async function startChatWithUser(recipientId, initialMessage = '', jobRequestId = null) {
         const token = localStorage.getItem('khedma_token');
         if (!token) {
             window.location.href = '/login';
@@ -2078,6 +2084,7 @@
                 },
                 body: JSON.stringify({
                     recipient_id: recipientId,
+                    job_request_id: jobRequestId || undefined,
                     message: initialMessage || undefined
                 })
             });

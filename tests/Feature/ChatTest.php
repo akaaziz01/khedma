@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\Conversation;
+use App\Models\JobRequest;
+use App\Models\ProviderProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -73,6 +75,10 @@ class ChatTest extends TestCase
         $replyResponse->assertStatus(201)
             ->assertJsonPath('message.body', 'Yes Mariem! I can come around 10:00 AM. Please share your location.');
 
+        $clientNotification = $client->notifications()->first();
+        $this->assertSame('new_message', $clientNotification->data['type']);
+        $this->assertSame('/messages', $clientNotification->data['url']);
+
         // 3. Client checks messages and marks as read
         Sanctum::actingAs($client);
 
@@ -92,6 +98,80 @@ class ChatTest extends TestCase
         $listResponse->assertStatus(200)
             ->assertJsonPath('conversations.0.participant.name', 'Youssef Pro')
             ->assertJsonPath('conversations.0.unread_count', 0);
+    }
+
+    public function test_provider_can_start_a_conversation_with_a_client_from_a_job_request(): void
+    {
+        $client = User::factory()->create(['role' => UserRole::CLIENT]);
+        $provider = User::factory()->create(['role' => UserRole::PROVIDER]);
+        ProviderProfile::create([
+            'user_id' => $provider->id,
+            'business_name' => 'Expert Craft',
+            'category' => 'Plumbing',
+            'city' => 'Tunis',
+            'bio' => 'Licensed professional with certified expertise.',
+            'skills' => ['Plumbing'],
+            'hourly_rate' => 45.00,
+            'is_available' => true,
+        ]);
+        $jobRequest = JobRequest::factory()->create([
+            'client_id' => $client->id,
+            'category' => 'Plumbing',
+        ]);
+
+        Sanctum::actingAs($provider);
+
+        $feedResponse = $this->getJson('/api/v1/provider/job-requests')
+            ->assertOk()
+            ->assertJsonPath('data.0.client_id', $client->id)
+            ->assertJsonPath('data.0.client_name', $client->name);
+
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
+        $this->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Message Client')
+            ->assertSee('startChatWithUser');
+
+        $response = $this->postJson('/api/v1/conversations', [
+            'recipient_id' => $feedResponse->json('data.0.client_id'),
+            'job_request_id' => $jobRequest->id,
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('conversation.client_id', $client->id)
+            ->assertJsonPath('conversation.provider_id', $provider->id)
+            ->assertJsonPath('conversation.job_request_id', $jobRequest->id);
+    }
+
+    public function test_user_cannot_start_a_conversation_with_another_user_of_the_same_role(): void
+    {
+        $client = User::factory()->create(['role' => UserRole::CLIENT]);
+        $otherClient = User::factory()->create(['role' => UserRole::CLIENT]);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/conversations', [
+            'recipient_id' => $otherClient->id,
+        ])->assertUnprocessable();
+
+        $this->assertDatabaseCount('conversations', 0);
+    }
+
+    public function test_conversation_cannot_be_linked_to_another_clients_job_request(): void
+    {
+        $client = User::factory()->create(['role' => UserRole::CLIENT]);
+        $otherClient = User::factory()->create(['role' => UserRole::CLIENT]);
+        $provider = User::factory()->create(['role' => UserRole::PROVIDER]);
+        $jobRequest = JobRequest::factory()->create(['client_id' => $otherClient->id]);
+
+        Sanctum::actingAs($provider);
+
+        $this->postJson('/api/v1/conversations', [
+            'recipient_id' => $client->id,
+            'job_request_id' => $jobRequest->id,
+        ])->assertUnprocessable();
+
+        $this->assertDatabaseCount('conversations', 0);
     }
 
     public function test_non_participant_cannot_access_or_send_messages(): void
