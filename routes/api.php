@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientFavoriteController;
+use App\Http\Controllers\Api\JobRequestController;
+use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\ProviderCompareController;
 use App\Http\Controllers\Api\ProviderDashboardController;
 use App\Http\Controllers\Api\PublicProviderController;
@@ -41,12 +43,21 @@ Route::prefix('v1')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
 
-        // Client Favorites & Saved Providers API
+        // Client Favorites & Job Requests / Proposals API
         Route::prefix('client')->group(function () {
+            // Favorites
             Route::get('/favorites', [ClientFavoriteController::class, 'index']);
             Route::post('/favorites/{providerId}', [ClientFavoriteController::class, 'store']);
             Route::delete('/favorites/{providerId}', [ClientFavoriteController::class, 'destroy']);
             Route::get('/favorites/{providerId}/status', [ClientFavoriteController::class, 'status']);
+
+            // Job Requests & Proposals
+            Route::get('/job-requests', [JobRequestController::class, 'index']);
+            Route::post('/job-requests', [JobRequestController::class, 'store']);
+            Route::get('/job-requests/{id}', [JobRequestController::class, 'show']);
+            Route::get('/job-requests/{id}/compare', [JobRequestController::class, 'compare']);
+            Route::post('/proposals/{id}/accept', [ProposalController::class, 'accept']);
+            Route::post('/proposals/{id}/reject', [ProposalController::class, 'reject']);
         });
 
         // Provider Dashboard API (Spotlight inspired with real DB data)
@@ -61,6 +72,17 @@ Route::prefix('v1')->group(function () {
             Route::post('/profile', [ProviderDashboardController::class, 'updateProfile']);
             Route::post('/portfolio', [ProviderDashboardController::class, 'uploadPortfolioPhoto']);
             Route::delete('/portfolio/{id}', [ProviderDashboardController::class, 'deletePortfolioPhoto']);
+
+            // Proposals & Job Requests Feed
+            Route::get('/job-requests', [JobRequestController::class, 'providerFeed']);
+            Route::post('/job-requests/{id}/proposals', [ProposalController::class, 'store']);
+            Route::get('/proposals', [ProposalController::class, 'providerIndex']);
+
+            // Semantic booking action endpoints (with transition guards)
+            Route::post('/bookings/{id}/accept',   [ProviderDashboardController::class, 'acceptBooking']);
+            Route::post('/bookings/{id}/decline',  [ProviderDashboardController::class, 'declineBooking']);
+            Route::post('/bookings/{id}/start',    [ProviderDashboardController::class, 'startBooking']);
+            Route::post('/bookings/{id}/complete', [ProviderDashboardController::class, 'completeBooking']);
         });
 
         // Admin Management Area (Secured with Admin Middleware)

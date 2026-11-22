@@ -296,6 +296,57 @@
                 </div>
             </div>
 
+            <!-- Client Job Requests & Proposals Section -->
+            <div id="jobRequestsSection" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                                <i class="bi bi-file-earmark-diff-fill text-blue-600"></i>
+                                <span>My Job Requests & Received Proposals</span>
+                            </h2>
+                            <span id="clientRequestsCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40">
+                                0 Requests
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Post custom job requests, receive tailored offers, and compare prices and delivery times side-by-side.</p>
+                    </div>
+
+                    <button onclick="openNewJobRequestModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold transition shadow-md shrink-0">
+                        <i class="bi bi-plus-circle-fill text-sm"></i>
+                        <span>Post New Request</span>
+                    </button>
+                </div>
+
+                <!-- Loading spinner for job requests -->
+                <div id="jobRequestsLoadingState" class="py-12 text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-3 border-blue-600 border-t-transparent mb-2"></div>
+                    <p class="text-xs text-slate-400 font-semibold">Loading your job requests and proposals...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="clientRequestsEmpty" class="hidden py-12 text-center max-w-sm mx-auto space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 flex items-center justify-center mx-auto text-2xl shadow-inner">
+                        <i class="bi bi-inbox-fill"></i>
+                    </div>
+                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">No Job Requests Posted Yet</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Need plumbing, electrical repairs, or custom work? Post a job request to get competitive quotes from top providers.
+                    </p>
+                    <div class="pt-2">
+                        <button onclick="openNewJobRequestModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Post Your First Job Request</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Requests Grid / List -->
+                <div id="clientRequestsGrid" class="hidden grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
             <!-- Client Saved & Favorite Providers Section -->
             <div id="favorites" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
@@ -350,6 +401,281 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: NEW JOB REQUEST (CLIENT)            -->
+<!-- ========================================== -->
+<div id="newJobRequestModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-xl w-full p-6 sm:p-8 space-y-6 my-8">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="bi bi-file-earmark-plus-fill text-blue-600"></i>
+                    <span>Post a Job Request</span>
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Describe your need and receive competitive quotes from verified providers.</p>
+            </div>
+            <button onclick="closeNewJobRequestModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+        </div>
+
+        <form onsubmit="handleCreateJobRequest(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Project / Request Title *</label>
+                <input type="text" id="jobReqTitle" required placeholder="e.g. Repair bathroom pipe leak & replace faucet"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Trade / Category *</label>
+                    <select id="jobReqCategory" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="HVAC & AC">HVAC & AC</option>
+                        <option value="Carpentry">Carpentry</option>
+                        <option value="Painting">Painting</option>
+                        <option value="Cleaning">Cleaning</option>
+                        <option value="Gardening">Gardening</option>
+                        <option value="Locksmith">Locksmith</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">City *</label>
+                    <select id="jobReqCity" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="Tunis">Tunis</option>
+                        <option value="Ariana">Ariana</option>
+                        <option value="Ben Arous">Ben Arous</option>
+                        <option value="Manouba">Manouba</option>
+                        <option value="Sousse">Sousse</option>
+                        <option value="Sfax">Sfax</option>
+                        <option value="Monastir">Monastir</option>
+                        <option value="Nabeul">Nabeul</option>
+                        <option value="Bizerte">Bizerte</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Estimated Budget (TND)</label>
+                    <input type="number" id="jobReqBudget" min="10" step="5" placeholder="e.g. 150"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Urgency</label>
+                    <select id="jobReqUrgency"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="low">Low (Next 2 weeks)</option>
+                        <option value="medium" selected>Medium (A few days)</option>
+                        <option value="urgent">Urgent (24 - 48 hours)</option>
+                        <option value="emergency">Emergency (Today)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Preferred Date</label>
+                    <input type="datetime-local" id="jobReqDate"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Neighborhood / Address</label>
+                <input type="text" id="jobReqAddress" placeholder="e.g. Ennasr 2, Rue Hedi Nouira"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Project Description & Scope *</label>
+                <textarea id="jobReqDescription" rows="3" required placeholder="Describe what needs to be done, specific dimensions, brands or issues observed..."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeNewJobRequestModal()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                    Cancel
+                </button>
+                <button type="submit" id="saveJobReqBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center gap-2">
+                    <i class="bi bi-send-fill text-xs"></i>
+                    <span>Publish Request</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: REVIEW & COMPARE PROPOSALS          -->
+<!-- ========================================== -->
+<div id="compareProposalsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-4xl w-full p-6 sm:p-8 space-y-6 my-8 max-h-[90vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4 shrink-0">
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span id="compareRequestCategoryTag" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400">
+                        Plumbing
+                    </span>
+                    <span id="compareRequestStatusTag" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
+                        Open
+                    </span>
+                    <span id="compareRequestNumber" class="text-xs text-slate-400 font-mono">REQ-123456</span>
+                </div>
+                <h3 id="compareRequestTitle" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-1">
+                    Job Request Proposals Comparison
+                </h3>
+                <p id="compareRequestMeta" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Tunis • Target budget: 150 TND
+                </p>
+            </div>
+            <button onclick="closeCompareModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition shrink-0">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Comparison Summary Highlights Bar -->
+        <div id="compareSummaryBar" class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 shrink-0">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Lowest Price</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryLowest" class="text-lg font-black text-emerald-600 dark:text-emerald-400">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">TND</span>
+                </div>
+                <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-tag-fill text-[9px]"></i> Best Price
+                </span>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Fastest Delivery</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryFastest" class="text-lg font-black text-blue-600 dark:text-blue-400">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">day(s)</span>
+                </div>
+                <span class="text-[10px] text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-lightning-charge-fill text-[9px]"></i> Quickest Turnaround
+                </span>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Top Provider Rating</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryRating" class="text-lg font-black text-amber-500">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">/ 5.0</span>
+                </div>
+                <span class="text-[10px] text-amber-500 font-bold flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-star-fill text-[9px]"></i> Highly Rated
+                </span>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Average Quote</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryAverage" class="text-lg font-black text-slate-900 dark:text-white">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">TND</span>
+                </div>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-calculator text-[9px]"></i> Market average
+                </span>
+            </div>
+        </div>
+
+        <!-- Sort Filter Controls -->
+        <div class="flex items-center justify-between gap-3 text-xs shrink-0">
+            <span class="text-slate-500 dark:text-slate-400 font-semibold">
+                Showing <strong id="compareCountLabel" class="text-slate-900 dark:text-white">0</strong> proposals
+            </span>
+            <div class="flex items-center gap-2">
+                <span class="text-slate-400 font-medium">Sort by:</span>
+                <select id="compareSortSelect" onchange="changeCompareSort(this.value)"
+                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:outline-none">
+                    <option value="price_asc">Lowest Price First</option>
+                    <option value="delivery_asc">Fastest Delivery First</option>
+                    <option value="rating_desc">Highest Rated Provider</option>
+                    <option value="price_desc">Highest Price First</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="compareLoadingState" class="py-12 text-center my-auto">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-3 border-blue-600 border-t-transparent mb-2"></div>
+            <p class="text-xs text-slate-400 font-semibold">Analyzing & comparing proposals...</p>
+        </div>
+
+        <!-- Empty state when 0 proposals -->
+        <div id="compareEmptyState" class="hidden py-12 text-center max-w-sm mx-auto space-y-3 my-auto">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mx-auto text-xl">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h4 class="text-sm font-extrabold text-slate-900 dark:text-white">Waiting for Provider Proposals</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                Your request has been published. Local providers in your trade are reviewing your details. Check back shortly!
+            </p>
+        </div>
+
+        <!-- Side-by-Side Comparison Proposals List/Grid -->
+        <div id="compareProposalsGrid" class="hidden overflow-y-auto space-y-4 pr-1">
+            <!-- Rendered dynamically via JS -->
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- MODAL: DECLINE BOOKING (PROVIDER)          -->
+<!-- ========================================== -->
+<div id="declineModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 sm:p-8 space-y-5">
+        <!-- Header -->
+        <div class="flex items-start justify-between">
+            <div>
+                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="bi bi-x-circle-fill text-red-500"></i>
+                    <span>Decline Booking Request</span>
+                </h3>
+                <p id="declineModalBookingRef" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">BK-XXXXXX — Client Name</p>
+            </div>
+            <button onclick="closeDeclineModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Warning Notice -->
+        <div class="flex items-start gap-3 p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40">
+            <i class="bi bi-exclamation-triangle-fill text-red-500 mt-0.5 shrink-0"></i>
+            <p class="text-xs text-red-800 dark:text-red-300 leading-relaxed">
+                Declining will notify the client and free up their request so they can find another provider. This action <strong>cannot be undone</strong>.
+            </p>
+        </div>
+
+        <!-- Reason Textarea -->
+        <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Reason for Declining <span class="text-red-500">*</span>
+            </label>
+            <textarea id="declineReasonText" rows="4" maxlength="1000" required
+                placeholder="Please explain why you cannot take this booking (e.g. already fully booked, outside your service area, missing required equipment)..."
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
+            <p class="text-[11px] text-slate-400 mt-1">The client will see this reason. Be professional and clear.</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button onclick="closeDeclineModal()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                Cancel — Keep Pending
+            </button>
+            <button id="confirmDeclineBtn" onclick="confirmDecline()"
+                class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center gap-2">
+                <i class="bi bi-x-circle-fill text-xs"></i>
+                <span>Confirm Decline</span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -415,6 +741,229 @@
         </form>
     </div>
 </div>
+
+<!-- ========================================== -->
+<!-- MODAL: NEW JOB REQUEST (CLIENT)            -->
+<!-- ========================================== -->
+<div id="newJobRequestModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-xl w-full p-6 sm:p-8 space-y-6 my-8">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="bi bi-file-earmark-plus-fill text-blue-600"></i>
+                    <span>Post a Job Request</span>
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Describe your need and receive competitive quotes from verified providers.</p>
+            </div>
+            <button onclick="closeNewJobRequestModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+        </div>
+
+        <form onsubmit="handleCreateJobRequest(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Project / Request Title *</label>
+                <input type="text" id="jobReqTitle" required placeholder="e.g. Repair bathroom pipe leak & replace faucet"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Trade / Category *</label>
+                    <select id="jobReqCategory" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="HVAC & AC">HVAC & AC</option>
+                        <option value="Carpentry">Carpentry</option>
+                        <option value="Painting">Painting</option>
+                        <option value="Cleaning">Cleaning</option>
+                        <option value="Gardening">Gardening</option>
+                        <option value="Locksmith">Locksmith</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">City *</label>
+                    <select id="jobReqCity" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="Tunis">Tunis</option>
+                        <option value="Ariana">Ariana</option>
+                        <option value="Ben Arous">Ben Arous</option>
+                        <option value="Manouba">Manouba</option>
+                        <option value="Sousse">Sousse</option>
+                        <option value="Sfax">Sfax</option>
+                        <option value="Monastir">Monastir</option>
+                        <option value="Nabeul">Nabeul</option>
+                        <option value="Bizerte">Bizerte</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Estimated Budget (TND)</label>
+                    <input type="number" id="jobReqBudget" min="10" step="5" placeholder="e.g. 150"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Urgency</label>
+                    <select id="jobReqUrgency"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="low">Low (Next 2 weeks)</option>
+                        <option value="medium" selected>Medium (A few days)</option>
+                        <option value="urgent">Urgent (24 - 48 hours)</option>
+                        <option value="emergency">Emergency (Today)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Preferred Date</label>
+                    <input type="datetime-local" id="jobReqDate"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Neighborhood / Address</label>
+                <input type="text" id="jobReqAddress" placeholder="e.g. Ennasr 2, Rue Hedi Nouira"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Project Description & Scope *</label>
+                <textarea id="jobReqDescription" rows="3" required placeholder="Describe what needs to be done, specific dimensions, brands or issues observed..."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeNewJobRequestModal()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                    Cancel
+                </button>
+                <button type="submit" id="saveJobReqBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center gap-2">
+                    <i class="bi bi-send-fill text-xs"></i>
+                    <span>Publish Request</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: REVIEW & COMPARE PROPOSALS          -->
+<!-- ========================================== -->
+<div id="compareProposalsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-4xl w-full p-6 sm:p-8 space-y-6 my-8 max-h-[90vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4 shrink-0">
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span id="compareRequestCategoryTag" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400">
+                        Plumbing
+                    </span>
+                    <span id="compareRequestStatusTag" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
+                        Open
+                    </span>
+                    <span id="compareRequestNumber" class="text-xs text-slate-400 font-mono">REQ-123456</span>
+                </div>
+                <h3 id="compareRequestTitle" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-1">
+                    Job Request Proposals Comparison
+                </h3>
+                <p id="compareRequestMeta" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Tunis • Target budget: 150 TND
+                </p>
+            </div>
+            <button onclick="closeCompareModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition shrink-0">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Comparison Summary Highlights Bar -->
+        <div id="compareSummaryBar" class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 shrink-0">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Lowest Price</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryLowest" class="text-lg font-black text-emerald-600 dark:text-emerald-400">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">TND</span>
+                </div>
+                <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-tag-fill text-[9px]"></i> Best Price
+                </span>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Fastest Delivery</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryFastest" class="text-lg font-black text-blue-600 dark:text-blue-400">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">day(s)</span>
+                </div>
+                <span class="text-[10px] text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-lightning-charge-fill text-[9px]"></i> Quickest Turnaround
+                </span>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Top Provider Rating</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryRating" class="text-lg font-black text-amber-500">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">/ 5.0</span>
+                </div>
+                <span class="text-[10px] text-amber-500 font-bold flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-star-fill text-[9px]"></i> Highly Rated
+                </span>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Average Quote</span>
+                <div class="mt-0.5 flex items-baseline gap-1">
+                    <span id="compareSummaryAverage" class="text-lg font-black text-slate-900 dark:text-white">--</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">TND</span>
+                </div>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1 mt-0.5">
+                    <i class="bi bi-calculator text-[9px]"></i> Market average
+                </span>
+            </div>
+        </div>
+
+        <!-- Sort Filter Controls -->
+        <div class="flex items-center justify-between gap-3 text-xs shrink-0">
+            <span class="text-slate-500 dark:text-slate-400 font-semibold">
+                Showing <strong id="compareCountLabel" class="text-slate-900 dark:text-white">0</strong> proposals
+            </span>
+            <div class="flex items-center gap-2">
+                <span class="text-slate-400 font-medium">Sort by:</span>
+                <select id="compareSortSelect" onchange="changeCompareSort(this.value)"
+                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:outline-none">
+                    <option value="price_asc">Lowest Price First</option>
+                    <option value="delivery_asc">Fastest Delivery First</option>
+                    <option value="rating_desc">Highest Rated Provider</option>
+                    <option value="price_desc">Highest Price First</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="compareLoadingState" class="py-12 text-center my-auto">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-3 border-blue-600 border-t-transparent mb-2"></div>
+            <p class="text-xs text-slate-400 font-semibold">Analyzing & comparing proposals...</p>
+        </div>
+
+        <!-- Empty state when 0 proposals -->
+        <div id="compareEmptyState" class="hidden py-12 text-center max-w-sm mx-auto space-y-3 my-auto">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mx-auto text-xl">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h4 class="text-sm font-extrabold text-slate-900 dark:text-white">Waiting for Provider Proposals</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                Your request has been published. Local providers in your trade are reviewing your details. Check back shortly!
+            </p>
+        </div>
+
+        <!-- Side-by-Side Comparison Proposals List/Grid -->
+        <div id="compareProposalsGrid" class="hidden overflow-y-auto space-y-4 pr-1">
+            <!-- Rendered dynamically via JS -->
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -603,17 +1152,23 @@
             if (b.status === 'pending') {
                 actionsHtml = `
                     <div class="flex items-center justify-end gap-1.5">
-                        <button onclick="updateStatus(${b.id}, 'accepted')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition">Accept</button>
-                        <button onclick="updateStatus(${b.id}, 'declined')" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs transition">Decline</button>
+                        <button onclick="acceptBooking(${b.id}, '${(b.booking_number||'').replace(/'/g,"\\'")}', '${(b.client?.name||'Client').replace(/'/g,"\\'")}')}"
+                            class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center gap-1">
+                            <i class="bi bi-check-lg text-[11px]"></i> Accept
+                        </button>
+                        <button onclick="openDeclineModal(${b.id}, '${(b.booking_number||'').replace(/'/g,"\\'")}', '${(b.client?.name||'Client').replace(/'/g,"\\'")}')"
+                            class="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 text-xs font-bold border border-red-200 dark:border-red-900/40 transition">
+                            Decline
+                        </button>
                     </div>
                 `;
             } else if (b.status === 'accepted') {
                 actionsHtml = `
-                    <button onclick="updateStatus(${b.id}, 'in_progress')" class="px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs transition">Start Job</button>
+                    <button onclick="startBooking(${b.id})" class="px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs transition">Start Job</button>
                 `;
             } else if (b.status === 'in_progress') {
                 actionsHtml = `
-                    <button onclick="updateStatus(${b.id}, 'completed')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition">✓ Mark Done</button>
+                    <button onclick="completeBooking(${b.id})" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition">✓ Mark Done</button>
                 `;
             } else if (b.status === 'completed') {
                 actionsHtml = `
@@ -621,6 +1176,8 @@
                         <span>✓</span> Paid
                     </span>
                 `;
+            } else if (b.status === 'declined') {
+                actionsHtml = `<span class="text-xs text-red-500 font-semibold">Declined</span>`;
             } else {
                 actionsHtml = `<span class="text-xs text-slate-400">—</span>`;
             }
@@ -695,6 +1252,126 @@
         } catch(e) {
             console.error('Failed to update status', e);
         }
+    }
+
+    // ── Accept Booking (semantic endpoint with confirm) ────────────────────────
+    async function acceptBooking(bookingId, bookingNumber, clientName) {
+        if (!confirm(`Accept booking ${bookingNumber} from ${clientName}?\n\nThe client will be notified and the booking will be confirmed.`)) return;
+        const token = localStorage.getItem('khedma_token');
+        try {
+            const res = await fetch(`/api/v1/provider/bookings/${bookingId}/accept`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: '{}'
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showToast(`✅ ${data.message}`, 'success');
+                await loadProviderDashboard(token);
+            } else {
+                showToast(data.message || 'Could not accept booking.', 'error');
+            }
+        } catch(e) { showToast('Network error.', 'error'); }
+    }
+
+    // ── Start Job ─────────────────────────────────────────────────────────────
+    async function startBooking(bookingId) {
+        const token = localStorage.getItem('khedma_token');
+        try {
+            const res = await fetch(`/api/v1/provider/bookings/${bookingId}/start`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                body: '{}'
+            });
+            const data = await res.json();
+            if (res.ok) { showToast(`🔧 ${data.message}`, 'info'); await loadProviderDashboard(token); }
+            else showToast(data.message || 'Could not start job.', 'error');
+        } catch(e) { showToast('Network error.', 'error'); }
+    }
+
+    // ── Complete Job ──────────────────────────────────────────────────────────
+    async function completeBooking(bookingId) {
+        if (!confirm('Mark this job as completed? The client will be able to leave a review.')) return;
+        const token = localStorage.getItem('khedma_token');
+        try {
+            const res = await fetch(`/api/v1/provider/bookings/${bookingId}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                body: '{}'
+            });
+            const data = await res.json();
+            if (res.ok) { showToast(`✅ ${data.message}`, 'success'); await loadProviderDashboard(token); }
+            else showToast(data.message || 'Could not complete booking.', 'error');
+        } catch(e) { showToast('Network error.', 'error'); }
+    }
+
+    // ── Decline Modal ─────────────────────────────────────────────────────────
+    let _declineBookingId = null;
+    function openDeclineModal(bookingId, bookingNumber, clientName) {
+        _declineBookingId = bookingId;
+        document.getElementById('declineModalBookingRef').textContent = `${bookingNumber} — ${clientName}`;
+        document.getElementById('declineReasonText').value = '';
+        document.getElementById('declineModal').classList.remove('hidden');
+    }
+    function closeDeclineModal() {
+        _declineBookingId = null;
+        document.getElementById('declineModal').classList.add('hidden');
+    }
+    async function confirmDecline() {
+        const reason = document.getElementById('declineReasonText').value.trim();
+        if (!reason || reason.length < 5) {
+            alert('Please enter a decline reason (at least 5 characters) so the client understands why.');
+            return;
+        }
+        const token = localStorage.getItem('khedma_token');
+        const btn = document.getElementById('confirmDeclineBtn');
+        btn.disabled = true;
+        btn.textContent = 'Declining...';
+        try {
+            const res = await fetch(`/api/v1/provider/bookings/${_declineBookingId}/decline`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                body: JSON.stringify({ declined_reason: reason })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                closeDeclineModal();
+                showToast(`Booking declined. Reason saved for the client.`, 'warning');
+                await loadProviderDashboard(token);
+            } else {
+                showToast(data.message || 'Could not decline booking.', 'error');
+            }
+        } catch(e) { showToast('Network error.', 'error'); }
+        finally { btn.disabled = false; btn.textContent = 'Confirm Decline'; }
+    }
+
+    // ── Toast Notification Helper ─────────────────────────────────────────────
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer') || (() => {
+            const el = document.createElement('div');
+            el.id = 'toastContainer';
+            el.className = 'fixed bottom-6 right-6 z-50 flex flex-col gap-2';
+            document.body.appendChild(el);
+            return el;
+        })();
+
+        const colors = {
+            success: 'bg-emerald-600 text-white',
+            error:   'bg-red-600 text-white',
+            info:    'bg-blue-600 text-white',
+            warning: 'bg-amber-500 text-white',
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `px-4 py-3 rounded-xl shadow-xl text-xs font-bold ${colors[type] || colors.success} flex items-center gap-2 max-w-xs animate-fade-in`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
     }
 
     // ── Render Services Catalog ────────────────────────────────────────────────

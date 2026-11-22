@@ -25,17 +25,24 @@ class Booking extends Model
         'city',
         'client_notes',
         'provider_notes',
+        'declined_reason',
         'completed_at',
+        'accepted_at',
+        'declined_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'total_price' => 'decimal:2',
+            'total_price'  => 'decimal:2',
             'scheduled_at' => 'datetime',
             'completed_at' => 'datetime',
+            'accepted_at'  => 'datetime',
+            'declined_at'  => 'datetime',
         ];
     }
+
+    // ── Relations ─────────────────────────────────────────────────────────────
 
     public function client(): BelongsTo
     {
@@ -55,5 +62,35 @@ class Booking extends Model
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
+    }
+
+    // ── Status Helpers ────────────────────────────────────────────────────────
+
+    public function isPending(): bool    { return $this->status === 'pending'; }
+    public function isAccepted(): bool   { return $this->status === 'accepted'; }
+    public function isInProgress(): bool { return $this->status === 'in_progress'; }
+    public function isCompleted(): bool  { return $this->status === 'completed'; }
+    public function isDeclined(): bool   { return $this->status === 'declined'; }
+    public function isCancelled(): bool  { return $this->status === 'cancelled'; }
+    public function isImmutable(): bool  { return in_array($this->status, ['completed', 'declined', 'cancelled']); }
+
+    /**
+     * Valid status transitions from each state.
+     */
+    public static function allowedTransitions(): array
+    {
+        return [
+            'pending'     => ['accepted', 'declined'],
+            'accepted'    => ['in_progress', 'cancelled'],
+            'in_progress' => ['completed'],
+            'completed'   => [],
+            'declined'    => [],
+            'cancelled'   => [],
+        ];
+    }
+
+    public function canTransitionTo(string $newStatus): bool
+    {
+        return in_array($newStatus, static::allowedTransitions()[$this->status] ?? []);
     }
 }

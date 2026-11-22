@@ -82,14 +82,152 @@ class ProviderDashboardController extends Controller
     }
 
     /**
-     * Update booking status (e.g. accepted, in_progress, completed, declined).
+     * Update booking status — generic endpoint (backward-compatible).
+     * Applies transition guard; use semantic endpoints for new code.
      */
     public function updateBookingStatus(Request $request, int $id): JsonResponse
     {
         $provider = $request->user();
 
         $validated = $request->validate([
-            'status' => ['required', 'string', Rule::in(['pending', 'accepted', 'in_progress', 'completed', 'declined', 'cancelled'])],
+            'status'          => ['required', 'string', Rule::in(['accepted', 'in_progress', 'completed', 'declined', 'cancelled'])],
+            'provider_notes'  => ['nullable', 'string', 'max:500'],
+            'declined_reason' => ['required_if:status,declined', 'nullable', 'string', 'max:1000'],
+        ]);
+
+        $booking = Booking::where('id', $id)
+            ->where('provider_id', $provider->id)
+            ->firstOrFail();
+
+        if (! $booking->canTransitionTo($validated['status'])) {
+            return response()->json([
+                'message' => "Cannot change booking from '{$booking->status}' to '{$validated['status']}'.",
+            ], 422);
+        }
+
+        $booking->status = $validated['status'];
+
+        if (isset($validated['provider_notes'])) {
+            $booking->provider_notes = $validated['provider_notes'];
+        }
+
+        if ($validated['status'] === 'accepted' && ! $booking->accepted_at) {
+            $booking->accepted_at = now();
+        }
+
+        if ($validated['status'] === 'completed' && ! $booking->completed_at) {
+            $booking->completed_at = now();
+        }
+
+        if ($validated['status'] === 'declined') {
+            $booking->declined_reason = $validated['declined_reason'] ?? null;
+            $booking->declined_at = now();
+        }
+
+        $booking->save();
+
+        return response()->json([
+            'message' => "Booking {$booking->booking_number} marked as {$booking->status}.",
+            'booking' => $booking->fresh(['client', 'review']),
+        ]);
+    }
+
+    /**
+     * Accept a pending booking request.
+     */
+    public function acceptBooking(Request $request, int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        $booking = Booking::where('id', $id)
+            ->where('provider_id', $provider->id)
+            ->firstOrFail();
+
+        if (! $booking->canTransitionTo('accepted')) {
+            return response()->json([
+                'message' => "This booking cannot be accepted (current status: {$booking->status}).",
+            ], 422);
+        }
+
+        $booking->update([
+            'status'      => 'accepted',
+            'accepted_at' => now(),
+        ]);
+
+        return response()->json([
+            'message' => "Booking {$booking->booking_number} accepted successfully! The client will be notified.",
+            'booking' => $booking->fresh(['client', 'review']),
+        ]);
+    }
+
+    /**
+     * Decline a pending booking request with a mandatory reason.
+     */
+    public function declineBooking(Request $request, int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        $validated = $request->validate([
+            'declined_reason' => ['required', 'string', 'min:5', 'max:1000'],
+            'provider_notes'  => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $booking = Booking::where('id', $id)
+            ->where('provider_id', $provider->id)
+            ->firstOrFail();
+
+        if (! $booking->canTransitionTo('declined')) {
+            return response()->json([
+                'message' => "This booking cannot be declined (current status: {$booking->status}).",
+            ], 422);
+        }
+
+        $booking->update([
+            'status'          => 'declined',
+            'declined_reason' => $validated['declined_reason'],
+            'provider_notes'  => $validated['provider_notes'] ?? $booking->provider_notes,
+            'declined_at'     => now(),
+        ]);
+
+        return response()->json([
+            'message' => "Booking {$booking->booking_number} declined.",
+            'booking' => $booking->fresh(['client', 'review']),
+        ]);
+    }
+
+    /**
+     * Start work on an accepted booking.
+     */
+    public function startBooking(Request $request, int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        $booking = Booking::where('id', $id)
+            ->where('provider_id', $provider->id)
+            ->firstOrFail();
+
+        if (! $booking->canTransitionTo('in_progress')) {
+            return response()->json([
+                'message' => "This booking cannot be started (current status: {$booking->status}).",
+            ], 422);
+        }
+
+        $booking->update(['status' => 'in_progress']);
+
+        return response()->json([
+            'message' => "Job started! Booking {$booking->booking_number} is now in progress.",
+            'booking' => $booking->fresh(['client', 'review']),
+        ]);
+    }
+
+    /**
+     * Mark an in-progress booking as completed.
+     */
+    public function completeBooking(Request $request, int $id): JsonResponse
+    {
+        $provider = $request->user();
+
+        $request->validate([
             'provider_notes' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -97,19 +235,20 @@ class ProviderDashboardController extends Controller
             ->where('provider_id', $provider->id)
             ->firstOrFail();
 
-        $booking->status = $validated['status'];
-        if (isset($validated['provider_notes'])) {
-            $booking->provider_notes = $validated['provider_notes'];
+        if (! $booking->canTransitionTo('completed')) {
+            return response()->json([
+                'message' => "This booking cannot be completed (current status: {$booking->status}).",
+            ], 422);
         }
 
-        if ($validated['status'] === 'completed' && ! $booking->completed_at) {
-            $booking->completed_at = now();
-        }
-
-        $booking->save();
+        $booking->update([
+            'status'         => 'completed',
+            'completed_at'   => now(),
+            'provider_notes' => $request->input('provider_notes', $booking->provider_notes),
+        ]);
 
         return response()->json([
-            'message' => "Booking {$booking->booking_number} marked as {$booking->status}.",
+            'message' => "Job completed! Booking {$booking->booking_number} is marked as done.",
             'booking' => $booking->fresh(['client', 'review']),
         ]);
     }
