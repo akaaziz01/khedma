@@ -226,9 +226,7 @@
                         <button type="button" onclick="toggleNotificationsMenu()"
                             class="h-9 w-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition relative">
                             <i class="bi bi-bell-fill text-sm"></i>
-                            <!-- Badge -->
-                            <span class="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-red-500 text-white font-extrabold text-[9px] flex items-center justify-center border border-white dark:border-slate-900">
-                                2
+                            <span id="notificationUnreadBadge" class="hidden absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-red-500 text-white font-extrabold text-[9px] flex items-center justify-center border border-white dark:border-slate-900">
                             </span>
                         </button>
 
@@ -236,18 +234,12 @@
                         <div id="notificationsMenu" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-3 space-y-2 text-xs z-50">
                             <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                                 <span class="font-extrabold text-slate-900 dark:text-white">Notifications</span>
-                                <span class="text-[10px] text-blue-600 dark:text-blue-400 font-bold cursor-pointer hover:underline">Mark all read</span>
+                                <button type="button" onclick="markAllNotificationsRead()" class="text-[10px] text-blue-600 dark:text-blue-400 font-bold hover:underline">Mark all read</button>
                             </div>
-                            <div class="space-y-1.5">
-                                <div class="p-2 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/50 dark:border-amber-800/40">
-                                    <div class="font-bold text-amber-900 dark:text-amber-300">New Booking Request</div>
-                                    <p class="text-[11px] text-amber-800 dark:text-amber-400">Mariem Ben Salem requested AC Diagnostics.</p>
-                                </div>
-                                <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                                    <div class="font-bold text-slate-800 dark:text-slate-200">5-Star Review Received</div>
-                                    <p class="text-[11px] text-slate-600 dark:text-slate-400">Amina Trabelsi left feedback on Sousse plumbing.</p>
-                                </div>
+                            <div id="notificationItems" class="max-h-80 space-y-1.5 overflow-y-auto">
+                                <p class="py-4 text-center text-[11px] text-slate-400">Loading notifications...</p>
                             </div>
+                            <p id="notificationError" class="hidden pt-1 text-[11px] font-semibold text-red-500" role="alert"></p>
                         </div>
                     </div>
 
@@ -540,6 +532,8 @@
                     const user = JSON.parse(userStr);
                     guestControls.classList.add('hidden');
                     authControls.classList.remove('hidden');
+                    loadNotifications();
+                    window.setInterval(loadNotifications, 30000);
 
                     document.getElementById('headerUserName').textContent = user.name;
                     document.getElementById('headerUserAvatar').textContent = user.name.charAt(0).toUpperCase();
@@ -675,6 +669,112 @@
             }
         }
 
+        async function loadNotifications() {
+            const token = localStorage.getItem('khedma_token');
+            if (!token) return;
+
+            try {
+                const response = await fetch('/api/v1/notifications', {
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Could not load notifications.');
+
+                const data = await response.json();
+                updateNotificationBadge(data.unread_count || 0);
+                renderNotifications(data.notifications || []);
+                document.getElementById('notificationError').classList.add('hidden');
+            } catch (error) {
+                const errorElement = document.getElementById('notificationError');
+                errorElement.textContent = error.message || 'Could not load notifications.';
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        function updateNotificationBadge(count) {
+            const badge = document.getElementById('notificationUnreadBadge');
+            const mobileDot = document.getElementById('mobileUnreadDot');
+            badge.textContent = count > 99 ? '99+' : String(count);
+            badge.classList.toggle('hidden', count === 0);
+            mobileDot.classList.toggle('hidden', count === 0);
+        }
+
+        function renderNotifications(notifications) {
+            const container = document.getElementById('notificationItems');
+            container.replaceChildren();
+
+            if (notifications.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.className = 'py-4 text-center text-[11px] text-slate-400';
+                emptyMessage.textContent = 'You are all caught up.';
+                container.appendChild(emptyMessage);
+                return;
+            }
+
+            notifications.forEach(notification => {
+                const item = document.createElement('a');
+                const targetUrl = new URL(notification.url || '/', window.location.origin);
+                item.href = targetUrl.origin === window.location.origin
+                    ? `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`
+                    : '/';
+                item.className = notification.read_at
+                    ? 'block rounded-xl border border-slate-100 bg-slate-50 p-2.5 text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800'
+                    : 'block rounded-xl border border-blue-200 bg-blue-50 p-2.5 text-blue-900 hover:bg-blue-100 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-200 dark:hover:bg-blue-950/70';
+
+                const title = document.createElement('div');
+                title.className = 'font-bold';
+                title.textContent = notification.title;
+                const message = document.createElement('p');
+                message.className = 'mt-0.5 text-[11px]';
+                message.textContent = notification.message;
+                const createdAt = document.createElement('span');
+                createdAt.className = 'mt-1 block text-[10px] opacity-70';
+                createdAt.textContent = notification.created_at_human || '';
+                item.append(title, message, createdAt);
+
+                if (!notification.read_at) {
+                    item.addEventListener('click', event => {
+                        event.preventDefault();
+                        markNotificationRead(notification.id, item.href);
+                    });
+                }
+
+                container.appendChild(item);
+            });
+        }
+
+        async function markNotificationRead(notificationId, targetUrl = null) {
+            const token = localStorage.getItem('khedma_token');
+            try {
+                const response = await fetch(`/api/v1/notifications/${encodeURIComponent(notificationId)}/read`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Could not mark notification as read.');
+                await loadNotifications();
+                if (targetUrl) window.location.assign(targetUrl);
+            } catch (error) {
+                const errorElement = document.getElementById('notificationError');
+                errorElement.textContent = error.message || 'Could not update notification.';
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        async function markAllNotificationsRead() {
+            const token = localStorage.getItem('khedma_token');
+            try {
+                const response = await fetch('/api/v1/notifications/read-all', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Could not mark notifications as read.');
+                await loadNotifications();
+            } catch (error) {
+                const errorElement = document.getElementById('notificationError');
+                errorElement.textContent = error.message || 'Could not update notifications.';
+                errorElement.classList.remove('hidden');
+            }
+        }
+
         function toggleUserDropdown() {
             const menu = document.getElementById('userDropdownMenu');
             menu.classList.toggle('hidden');
@@ -685,6 +785,7 @@
             const menu = document.getElementById('notificationsMenu');
             menu.classList.toggle('hidden');
             document.getElementById('userDropdownMenu').classList.add('hidden');
+            if (!menu.classList.contains('hidden')) loadNotifications();
         }
 
         // Close dropdowns when clicking outside

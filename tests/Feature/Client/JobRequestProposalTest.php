@@ -429,10 +429,12 @@ class JobRequestProposalTest extends TestCase
         // Winning proposal is accepted
         $this->assertEquals('accepted', $winningProp->fresh()->status);
         $this->assertNotNull($winningProp->fresh()->accepted_at);
+        $this->assertSame('proposal_accepted', $winningProvider->notifications()->first()->data['type']);
 
         // Competing proposal is rejected
         $this->assertEquals('rejected', $competingProp->fresh()->status);
         $this->assertStringContainsString('accepted another proposal', $competingProp->fresh()->rejection_reason);
+        $this->assertSame('proposal_rejected', $competingProvider->notifications()->first()->data['type']);
 
         // Job request is awarded
         $freshJob = $job->fresh();
@@ -494,6 +496,7 @@ class JobRequestProposalTest extends TestCase
 
         $this->assertEquals('rejected', $proposal->fresh()->status);
         $this->assertEquals('Price is outside my expected range.', $proposal->fresh()->rejection_reason);
+        $this->assertSame('proposal_rejected', $provider->notifications()->first()->data['type']);
     }
 
     // =========================================================================

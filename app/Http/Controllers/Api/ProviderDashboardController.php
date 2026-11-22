@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Service;
+use App\Notifications\ActivityNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -81,6 +82,29 @@ class ProviderDashboardController extends Controller
         ]);
     }
 
+    private function notifyClientOfBookingStatus(Booking $booking): void
+    {
+        $statusLabels = [
+            'accepted' => ['Booking accepted', 'Your booking has been accepted by the provider.'],
+            'declined' => ['Booking declined', 'Your booking has been declined by the provider.'],
+            'in_progress' => ['Work started', 'The provider has started work on your booking.'],
+            'completed' => ['Job completed', 'Your booking has been marked as completed.'],
+            'cancelled' => ['Booking cancelled', 'Your booking has been cancelled.'],
+        ];
+
+        if (! isset($statusLabels[$booking->status])) {
+            return;
+        }
+
+        [$title, $message] = $statusLabels[$booking->status];
+        $booking->client->notify(new ActivityNotification(
+            'booking_status',
+            $title,
+            "{$message} Booking #{$booking->booking_number}.",
+            '/dashboard',
+        ));
+    }
+
     /**
      * Update booking status — generic endpoint (backward-compatible).
      * Applies transition guard; use semantic endpoints for new code.
@@ -125,6 +149,7 @@ class ProviderDashboardController extends Controller
         }
 
         $booking->save();
+        $this->notifyClientOfBookingStatus($booking);
 
         return response()->json([
             'message' => "Booking {$booking->booking_number} marked as {$booking->status}.",
@@ -153,6 +178,7 @@ class ProviderDashboardController extends Controller
             'status'      => 'accepted',
             'accepted_at' => now(),
         ]);
+        $this->notifyClientOfBookingStatus($booking);
 
         return response()->json([
             'message' => "Booking {$booking->booking_number} accepted successfully! The client will be notified.",
@@ -188,6 +214,7 @@ class ProviderDashboardController extends Controller
             'provider_notes'  => $validated['provider_notes'] ?? $booking->provider_notes,
             'declined_at'     => now(),
         ]);
+        $this->notifyClientOfBookingStatus($booking);
 
         return response()->json([
             'message' => "Booking {$booking->booking_number} declined.",
@@ -213,6 +240,7 @@ class ProviderDashboardController extends Controller
         }
 
         $booking->update(['status' => 'in_progress']);
+        $this->notifyClientOfBookingStatus($booking);
 
         return response()->json([
             'message' => "Job started! Booking {$booking->booking_number} is now in progress.",
@@ -246,6 +274,7 @@ class ProviderDashboardController extends Controller
             'completed_at'   => now(),
             'provider_notes' => $request->input('provider_notes', $booking->provider_notes),
         ]);
+        $this->notifyClientOfBookingStatus($booking);
 
         return response()->json([
             'message' => "Job completed! Booking {$booking->booking_number} is marked as done.",
