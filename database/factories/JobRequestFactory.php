@@ -16,6 +16,9 @@ class JobRequestFactory extends Factory
 
     public function definition(): array
     {
+        $city = fake()->randomElement(['Tunis', 'Ariana', 'Sousse', 'Sfax', 'Nabeul']);
+        $deadline = fake()->dateTimeBetween('now', '+2 weeks');
+
         return [
             'request_number' => JobRequest::generateRequestNumber(),
             'client_id'      => User::factory()->create(['role' => UserRole::CLIENT])->id,
@@ -23,10 +26,12 @@ class JobRequestFactory extends Factory
             'category'       => fake()->randomElement(['Plumbing', 'Electrical', 'Painting', 'Carpentry', 'HVAC']),
             'description'    => fake()->paragraph(),
             'budget'         => fake()->randomFloat(2, 50, 800),
-            'city'           => fake()->randomElement(['Tunis', 'Ariana', 'Sousse', 'Sfax', 'Nabeul']),
+            'location'       => $city,
+            'city'           => $city,
             'address'        => fake()->address(),
             'urgency'        => fake()->randomElement(['low', 'medium', 'urgent', 'emergency']),
-            'preferred_date' => fake()->dateTimeBetween('now', '+2 weeks'),
+            'deadline'       => $deadline,
+            'preferred_date' => $deadline,
             'status'         => 'open',
         ];
     }

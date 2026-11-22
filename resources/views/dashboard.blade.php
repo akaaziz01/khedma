@@ -464,7 +464,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Estimated Budget (TND)</label>
-                    <input type="number" id="jobReqBudget" min="10" step="5" placeholder="e.g. 150"
+                    <input type="number" id="jobReqBudget" min="1" step="5" required placeholder="e.g. 150"
                         class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
                 </div>
                 <div>
@@ -479,7 +479,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Preferred Date</label>
-                    <input type="datetime-local" id="jobReqDate"
+                    <input type="datetime-local" id="jobReqDate" required
                         class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
                 </div>
             </div>
@@ -802,7 +802,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Estimated Budget (TND)</label>
-                    <input type="number" id="jobReqBudget" min="10" step="5" placeholder="e.g. 150"
+                    <input type="number" id="jobReqBudget" min="1" step="5" required placeholder="e.g. 150"
                         class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
                 </div>
                 <div>
@@ -817,7 +817,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Preferred Date</label>
-                    <input type="datetime-local" id="jobReqDate"
+                    <input type="datetime-local" id="jobReqDate" required
                         class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
                 </div>
             </div>
@@ -1500,7 +1500,150 @@
 
         const token = localStorage.getItem('khedma_token');
         if (token) {
+            await loadClientJobRequests(token);
             await loadClientFavorites(token);
+        }
+    }
+
+    function openNewJobRequestModal() {
+        const modal = document.getElementById('newJobRequestModal');
+        const dateInput = document.getElementById('jobReqDate');
+        if (!modal) return;
+
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        if (dateInput) dateInput.min = now.toISOString().slice(0, 16);
+
+        modal.classList.remove('hidden');
+        document.getElementById('jobReqTitle')?.focus();
+    }
+
+    function closeNewJobRequestModal() {
+        const modal = document.getElementById('newJobRequestModal');
+        modal?.classList.add('hidden');
+    }
+
+    function escapeJobRequestHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    async function handleCreateJobRequest(event) {
+        event.preventDefault();
+
+        const token = localStorage.getItem('khedma_token');
+        const submitButton = document.getElementById('saveJobReqBtn');
+        const payload = {
+            title: document.getElementById('jobReqTitle').value.trim(),
+            category: document.getElementById('jobReqCategory').value,
+            location: document.getElementById('jobReqAddress').value.trim()
+                || document.getElementById('jobReqCity').value,
+            city: document.getElementById('jobReqCity').value,
+            address: document.getElementById('jobReqAddress').value.trim(),
+            description: document.getElementById('jobReqDescription').value.trim(),
+            budget: Number(document.getElementById('jobReqBudget').value),
+            urgency: document.getElementById('jobReqUrgency').value,
+            deadline: document.getElementById('jobReqDate').value,
+        };
+
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="bi bi-hourglass-split text-xs"></i><span>Publishing...</span>';
+
+        try {
+            const res = await fetch('/api/v1/client/job-requests', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const json = await res.json();
+            if (!res.ok) {
+                const firstError = json.errors ? Object.values(json.errors)[0]?.[0] : null;
+                alert(firstError || json.message || 'Could not publish the service request.');
+                return;
+            }
+
+            event.target.reset();
+            closeNewJobRequestModal();
+            await loadClientJobRequests(token);
+        } catch (error) {
+            console.error('Error creating job request:', error);
+            alert('Could not publish the service request.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="bi bi-send-fill text-xs"></i><span>Publish Request</span>';
+        }
+    }
+
+    async function loadClientJobRequests(token) {
+        const loading = document.getElementById('jobRequestsLoadingState');
+        const empty = document.getElementById('clientRequestsEmpty');
+        const grid = document.getElementById('clientRequestsGrid');
+        const badge = document.getElementById('clientRequestsCountBadge');
+
+        try {
+            const res = await fetch('/api/v1/client/job-requests', {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!res.ok) throw new Error('Could not fetch job requests');
+
+            const json = await res.json();
+            const requests = json.data || [];
+            badge.textContent = `${requests.length} Request${requests.length === 1 ? '' : 's'}`;
+            loading?.classList.add('hidden');
+
+            if (requests.length === 0) {
+                empty?.classList.remove('hidden');
+                grid?.classList.add('hidden');
+                return;
+            }
+
+            empty?.classList.add('hidden');
+            grid?.classList.remove('hidden');
+
+            grid.innerHTML = requests.map(request => {
+                const budget = request.budget !== null
+                    ? `${Number(request.budget).toFixed(2)} TND`
+                    : 'Budget not set';
+                const deadline = request.deadline
+                    ? new Date(request.deadline).toLocaleDateString()
+                    : 'No deadline';
+
+                return `
+                    <article class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <span class="text-[10px] font-black uppercase tracking-wider text-blue-600">${escapeJobRequestHtml(request.category)}</span>
+                                <h3 class="mt-1 text-sm font-extrabold text-slate-900 dark:text-white">${escapeJobRequestHtml(request.title)}</h3>
+                            </div>
+                            <span class="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">${escapeJobRequestHtml(request.status)}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-3">${escapeJobRequestHtml(request.description)}</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <span class="text-slate-500"><i class="bi bi-geo-alt-fill mr-1 text-blue-500"></i>${escapeJobRequestHtml(request.location || request.city)}</span>
+                            <span class="text-slate-500"><i class="bi bi-cash-stack mr-1 text-emerald-500"></i>${escapeJobRequestHtml(budget)}</span>
+                            <span class="col-span-2 text-slate-500"><i class="bi bi-calendar-event mr-1 text-amber-500"></i>${escapeJobRequestHtml(deadline)}</span>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Error loading client job requests:', error);
+            loading?.classList.add('hidden');
+            empty?.classList.remove('hidden');
         }
     }
 

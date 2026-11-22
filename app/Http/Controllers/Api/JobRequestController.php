@@ -55,6 +55,8 @@ class JobRequestController extends Controller
     public function store(StoreJobRequest $request): JsonResponse
     {
         $client = $request->user();
+        $location = trim((string) ($request->input('location') ?: $request->input('address') ?: $request->input('city')));
+        $deadline = $request->input('deadline') ?: $request->input('preferred_date');
 
         $jobRequest = JobRequest::create([
             'request_number' => JobRequest::generateRequestNumber(),
@@ -63,10 +65,12 @@ class JobRequestController extends Controller
             'category'       => $request->input('category'),
             'description'    => $request->input('description'),
             'budget'         => $request->input('budget'),
-            'city'           => $request->input('city'),
+            'location'       => $location,
+            'city'           => $request->input('city') ?: $location,
             'address'        => $request->input('address'),
             'urgency'        => $request->input('urgency', 'medium'),
-            'preferred_date' => $request->input('preferred_date'),
+            'deadline'       => $deadline,
+            'preferred_date' => $deadline,
             'status'         => 'open',
         ]);
 

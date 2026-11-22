@@ -83,6 +83,50 @@ class JobRequestProposalTest extends TestCase
         ]);
     }
 
+    public function test_client_can_post_request_using_location_and_deadline_fields(): void
+    {
+        $client = $this->createClient();
+        Sanctum::actingAs($client);
+
+        $response = $this->postJson('/api/v1/client/job-requests', [
+            'title'       => 'Install an air conditioner',
+            'category'    => 'HVAC',
+            'description' => 'Install a split air conditioner in the living room.',
+            'budget'      => 650,
+            'location'    => 'Sousse, Hammam Sousse',
+            'address'     => 'Rue des Palmiers',
+            'deadline'    => now()->addWeek()->format('Y-m-d H:i:s'),
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.location', 'Sousse, Hammam Sousse')
+            ->assertJsonPath('data.budget', 650);
+
+        $this->assertDatabaseHas('job_requests', [
+            'client_id' => $client->id,
+            'location'  => 'Sousse, Hammam Sousse',
+            'budget'    => 650,
+            'status'    => 'open',
+        ]);
+    }
+
+    public function test_job_request_requires_budget_location_and_future_deadline(): void
+    {
+        $client = $this->createClient();
+        Sanctum::actingAs($client);
+
+        $response = $this->postJson('/api/v1/client/job-requests', [
+            'title'       => 'Repair an electrical outlet',
+            'category'    => 'Electricity',
+            'description' => 'The outlet does not work and needs professional repair.',
+            'budget'      => 0,
+            'deadline'    => now()->subDay()->format('Y-m-d H:i:s'),
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['budget', 'location', 'deadline']);
+    }
+
     public function test_client_cannot_create_job_request_with_invalid_data(): void
     {
         $client = $this->createClient();

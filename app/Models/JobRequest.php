@@ -21,9 +21,11 @@ class JobRequest extends Model
         'category',
         'description',
         'budget',
+        'location',
         'city',
         'address',
         'urgency',
+        'deadline',
         'preferred_date',
         'status',
         'accepted_proposal_id',
@@ -34,6 +36,7 @@ class JobRequest extends Model
     {
         return [
             'budget'         => 'decimal:2',
+            'deadline'       => 'datetime',
             'preferred_date' => 'datetime',
         ];
     }
