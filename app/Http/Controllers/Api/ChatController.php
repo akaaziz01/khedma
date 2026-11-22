@@ -33,7 +33,11 @@ class ChatController extends Controller
             ->orderBy('last_message_at', 'desc')
             ->get()
             ->map(function ($conv) use ($user) {
-                $otherUser = $conv->client_id === $user->id ? $conv->provider : $conv->client;
+                $otherUser = (int) $conv->client_id === (int) $user->id ? $conv->provider : $conv->client;
+                if (! $otherUser) {
+                    return null;
+                }
+
                 $unreadCount = Message::where('conversation_id', $conv->id)
                     ->where('sender_id', '!=', $user->id)
                     ->whereNull('read_at')
@@ -54,7 +58,9 @@ class ChatController extends Controller
                     'last_message_at' => $conv->last_message_at?->toISOString(),
                     'created_at' => $conv->created_at?->toISOString(),
                 ];
-            });
+            })
+            ->filter()
+            ->values();
 
         return response()->json([
             'conversations' => $conversations,
@@ -144,7 +150,7 @@ class ChatController extends Controller
 
         $conversation = Conversation::with(['client', 'provider', 'jobRequest', 'booking'])->findOrFail($id);
 
-        if ($conversation->client_id !== $user->id && $conversation->provider_id !== $user->id && ! $user->isAdmin()) {
+        if ((int) $conversation->client_id !== (int) $user->id && (int) $conversation->provider_id !== (int) $user->id && ! $user->isAdmin()) {
             return response()->json([
                 'message' => 'Unauthorized access to this conversation.',
             ], 403);
@@ -160,15 +166,15 @@ class ChatController extends Controller
             ->with('sender:id,name,avatar_path')
             ->get();
 
-        $otherUser = $conversation->client_id === $user->id ? $conversation->provider : $conversation->client;
+        $otherUser = (int) $conversation->client_id === (int) $user->id ? $conversation->provider : $conversation->client;
 
         return response()->json([
             'conversation_id' => $conversation->id,
             'participant' => [
-                'id' => $otherUser->id,
-                'name' => $otherUser->name,
-                'role' => $otherUser->role?->value ?? $otherUser->role,
-                'avatar_url' => $otherUser->avatar_url,
+                'id' => $otherUser?->id,
+                'name' => $otherUser?->name ?? 'User',
+                'role' => $otherUser?->role?->value ?? $otherUser?->role ?? 'user',
+                'avatar_url' => $otherUser?->avatar_url,
             ],
             'job_request' => $conversation->jobRequest,
             'booking' => $conversation->booking,
@@ -185,7 +191,7 @@ class ChatController extends Controller
 
         $conversation = Conversation::findOrFail($id);
 
-        if ($conversation->client_id !== $user->id && $conversation->provider_id !== $user->id && ! $user->isAdmin()) {
+        if ((int) $conversation->client_id !== (int) $user->id && (int) $conversation->provider_id !== (int) $user->id && ! $user->isAdmin()) {
             return response()->json([
                 'message' => 'Unauthorized access to this conversation.',
             ], 403);

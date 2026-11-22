@@ -355,7 +355,7 @@
                                 <i class="bi bi-layout-split compare-card-icon"></i>
                                 <span class="compare-card-text">Compare</span>
                             </button>
-                            <a href="{{ route('chat', ['provider_id' => $pro->id]) }}" 
+                            <a href="{{ route('chat', ['provider_id' => $pro->id], false) }}" 
                                class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center justify-center shrink-0"
                                title="Envoyer un message au prestataire">
                                 <i class="bi bi-chat-dots-fill text-sm"></i>

@@ -53,7 +53,8 @@ Route::get('/messages', function () {
 })->name('chat');
 
 Route::get('/chat', function () {
-    return redirect()->route('chat', request()->query());
+    $queryString = request()->getQueryString();
+    return redirect('/messages' . ($queryString ? '?' . $queryString : ''));
 });
 
 Route::get('/report', function () {

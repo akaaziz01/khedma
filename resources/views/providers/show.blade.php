@@ -114,7 +114,7 @@
                             <span>Request Booking</span>
                         </button>
 
-                        <a href="{{ route('chat', ['provider_id' => $provider->id]) }}" 
+                        <a href="{{ route('chat', ['provider_id' => $provider->id], false) }}" 
                            id="heroChatBtn"
                            class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-2">
                             <i class="bi bi-chat-dots-fill text-blue-600 dark:text-blue-400 text-sm"></i>
@@ -278,7 +278,7 @@
                                         </span>
 
                                         <div class="flex items-center gap-1.5">
-                                            <a href="{{ route('chat', ['provider_id' => $provider->id]) }}" class="pro-service-chat-btn p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold hover:text-blue-600 hover:bg-slate-100 transition" title="Message Provider">
+                                            <a href="{{ route('chat', ['provider_id' => $provider->id], false) }}" class="pro-service-chat-btn p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold hover:text-blue-600 hover:bg-slate-100 transition" title="Message Provider">
                                                 <i class="bi bi-chat-dots-fill"></i>
                                             </a>
                                             <a href="{{ route('services.show', $service->id) }}" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-100 transition">
@@ -556,7 +556,7 @@
                             <span>Schedule Appointment</span>
                         </button>
 
-                        <a href="{{ route('chat', ['provider_id' => $provider->id]) }}" 
+                        <a href="{{ route('chat', ['provider_id' => $provider->id], false) }}" 
                            id="sidebarChatBtn"
                            class="w-full py-3 px-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-xs text-center transition flex items-center justify-center gap-2">
                             <i class="bi bi-chat-dots-fill text-blue-600 dark:text-blue-400"></i>

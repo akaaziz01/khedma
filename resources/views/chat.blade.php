@@ -8,7 +8,7 @@
     <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col md:flex-row h-[calc(100vh-140px)] min-h-[580px]">
 
         <!-- Left Column: Conversations List -->
-        <div class="w-full md:w-80 lg:w-96 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
+        <div id="chatConversationsPanel" class="w-full md:w-80 lg:w-96 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
             <!-- Search & Filter Header -->
             <div class="p-4 border-b border-slate-200 dark:border-slate-800 space-y-3">
                 <div class="flex items-center justify-between">
@@ -40,10 +40,13 @@
         </div>
 
         <!-- Right Column: Active Conversation Messages Area -->
-        <div class="flex-1 flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
+        <div id="chatMessagesPanel" class="hidden md:flex flex-1 flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
             <!-- Chat Header -->
             <div id="chatHeader" class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 z-10">
                 <div class="flex items-center gap-3 min-w-0">
+                    <button type="button" onclick="showConversationsPanelOnMobile()" class="md:hidden p-1.5 -ml-1 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition" title="Back to conversations">
+                        <i class="bi bi-arrow-left text-lg"></i>
+                    </button>
                     <div id="chatAvatar" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-amber-500 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         U
                     </div>
@@ -248,6 +251,17 @@
         activeConversationId = convId;
         const token = localStorage.getItem('khedma_token');
 
+        // On mobile, show message panel and hide conversation list
+        if (window.innerWidth < 768) {
+            const convPanel = document.getElementById('chatConversationsPanel');
+            const msgPanel = document.getElementById('chatMessagesPanel');
+            if (convPanel) convPanel.classList.add('hidden');
+            if (msgPanel) {
+                msgPanel.classList.remove('hidden');
+                msgPanel.classList.add('flex');
+            }
+        }
+
         // Update active UI styling
         document.querySelectorAll('[id^="conv-btn-"]').forEach(el => {
             el.className = el.className.replace('bg-blue-50/70 dark:bg-blue-950/40 border-l-4 border-blue-600', '');
@@ -383,6 +397,16 @@
             }
         } catch (e) {
             console.error(e);
+        }
+    }
+
+    function showConversationsPanelOnMobile() {
+        const convPanel = document.getElementById('chatConversationsPanel');
+        const msgPanel = document.getElementById('chatMessagesPanel');
+        if (convPanel) convPanel.classList.remove('hidden');
+        if (msgPanel) {
+            msgPanel.classList.add('hidden');
+            msgPanel.classList.remove('flex');
         }
     }
 

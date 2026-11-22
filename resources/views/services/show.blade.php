@@ -170,7 +170,7 @@
 
                     @if($provider)
                         <div id="serviceProviderChatBox" class="pt-3 border-t border-slate-100 dark:border-slate-800">
-                            <a href="{{ route('chat', ['provider_id' => $provider->id]) }}" 
+                            <a href="{{ route('chat', ['provider_id' => $provider->id], false) }}" 
                                class="w-full py-2.5 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-extrabold text-xs text-center transition flex items-center justify-center gap-2">
                                 <i class="bi bi-chat-dots-fill text-sm"></i>
                                 <span>Envoyer un message à {{ $provider->name }}</span>
@@ -262,7 +262,7 @@
                         <a href="/login?redirect={{ urlencode(route('services.show', $service->id)) }}" class="w-full py-3 px-4 rounded-2xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs text-center shadow-sm transition block">
                             Sign In to Book This Service
                         </a>
-                        <a href="{{ route('chat', ['provider_id' => $service->provider_id]) }}" class="w-full py-2.5 px-4 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs text-center border border-white/30 transition flex items-center justify-center gap-2">
+                        <a href="{{ route('chat', ['provider_id' => $service->provider_id], false) }}" class="w-full py-2.5 px-4 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs text-center border border-white/30 transition flex items-center justify-center gap-2">
                             <i class="bi bi-chat-dots-fill"></i>
                             <span>Envoyer un message</span>
                         </a>
@@ -276,7 +276,7 @@
                             <i class="bi bi-calendar-check-fill"></i>
                             <span>Réserver ce service</span>
                         </a>
-                        <a href="{{ route('chat', ['provider_id' => $service->provider_id]) }}" class="w-full py-2.5 px-4 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs text-center border border-white/30 transition flex items-center justify-center gap-2">
+                        <a href="{{ route('chat', ['provider_id' => $service->provider_id], false) }}" class="w-full py-2.5 px-4 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs text-center border border-white/30 transition flex items-center justify-center gap-2">
                             <i class="bi bi-chat-dots-fill"></i>
                             <span>Envoyer un message</span>
                         </a>

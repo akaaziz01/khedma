@@ -189,21 +189,21 @@ class ChatTest extends TestCase
         // 1. Service Card in Catalog (services.index)
         $servicesResponse = $this->get(route('services.index'));
         $servicesResponse->assertStatus(200);
-        $servicesResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+        $servicesResponse->assertSee(route('chat', ['provider_id' => $provider->id], false));
 
         // 2. Service Detail Page (services.show)
         $serviceShowResponse = $this->get(route('services.show', $service->id));
         $serviceShowResponse->assertStatus(200);
-        $serviceShowResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+        $serviceShowResponse->assertSee(route('chat', ['provider_id' => $provider->id], false));
 
         // 3. Provider Card in Directory (providers.index)
         $providersResponse = $this->get(route('providers.index'));
         $providersResponse->assertStatus(200);
-        $providersResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+        $providersResponse->assertSee(route('chat', ['provider_id' => $provider->id], false));
 
         // 4. Provider Profile Page (providers.show)
         $providerShowResponse = $this->get(route('providers.show', $provider->id));
         $providerShowResponse->assertStatus(200);
-        $providerShowResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+        $providerShowResponse->assertSee(route('chat', ['provider_id' => $provider->id], false));
     }
 }
