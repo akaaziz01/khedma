@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Conversation;
+use App\Models\JobRequest;
 use App\Models\Message;
 use App\Models\User;
 use App\Notifications\ActivityNotification;
@@ -94,8 +96,28 @@ class ChatController extends Controller
             $clientId = $recipient->id;
             $providerId = $user->id;
         } else {
-            $clientId = $user->id;
-            $providerId = $recipient->id;
+            return response()->json([
+                'message' => 'Conversations are only available between clients and providers.',
+            ], 422);
+        }
+
+        if (isset($validated['job_request_id']) && ! JobRequest::query()
+            ->whereKey($validated['job_request_id'])
+            ->where('client_id', $clientId)
+            ->exists()) {
+            return response()->json([
+                'message' => 'The job request must belong to the client in this conversation.',
+            ], 422);
+        }
+
+        if (isset($validated['booking_id']) && ! Booking::query()
+            ->whereKey($validated['booking_id'])
+            ->where('client_id', $clientId)
+            ->where('provider_id', $providerId)
+            ->exists()) {
+            return response()->json([
+                'message' => 'The booking must belong to both participants in this conversation.',
+            ], 422);
         }
 
         $conversation = Conversation::firstOrCreate(

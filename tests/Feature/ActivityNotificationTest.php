@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Models\Booking;
 use App\Models\Conversation;
 use App\Models\JobRequest;
+use App\Models\ProviderProfile;
 use App\Models\User;
 use App\Notifications\ActivityNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -55,6 +56,52 @@ class ActivityNotificationTest extends TestCase
         $notification = $provider->notifications()->first();
         $this->assertSame('new_message', $notification->data['type']);
         $this->assertSame('/messages', $notification->data['url']);
+        $this->assertSame(0, $client->notifications()->count());
+    }
+
+    public function test_new_job_request_notifies_providers_in_the_matching_trade(): void
+    {
+        $client = User::factory()->create(['role' => UserRole::CLIENT]);
+        $matchingProvider = User::factory()->create(['role' => UserRole::PROVIDER]);
+        $otherProvider = User::factory()->create(['role' => UserRole::PROVIDER]);
+
+        ProviderProfile::create([
+            'user_id' => $matchingProvider->id,
+            'business_name' => 'Expert Craft',
+            'category' => 'Plumbing',
+            'city' => 'Tunis',
+            'bio' => 'Licensed professional with certified expertise.',
+            'skills' => ['Plumbing'],
+            'hourly_rate' => 45.00,
+            'is_available' => true,
+        ]);
+        ProviderProfile::create([
+            'user_id' => $otherProvider->id,
+            'business_name' => 'Electrical Experts',
+            'category' => 'Electrical',
+            'city' => 'Tunis',
+            'bio' => 'Experienced electrical service provider.',
+            'skills' => ['Electrical'],
+            'hourly_rate' => 50.00,
+            'is_available' => true,
+        ]);
+
+        $this->actingAs($client)
+            ->postJson('/api/v1/client/job-requests', [
+                'title' => 'Repair kitchen sink',
+                'category' => 'Plumbing',
+                'description' => 'The kitchen sink pipe is leaking and needs repair.',
+                'budget' => 125,
+                'city' => 'Tunis',
+                'deadline' => now()->addDay()->toDateString(),
+            ])
+            ->assertCreated();
+
+        $notification = $matchingProvider->notifications()->first();
+        $this->assertSame('new_request', $notification->data['type']);
+        $this->assertSame('/dashboard', $notification->data['url']);
+        $this->assertStringContainsString('Repair kitchen sink', $notification->data['message']);
+        $this->assertSame(0, $otherProvider->notifications()->count());
         $this->assertSame(0, $client->notifications()->count());
     }
 
@@ -124,7 +171,7 @@ class ActivityNotificationTest extends TestCase
 
     public function test_application_layout_renders_the_live_notification_menu(): void
     {
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
 
         $this->get('/')
             ->assertOk()

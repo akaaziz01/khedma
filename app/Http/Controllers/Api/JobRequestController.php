@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreJobRequest;
 use App\Http\Resources\JobRequestResource;
 use App\Http\Resources\ProposalResource;
 use App\Models\JobRequest;
+use App\Models\User;
+use App\Notifications\ActivityNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -73,6 +76,17 @@ class JobRequestController extends Controller
             'preferred_date' => $deadline,
             'status'         => 'open',
         ]);
+
+        User::query()
+            ->where('role', UserRole::PROVIDER->value)
+            ->whereHas('providerProfile', fn ($query) => $query->where('category', $jobRequest->category))
+            ->get()
+            ->each(fn (User $provider) => $provider->notify(new ActivityNotification(
+                'new_request',
+                'New service request',
+                "A new {$jobRequest->category} request is available: {$jobRequest->title}.",
+                '/dashboard',
+            )));
 
         return response()->json([
             'message' => 'Your job request has been published successfully. Providers in your trade will be notified.',
@@ -201,14 +215,14 @@ class JobRequestController extends Controller
         return response()->json([
             'job_request' => new JobRequestResource($jobRequest),
             'summary'     => [
-                'proposals_count'    => $proposals->count(),
-                'lowest_price'       => $minPrice,
+                'proposals_count'       => $proposals->count(),
+                'lowest_price'          => $minPrice,
                 'lowest_price_formatted' => number_format($minPrice, 2) . ' TND',
-                'highest_price'      => $maxPrice,
-                'average_price'      => $avgPrice,
+                'highest_price'         => $maxPrice,
+                'average_price'         => $avgPrice,
                 'average_price_formatted' => number_format($avgPrice, 2) . ' TND',
-                'fastest_days'       => $minDays,
-                'top_rating'         => $maxRating,
+                'fastest_days'          => $minDays,
+                'top_rating'            => $maxRating,
             ],
             'proposals'   => $sortedCollection,
         ]);
@@ -254,6 +268,8 @@ class JobRequestController extends Controller
             $myProposal = $req->proposals->firstWhere('provider_id', $provider->id);
             return [
                 'id'                  => $req->id,
+                'client_id'           => $req->client_id,
+                'client_name'         => $req->client?->name,
                 'request_number'      => $req->request_number,
                 'title'               => $req->title,
                 'category'            => $req->category,
