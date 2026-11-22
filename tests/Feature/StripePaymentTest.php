@@ -135,6 +135,21 @@ class StripePaymentTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_client_can_create_stripe_checkout_session(): void
+    {
+        $response = $this->actingAs($this->client, 'sanctum')
+            ->postJson("/api/v1/client/bookings/{$this->booking->id}/stripe-checkout");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'checkout_url',
+                'session_id',
+                'booking_id',
+            ]);
+
+        $this->assertStringStartsWith('https://checkout.stripe.com', $response->json('checkout_url'));
+    }
+
     public function test_webhook_marks_booking_as_paid_on_checkout_session_completed(): void
     {
         $payload = [

@@ -153,7 +153,6 @@ class StripePaymentController extends Controller
 
         try {
             $session = $stripe->checkout->sessions->create([
-                'payment_method_types' => ['card'],
                 'mode'                 => 'payment',
                 'customer_email'       => $user->email,
                 'client_reference_id'  => (string) $booking->id,
