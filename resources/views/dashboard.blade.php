@@ -187,6 +187,26 @@
                 </div>
             </div>
 
+            <section class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="bi bi-file-earmark-text-fill text-amber-600"></i>
+                            <span>Service Requests</span>
+                            <span id="providerJobRequestsCount" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700">0</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Review requests in your trade and send the client your price, delivery time, and message.</p>
+                    </div>
+                    <button type="button" onclick="loadProviderJobRequests(localStorage.getItem('khedma_token'))"
+                        class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <i class="bi bi-arrow-clockwise mr-1"></i> Refresh
+                    </button>
+                </div>
+                <div id="providerJobRequestsLoading" class="py-8 text-center text-xs text-slate-400">Loading service requests...</div>
+                <div id="providerJobRequestsEmpty" class="hidden py-8 text-center text-xs text-slate-400">No matching service requests are available right now.</div>
+                <div id="providerJobRequestsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+            </section>
+
             <!-- 4. Two Columns: Services Catalog & Recent Client Reviews -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Services Catalog (2 cols) -->
@@ -742,6 +762,54 @@
     </div>
 </div>
 
+<div id="sendProposalModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-xl w-full p-6 sm:p-8 space-y-5 my-8">
+        <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div class="min-w-0">
+                <p id="proposalRequestCategory" class="text-[10px] font-black uppercase tracking-wider text-amber-600"></p>
+                <h2 id="proposalRequestTitle" class="mt-1 text-lg font-extrabold text-slate-900 dark:text-white"></h2>
+                <p id="proposalRequestMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400"></p>
+            </div>
+            <button type="button" onclick="closeProposalModal()" class="ml-3 p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <p id="proposalRequestDescription" class="max-h-32 overflow-y-auto text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line"></p>
+        <form onsubmit="handleSubmitProposal(event)" class="space-y-4">
+            <input id="proposalJobRequestId" type="hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="proposalPrice" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Your price (TND) *</label>
+                    <input id="proposalPrice" type="number" min="1" max="999999" step="0.01" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label for="proposalDeliveryTime" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Delivery time *</label>
+                    <input id="proposalDeliveryTime" type="text" maxlength="100" required placeholder="e.g. Within 2 days"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+            </div>
+            <div>
+                <label for="proposalDeliveryDays" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Delivery days (optional)</label>
+                <input id="proposalDeliveryDays" type="number" min="1" max="365" step="1" placeholder="For comparing turnaround times"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+            <div>
+                <label for="proposalMessage" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Message to the client *</label>
+                <textarea id="proposalMessage" rows="4" minlength="10" maxlength="3000" required
+                    placeholder="Explain how you will complete the work and what is included in your offer."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+            </div>
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeProposalModal()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl">Cancel</button>
+                <button type="submit" id="sendProposalButton" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold rounded-xl shadow-md transition">
+                    Send Proposal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- ========================================== -->
 <!-- MODAL: NEW JOB REQUEST (CLIENT)            -->
 <!-- ========================================== -->
@@ -969,6 +1037,7 @@
 @section('scripts')
 <script>
     let globalBookings = [];
+    let providerJobRequests = [];
     let currentFilter = 'all';
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -1063,7 +1132,10 @@
             // 5. Render Reviews
             renderReviews(data.reviews || []);
 
-            // 6. Bio & Skills
+            // 6. Load service requests for provider proposals
+            await loadProviderJobRequests(token);
+
+            // 7. Bio & Skills
             document.getElementById('providerBioText').textContent = provider.profile?.bio ? `"${provider.profile.bio}"` : 'No professional bio added yet.';
             const skillsContainer = document.getElementById('providerSkillsContainer');
             skillsContainer.innerHTML = '';
@@ -1081,6 +1153,169 @@
 
         } catch (err) {
             console.error('Error fetching provider data:', err);
+        }
+    }
+
+    async function loadProviderJobRequests(token) {
+        const loading = document.getElementById('providerJobRequestsLoading');
+        const empty = document.getElementById('providerJobRequestsEmpty');
+        const grid = document.getElementById('providerJobRequestsGrid');
+
+        if (!token) {
+            loading?.classList.add('hidden');
+            empty?.classList.remove('hidden');
+            if (empty) empty.textContent = 'Sign in as a provider to view service requests.';
+            return;
+        }
+
+        if (loading) {
+            loading.textContent = 'Loading service requests...';
+            loading.classList.remove('hidden');
+        }
+        empty?.classList.add('hidden');
+        grid?.classList.add('hidden');
+
+        try {
+            const response = await fetch('/api/v1/provider/job-requests', {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || 'Could not load service requests.');
+            }
+
+            providerJobRequests = result.data || [];
+            document.getElementById('providerJobRequestsCount').textContent = result.meta?.total ?? providerJobRequests.length;
+            loading?.classList.add('hidden');
+
+            if (providerJobRequests.length === 0) {
+                empty?.classList.remove('hidden');
+                if (empty) empty.textContent = 'No matching service requests are available right now.';
+                return;
+            }
+
+            renderProviderJobRequests();
+        } catch (error) {
+            console.error('Error loading provider service requests:', error);
+            loading?.classList.add('hidden');
+            empty?.classList.remove('hidden');
+            if (empty) empty.textContent = error.message || 'Could not load service requests. Please try again.';
+        }
+    }
+
+    function renderProviderJobRequests() {
+        const grid = document.getElementById('providerJobRequestsGrid');
+        if (!grid) return;
+        grid.innerHTML = providerJobRequests.map(request => {
+            const deadline = request.deadline
+                ? new Date(request.deadline).toLocaleDateString()
+                : (request.preferred_date || 'Flexible');
+            const proposalStatus = request.my_proposal_status;
+            const proposalAction = proposalStatus === 'pending'
+                ? `<button type="button" onclick="openProposalModal(${Number(request.id)})" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold transition"><i class="bi bi-pencil-square mr-1"></i> Update Proposal</button>`
+                : proposalStatus
+                    ? `<span class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold">Proposal ${escapeJobRequestHtml(proposalStatus)}</span>`
+                    : `<button type="button" onclick="openProposalModal(${Number(request.id)})" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold transition"><i class="bi bi-send-fill mr-1"></i> Send Proposal</button>`;
+
+            return `
+                <article class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-amber-600">${escapeJobRequestHtml(request.category)}</span>
+                            <h3 class="mt-1 text-sm font-extrabold text-slate-900 dark:text-white">${escapeJobRequestHtml(request.title)}</h3>
+                            <p class="mt-1 text-[11px] text-slate-400">${escapeJobRequestHtml(request.request_number)} · ${escapeJobRequestHtml(request.created_at_human || '')}</p>
+                        </div>
+                        <span class="shrink-0 px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">${escapeJobRequestHtml(request.urgency || 'medium')}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">${escapeJobRequestHtml(request.description)}</p>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <span class="text-slate-500"><i class="bi bi-geo-alt-fill mr-1 text-amber-500"></i>${escapeJobRequestHtml(request.location || request.city)}</span>
+                        <span class="text-slate-500"><i class="bi bi-cash-stack mr-1 text-emerald-500"></i>${escapeJobRequestHtml(request.budget_formatted || 'Flexible')}</span>
+                        <span class="col-span-2 text-slate-500"><i class="bi bi-calendar-event mr-1 text-blue-500"></i>Deadline: ${escapeJobRequestHtml(deadline)}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800 pt-3">
+                        <span class="text-xs text-slate-500">Client: ${escapeJobRequestHtml(request.client_name || 'Khedma client')}</span>
+                        ${proposalAction}
+                    </div>
+                </article>
+            `;
+        }).join('');
+        grid.classList.remove('hidden');
+    }
+
+    function openProposalModal(jobRequestId) {
+        const request = providerJobRequests.find(item => Number(item.id) === Number(jobRequestId));
+        if (!request) {
+            alert('This service request is no longer available. Refresh the list and try again.');
+            return;
+        }
+
+        document.getElementById('proposalJobRequestId').value = request.id;
+        document.getElementById('proposalRequestCategory').textContent = request.category || 'Service request';
+        document.getElementById('proposalRequestTitle').textContent = request.title || '';
+        document.getElementById('proposalRequestMeta').textContent = [
+            request.location || request.city,
+            request.budget_formatted || 'Flexible budget',
+            request.deadline ? `Deadline ${new Date(request.deadline).toLocaleDateString()}` : null
+        ].filter(Boolean).join(' · ');
+        document.getElementById('proposalRequestDescription').textContent = request.description || '';
+        document.getElementById('proposalPrice').value = request.my_proposal_price ?? '';
+        document.getElementById('proposalDeliveryTime').value = request.my_proposal_delivery_time || '';
+        document.getElementById('proposalDeliveryDays').value = request.my_proposal_delivery_days ?? '';
+        document.getElementById('proposalMessage').value = request.my_proposal_message || '';
+        document.getElementById('sendProposalButton').textContent = request.my_proposal_status === 'pending' ? 'Update Proposal' : 'Send Proposal';
+        document.getElementById('sendProposalModal').classList.remove('hidden');
+        document.getElementById('proposalPrice').focus();
+    }
+
+    function closeProposalModal() {
+        document.getElementById('sendProposalModal')?.classList.add('hidden');
+    }
+
+    async function handleSubmitProposal(event) {
+        event.preventDefault();
+        const token = localStorage.getItem('khedma_token');
+        const jobRequestId = document.getElementById('proposalJobRequestId').value;
+        const button = document.getElementById('sendProposalButton');
+        const payload = {
+            price: Number(document.getElementById('proposalPrice').value),
+            delivery_time: document.getElementById('proposalDeliveryTime').value.trim(),
+            delivery_days: document.getElementById('proposalDeliveryDays').value || null,
+            message: document.getElementById('proposalMessage').value.trim()
+        };
+
+        button.disabled = true;
+        button.textContent = 'Sending...';
+
+        try {
+            const response = await fetch(`/api/v1/provider/job-requests/${encodeURIComponent(jobRequestId)}/proposals`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                const firstError = result.errors ? Object.values(result.errors)[0]?.[0] : null;
+                alert(firstError || result.message || 'Could not send your proposal.');
+                return;
+            }
+
+            closeProposalModal();
+            await loadProviderJobRequests(token);
+        } catch (error) {
+            console.error('Error sending proposal:', error);
+            alert('Could not send your proposal. Please try again.');
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Send Proposal';
         }
     }
 

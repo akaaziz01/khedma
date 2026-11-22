@@ -186,8 +186,9 @@ class JobRequestProposalTest extends TestCase
         $response = $this->postJson("/api/v1/provider/job-requests/{$job->id}/proposals", $payload);
 
         $response->assertStatus(201)
-            ->assertJsonPath('data.price', 95.0)
+            ->assertJsonPath('data.price', 95)
             ->assertJsonPath('data.delivery_time', '1 day')
+            ->assertJsonPath('data.message', $payload['message'])
             ->assertJsonPath('data.delivery_days', 1)
             ->assertJsonPath('data.status', 'pending');
 
@@ -225,7 +226,7 @@ class JobRequestProposalTest extends TestCase
         ]);
 
         $response->assertStatus(201)
-            ->assertJsonPath('data.price', 120.0);
+            ->assertJsonPath('data.price', 120);
 
         $this->assertEquals(1, Proposal::where('job_request_id', $job->id)->where('provider_id', $provider->id)->count());
         $this->assertEquals(120.00, $proposal->fresh()->price);
@@ -248,6 +249,28 @@ class JobRequestProposalTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_provider_must_supply_price_delivery_time_and_message_for_proposal(): void
+    {
+        $client = $this->createClient();
+        $job = JobRequest::factory()->create(['client_id' => $client->id]);
+        $provider = $this->createProvider();
+        Sanctum::actingAs($provider);
+
+        $response = $this->postJson("/api/v1/provider/job-requests/{$job->id}/proposals", [
+            'price'         => 0,
+            'delivery_time' => '',
+            'message'       => 'Short',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['price', 'delivery_time', 'message']);
+
+        $this->assertDatabaseMissing('proposals', [
+            'job_request_id' => $job->id,
+            'provider_id' => $provider->id,
+        ]);
     }
 
     // =========================================================================
@@ -480,10 +503,12 @@ class JobRequestProposalTest extends TestCase
     public function test_provider_can_view_open_job_feed_matching_their_trade(): void
     {
         $client = $this->createClient();
-        JobRequest::factory()->create([
+        $job = JobRequest::factory()->create([
             'client_id' => $client->id,
             'category'  => 'Plumbing',
             'city'      => 'Tunis',
+            'location'  => 'Tunis, La Marsa',
+            'deadline'  => now()->addWeek(),
             'status'    => 'open',
         ]);
         JobRequest::factory()->create([
@@ -494,12 +519,33 @@ class JobRequestProposalTest extends TestCase
         ]);
 
         $provider = $this->createProvider([], ['category' => 'Plumbing']);
+        Proposal::factory()->create([
+            'job_request_id' => $job->id,
+            'provider_id' => $provider->id,
+            'price' => 130,
+            'delivery_time' => '3 days',
+            'delivery_days' => 3,
+            'message' => 'I can complete the installation within three business days.',
+            'status' => 'pending',
+        ]);
         Sanctum::actingAs($provider);
 
         $response = $this->getJson('/api/v1/provider/job-requests?category=Plumbing');
 
         $response->assertStatus(200)
             ->assertJsonPath('meta.total', 1)
-            ->assertJsonPath('data.0.category', 'Plumbing');
+            ->assertJsonPath('data.0.category', 'Plumbing')
+            ->assertJsonPath('data.0.location', 'Tunis, La Marsa')
+            ->assertJsonPath('data.0.has_applied', true)
+            ->assertJsonPath('data.0.my_proposal_delivery_time', '3 days')
+            ->assertJsonPath('data.0.my_proposal_message', 'I can complete the installation within three business days.');
+    }
+
+    public function test_client_cannot_view_provider_job_request_feed(): void
+    {
+        Sanctum::actingAs($this->createClient());
+
+        $this->getJson('/api/v1/provider/job-requests')
+            ->assertStatus(403);
     }
 }

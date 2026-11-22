@@ -220,6 +220,10 @@ class JobRequestController extends Controller
     public function providerFeed(Request $request): JsonResponse
     {
         $provider = $request->user();
+        if (! $provider->isProvider()) {
+            return response()->json(['message' => 'Only providers can view the service request feed.'], 403);
+        }
+
         $profile = $provider->providerProfile;
 
         $query = JobRequest::whereIn('status', ['open', 'in_review'])
@@ -256,13 +260,19 @@ class JobRequestController extends Controller
                 'description'         => $req->description,
                 'budget'              => $req->budget !== null ? (float) $req->budget : null,
                 'budget_formatted'    => $req->budget !== null ? number_format((float) $req->budget, 2) . ' TND' : 'Flexible',
+                'location'            => $req->location ?: ($req->address ?: $req->city),
                 'city'                => $req->city,
+                'address'             => $req->address,
                 'urgency'             => $req->urgency,
+                'deadline'            => ($req->deadline ?: $req->preferred_date)?->toISOString(),
                 'preferred_date'      => $req->preferred_date?->format('M d, Y'),
                 'created_at_human'    => $req->created_at?->diffForHumans(),
                 'has_applied'         => (bool) $myProposal,
                 'my_proposal_status'  => $myProposal?->status,
                 'my_proposal_price'   => $myProposal ? (float) $myProposal->price : null,
+                'my_proposal_delivery_time' => $myProposal?->delivery_time,
+                'my_proposal_delivery_days' => $myProposal?->delivery_days,
+                'my_proposal_message' => $myProposal?->message,
             ];
         });
 
