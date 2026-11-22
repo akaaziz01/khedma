@@ -22,8 +22,8 @@ class ChatController extends Controller
         $conversations = Conversation::where('client_id', $user->id)
             ->orWhere('provider_id', $user->id)
             ->with([
-                'client:id,name,avatar_path,role',
-                'provider:id,name,avatar_path,role',
+                'client:id,name,role',
+                'provider:id,name,role',
                 'jobRequest:id,title,category,budget',
                 'booking:id,booking_number,service_title,total_price,status',
                 'messages' => function ($query) {
@@ -133,8 +133,8 @@ class ChatController extends Controller
 
         return response()->json([
             'conversation' => $conversation->load([
-                'client:id,name,avatar_path,role',
-                'provider:id,name,avatar_path,role',
+                'client:id,name,role',
+                'provider:id,name,role',
                 'jobRequest',
                 'booking',
             ]),
@@ -163,7 +163,7 @@ class ChatController extends Controller
             ->update(['read_at' => now()]);
 
         $messages = $conversation->messages()
-            ->with('sender:id,name,avatar_path')
+            ->with('sender:id,name')
             ->get();
 
         $otherUser = (int) $conversation->client_id === (int) $user->id ? $conversation->provider : $conversation->client;
@@ -211,7 +211,7 @@ class ChatController extends Controller
         $this->notifyRecipient($conversation, $user);
 
         return response()->json([
-            'message' => $message->load('sender:id,name,avatar_path'),
+            'message' => $message->load('sender:id,name'),
         ], 201);
     }
 
