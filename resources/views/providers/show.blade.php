@@ -113,6 +113,13 @@
                             <i class="bi bi-calendar-plus"></i>
                             <span>Request Booking</span>
                         </button>
+                        <button type="button"
+                                id="contactProviderBtn"
+                                onclick="contactProvider({{ $provider->id }})"
+                                class="w-full sm:w-auto px-5 py-3 rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-2 hover:bg-blue-100 dark:hover:bg-blue-900/60">
+                            <i class="bi bi-chat-dots-fill"></i>
+                            <span>Contact Provider</span>
+                        </button>
 
                         <!-- Provider Owner Actions (Shown when viewing own profile) -->
                         <a href="/profile" id="ownerHeroEditBtn" class="hidden w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-md">
@@ -504,7 +511,7 @@
                 </div>
 
                 <!-- Client / Guest Booking Box -->
-                <div id="clientBookingBox" class="sticky top-24 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none space-y-6">
+                <div id="booking" class="sticky top-24 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none space-y-6">
                     <div>
                         <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
                             Direct Booking Request
@@ -546,7 +553,7 @@
                             <span>Schedule Appointment</span>
                         </button>
 
-                        <a href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
+                        <a href="/register?role=client&amp;redirect={{ urlencode(route('providers.show', $provider->id, false)) }}" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
                             Create Client Account to Hire
                         </a>
                     </div>
@@ -640,10 +647,10 @@
         </div>
 
         <div class="space-y-2 pt-1">
-            <a href="/login?redirect={{ urlencode(route('providers.show', $provider->id)) }}" class="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition block">
+            <a id="providerBookingLoginLink" href="/login?redirect={{ urlencode(route('providers.show', $provider->id, false)) }}" class="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition block">
                 Sign In to Hire
             </a>
-            <a href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
+            <a id="providerBookingRegisterLink" href="/register?role=client&amp;redirect={{ urlencode(route('providers.show', $provider->id, false)) }}" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
                 New to Khedma? Create Free Account
             </a>
         </div>
@@ -685,6 +692,9 @@
 
         document.getElementById('bookingModalProviderName').textContent = name;
         document.getElementById('bookingModalRate').textContent = rate;
+        const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+        document.getElementById('providerBookingLoginLink').href = `/login?redirect=${encodeURIComponent(returnTo)}`;
+        document.getElementById('providerBookingRegisterLink').href = `/register?role=client&redirect=${encodeURIComponent(returnTo)}`;
         document.getElementById('providerBookingModal').classList.remove('hidden');
     }
 
@@ -717,7 +727,7 @@
                 const ownerServices = document.getElementById('ownerHeroServicesBtn');
                 if (ownerServices) ownerServices.classList.remove('hidden');
 
-                const clientBox = document.getElementById('clientBookingBox');
+                const clientBox = document.getElementById('booking');
                 if (clientBox) clientBox.classList.add('hidden');
 
                 const ownerSidebar = document.getElementById('ownerProfileSidebar');
@@ -731,6 +741,8 @@
 
                 const favBtn = document.getElementById('favoriteBtn');
                 if (favBtn) favBtn.classList.add('hidden');
+                const contactBtn = document.getElementById('contactProviderBtn');
+                if (contactBtn) contactBtn.classList.add('hidden');
 
                 // Hide individual booking buttons on their services
                 document.querySelectorAll('.pro-service-book-btn').forEach(b => b.classList.add('hidden'));
@@ -738,6 +750,8 @@
                 // Another provider is viewing
                 const favBtn = document.getElementById('favoriteBtn');
                 if (favBtn) favBtn.classList.add('hidden');
+                const contactBtn = document.getElementById('contactProviderBtn');
+                if (contactBtn) contactBtn.classList.add('hidden');
                 document.querySelectorAll('.pro-service-book-btn').forEach(b => b.classList.add('hidden'));
             }
 
@@ -764,6 +778,14 @@
                 }
             } catch(e) {}
         }
+
+        if (window.location.hash === '#booking' && !token) {
+            openGuestBookingModal(
+                '{{ addslashes($provider->name) }}',
+                '{{ $profile?->hourly_rate ? number_format($profile->hourly_rate, 2) . ' TND/hr' : 'Custom Quote' }}',
+                {{ $provider->is_verified ? 'true' : 'false' }}
+            );
+        }
     });
 
     function setFavoriteButtonState(favorited) {
@@ -788,9 +810,7 @@
     async function toggleFavorite(providerId) {
         const token = localStorage.getItem('khedma_token');
         if (!token) {
-            if (confirm('Please log in to save providers to your favorites list. Go to login?')) {
-                window.location.href = '/login';
-            }
+            openGuestAuthPrompt('save this provider');
             return;
         }
 
@@ -822,6 +842,51 @@
             console.error('Error toggling favorite:', e);
         } finally {
             if (icon) icon.classList.remove('scale-125');
+        }
+    }
+
+    async function contactProvider(providerId) {
+        const token = localStorage.getItem('khedma_token');
+        if (!token) {
+            openGuestAuthPrompt('contact this provider');
+            return;
+        }
+
+        let user;
+        try {
+            user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+        } catch (error) {
+            alert('Please sign in again before contacting this provider.');
+            return;
+        }
+
+        if (user.role !== 'client') {
+            alert('Only client accounts can contact service providers.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/v1/conversations', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({ provider_id: providerId })
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.conversation) {
+                alert(data.message || 'Could not contact this provider.');
+                return;
+            }
+
+            window.location.href = `/messages?conversation_id=${data.conversation.id}`;
+        } catch (error) {
+            console.error('Error starting provider conversation:', error);
+            alert('Could not contact this provider. Please try again.');
         }
     }
 </script>

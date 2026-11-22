@@ -169,6 +169,12 @@ class PublicProviderProfileTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Tarek Mansour')
+            ->assertSee('Contact Provider')
+            ->assertSee('guestAuthPrompt')
+            ->assertSee("openGuestAuthPrompt('contact this provider')", false)
+            ->assertSee("openGuestAuthPrompt('save this provider')", false)
+            ->assertSee('redirect=%2Fproviders%2F' . $provider->id, false)
+            ->assertSee("window.location.hash === '#booking'", false)
             ->assertSee('Mansour HVAC & Heat')
             ->assertSee('HVAC & Climate')
             ->assertSee('45.00')

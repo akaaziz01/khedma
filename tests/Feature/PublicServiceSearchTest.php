@@ -246,7 +246,9 @@ class PublicServiceSearchTest extends TestCase
             ->assertSee('Tunis')
             ->assertSee('Youssef Electric')
             ->assertSee('Verified')
-            ->assertSee('200.00');
+            ->assertSee('200.00')
+            ->assertSee('modalRegisterLink')
+            ->assertSee("encodeURIComponent('/services/' + serviceId)", false);
     }
 
     public function test_guest_can_view_web_service_detail_page(): void
@@ -264,7 +266,11 @@ class PublicServiceSearchTest extends TestCase
             ->assertSee('Sousse Carpentry Studio')
             ->assertSee('Sami Trabelsi')
             ->assertSee('150.00')
-            ->assertSee('Sign In to Book This Service');
+            ->assertSee('Sign In to Book This Service')
+            ->assertSee('New Client? Create Account')
+            ->assertSee("openGuestAuthPrompt('save this provider')", false)
+            ->assertSee('getSafePostAuthRedirect', false)
+            ->assertSee('redirect=%2Fservices%2F' . $data['service']->id, false);
     }
 
     public function test_unapproved_service_returns_404_on_web_show(): void

@@ -249,10 +249,10 @@
                     </p>
 
                     <div class="pt-2 space-y-2">
-                        <a href="/login?redirect={{ urlencode(route('services.show', $service->id)) }}" class="w-full py-3 px-4 rounded-2xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs text-center shadow-sm transition block">
+                        <a href="/login?redirect={{ urlencode(route('services.show', $service->id, false)) }}" class="w-full py-3 px-4 rounded-2xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs text-center shadow-sm transition block">
                             Sign In to Book This Service
                         </a>
-                        <a href="/register?role=client" class="w-full py-2.5 px-4 rounded-2xl bg-blue-700/60 hover:bg-blue-700 text-white font-bold text-xs text-center border border-blue-500/50 transition block">
+                        <a href="/register?role=client&amp;redirect={{ urlencode(route('services.show', $service->id, false)) }}" class="w-full py-2.5 px-4 rounded-2xl bg-blue-700/60 hover:bg-blue-700 text-white font-bold text-xs text-center border border-blue-500/50 transition block">
                             New Client? Create Account
                         </a>
                     </div>
@@ -327,9 +327,7 @@
     async function toggleQuickFavorite(providerId) {
         const token = localStorage.getItem('khedma_token');
         if (!token) {
-            if (confirm('Please log in to save providers to your favorites list. Go to login?')) {
-                window.location.href = '/login';
-            }
+            openGuestAuthPrompt('save this provider');
             return;
         }
 

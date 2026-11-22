@@ -397,9 +397,7 @@
     async function toggleQuickFavorite(providerId, btn) {
         const token = localStorage.getItem('khedma_token');
         if (!token) {
-            if (confirm('Please sign in to save providers to your favorites list. Go to login?')) {
-                window.location.href = '/login';
-            }
+            openGuestAuthPrompt('save this provider');
             return;
         }
 
