@@ -87,7 +87,7 @@
                 <!-- Total Revenue Card -->
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total Revenue</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total Revenue (Net)</span>
                         <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                             <i class="bi bi-cash-coin text-lg"></i>
                         </div>
@@ -97,7 +97,7 @@
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">TND</span>
                     </div>
                     <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2 flex items-center gap-1">
-                        <i class="bi bi-arrow-up-right"></i> From completed client jobs
+                        <i class="bi bi-arrow-up-right"></i> Revenu net (-10% commission déduite)
                     </p>
                 </div>
 
@@ -1164,7 +1164,8 @@
             updateAvailabilityDisplay(metrics.is_available);
 
             // 2. Metrics Cards
-            document.getElementById('statRevenue').textContent = metrics.total_revenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            const netRevenue = metrics.net_revenue !== undefined ? metrics.net_revenue : (metrics.total_revenue * 0.9);
+            document.getElementById('statRevenue').textContent = Number(netRevenue).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
             document.getElementById('statActiveJobs').textContent = metrics.active_jobs;
             document.getElementById('statPendingLeads').textContent = metrics.pending_leads;
             document.getElementById('statRating').textContent = metrics.average_rating.toFixed(1);
@@ -1483,7 +1484,10 @@
                     <div class="text-xs text-slate-800 font-medium">${formattedDate}</div>
                     <div class="text-[11px] text-slate-400">${b.address}, ${b.city}</div>
                 </td>
-                <td class="py-4 px-6 font-bold text-xs text-slate-900">${parseFloat(b.total_price).toFixed(0)} TND</td>
+                <td class="py-4 px-6 font-bold text-xs text-slate-900">
+                    ${(Number(b.provider_amount || b.total_price * 0.9)).toFixed(2)} TND
+                    <span class="block text-[10px] text-slate-400 font-normal">Brut: ${parseFloat(b.total_price).toFixed(0)} TND (-10%)</span>
+                </td>
                 <td class="py-4 px-6">
                     <span class="inline-block px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider ${badgeClass}">
                         ${b.status.replace('_', ' ')}
