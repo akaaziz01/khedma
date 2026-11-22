@@ -520,19 +520,19 @@
                     <!-- Rate Breakdown -->
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2">
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-slate-500 dark:text-slate-400">Hourly Rate</span>
+                            <span class="text-slate-500 dark:text-slate-400">Tarif horaire</span>
                             <span class="font-black text-slate-900 dark:text-white">
-                                {{ $profile?->hourly_rate ? number_format($profile->hourly_rate, 2) . ' TND' : 'Custom' }}
+                                {{ $profile?->hourly_rate ? number_format($profile->hourly_rate, 2) . ' TND' : 'Sur devis' }}
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-slate-500 dark:text-slate-400">Booking Fee</span>
-                            <span class="font-black text-emerald-600 dark:text-emerald-400">0.00 TND (Free)</span>
+                            <span class="text-slate-500 dark:text-slate-400">Commission Plateforme</span>
+                            <span class="font-black text-blue-600 dark:text-blue-400">10% (Inclus)</span>
                         </div>
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-slate-500 dark:text-slate-400">Verified Craft</span>
-                            <span class="font-bold text-slate-700 dark:text-slate-300">
-                                {{ $provider->is_verified ? 'Yes (Verified)' : 'Standard' }}
+                            <span class="text-slate-500 dark:text-slate-400">Moyen de paiement</span>
+                            <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                <i class="bi bi-credit-card-2-front text-blue-600"></i> Carte Bancaire (Stripe)
                             </span>
                         </div>
                     </div>
@@ -541,7 +541,7 @@
                     <div class="space-y-2.5">
                         <button type="button" 
                                 onclick="openGuestBookingModal('{{ addslashes($provider->name) }}', '{{ $profile?->hourly_rate ? number_format($profile->hourly_rate, 2) . ' TND/hr' : 'Custom Quote' }}', {{ $provider->is_verified ? 'true' : 'false' }})" 
-                                class="w-full py-3.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2">
+                                class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2">
                             <i class="bi bi-calendar-check text-sm"></i>
                             <span>Schedule Appointment</span>
                         </button>
@@ -555,15 +555,15 @@
                     <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs text-slate-500 dark:text-slate-400">
                         <div class="flex items-center gap-2">
                             <i class="bi bi-shield-check text-emerald-500"></i>
-                            <span>No advance payment needed to inquire</span>
+                            <span>Paiement en ligne sécurisé 100% garanti via Stripe</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="bi bi-clock-history text-blue-500"></i>
-                            <span>Direct response from professional</span>
+                            <span>Confirmation immédiate après paiement</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="bi bi-geo-alt text-rose-500"></i>
-                            <span>Local service area: {{ $profile?->city ?? 'Tunisia' }}</span>
+                            <span>Zone d'intervention : {{ $profile?->city ?? 'Tunisia' }}</span>
                         </div>
                     </div>
                 </div>
@@ -698,17 +698,34 @@
                     class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"></textarea>
             </div>
 
-            <div class="space-y-2 pt-2">
+            <!-- Price & Platform Commission Breakdown (10%) -->
+            <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5 text-xs">
+                <div class="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                    <span>Prestation :</span>
+                    <span id="bookingModalBreakdownBasePrice" class="font-bold text-slate-800 dark:text-slate-200">50.00 TND</span>
+                </div>
+                <div class="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                    <span class="flex items-center gap-1">
+                        <i class="bi bi-shield-check text-blue-600"></i> Commission Plateforme (10%) :
+                    </span>
+                    <span id="bookingModalBreakdownCommission" class="font-bold text-blue-600 dark:text-blue-400">5.00 TND</span>
+                </div>
+                <div class="flex items-center justify-between border-t border-slate-200/80 dark:border-slate-700/80 pt-1.5 font-black text-slate-900 dark:text-white">
+                    <span>Total à régler par Stripe :</span>
+                    <span id="bookingModalBreakdownTotal" class="text-sm font-black text-indigo-600 dark:text-indigo-400">50.00 TND</span>
+                </div>
+            </div>
+
+            <div class="space-y-2 pt-1">
                 <button type="submit" id="btnBookAndPayStripe"
-                    class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs text-center shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
-                    <i class="bi bi-credit-card-2-front-fill text-sm"></i>
-                    <span>Réserver & Payer avec Stripe</span>
+                    class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs text-center shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
+                    <i class="bi bi-shield-lock-fill text-sm"></i>
+                    <span>Payer & Réserver avec Stripe</span>
                 </button>
-                <button type="button" onclick="submitBookingWithoutStripe()" id="btnBookPayLater"
-                    class="w-full py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs text-center transition flex items-center justify-center gap-1.5">
-                    <i class="bi bi-calendar-check text-xs"></i>
-                    <span>Réserver (Paiement sur place)</span>
-                </button>
+                <p class="text-[11px] text-center text-slate-400 dark:text-slate-500 flex items-center justify-center gap-1.5">
+                    <i class="bi bi-lock-fill text-xs text-emerald-500"></i>
+                    <span>Paiement en ligne sécurisé obligatoire (Stripe)</span>
+                </p>
             </div>
         </form>
     </div>
@@ -769,6 +786,13 @@
             document.getElementById('bookInputPrice').value = priceNum;
             document.getElementById('bookInputCategory').value = category || '{{ addslashes($profile?->primary_category ?? "General Maintenance") }}';
 
+            // Price & 10% platform commission breakdown
+            const basePrice = priceNum;
+            const comm = (basePrice * 0.10).toFixed(2);
+            document.getElementById('bookingModalBreakdownBasePrice').textContent = basePrice.toFixed(2) + ' TND';
+            document.getElementById('bookingModalBreakdownCommission').textContent = comm + ' TND';
+            document.getElementById('bookingModalBreakdownTotal').textContent = basePrice.toFixed(2) + ' TND';
+
             // Pre-fill address
             const addrInput = document.getElementById('bookInputAddress');
             if (addrInput && !addrInput.value) {
@@ -804,16 +828,7 @@
 
     async function handleClientBookingSubmit(e) {
         e.preventDefault();
-        await doCreateBooking(true);
-    }
-
-    async function submitBookingWithoutStripe() {
-        const form = document.getElementById('bookingModalClientSection');
-        if (!form.reportValidity()) return;
-        await doCreateBooking(false);
-    }
-
-    async function doCreateBooking(redirectToStripe) {
+        
         const token = localStorage.getItem('khedma_token');
         if (!token) {
             window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href);
@@ -821,18 +836,10 @@
         }
 
         const btnStripe = document.getElementById('btnBookAndPayStripe');
-        const btnLater = document.getElementById('btnBookPayLater');
         const origStripeText = btnStripe.innerHTML;
-        const origLaterText = btnLater.innerHTML;
 
         btnStripe.disabled = true;
-        btnLater.disabled = true;
-
-        if (redirectToStripe) {
-            btnStripe.innerHTML = '<span class="inline-block animate-spin mr-1.5"><i class="bi bi-arrow-repeat"></i></span> Redirection Stripe...';
-        } else {
-            btnLater.innerHTML = '<span class="inline-block animate-spin mr-1.5"><i class="bi bi-arrow-repeat"></i></span> Enregistrement...';
-        }
+        btnStripe.innerHTML = '<span class="inline-block animate-spin mr-1.5"><i class="bi bi-arrow-repeat"></i></span> Préparation du paiement Stripe...';
 
         const scheduledAt = document.getElementById('bookInputScheduledAt').value;
         const address = document.getElementById('bookInputAddress').value;
@@ -870,41 +877,35 @@
             if (!res.ok) {
                 alert(data.message || 'Impossible de créer la réservation.');
                 btnStripe.disabled = false;
-                btnLater.disabled = false;
                 btnStripe.innerHTML = origStripeText;
-                btnLater.innerHTML = origLaterText;
                 return;
             }
 
             const booking = data.data;
 
-            if (redirectToStripe) {
-                // Call stripe checkout immediately
-                const stripeRes = await fetch(`/api/v1/client/bookings/${booking.id}/stripe-checkout`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken || ''
-                    }
-                });
-                const stripeData = await stripeRes.json();
-                if (stripeRes.ok && stripeData.checkout_url) {
-                    window.location.href = stripeData.checkout_url;
-                    return;
+            // Direct online Stripe payment (no cash on delivery / no payment on site)
+            const stripeRes = await fetch(`/api/v1/client/bookings/${booking.id}/stripe-checkout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
                 }
+            });
+            const stripeData = await stripeRes.json();
+            if (stripeRes.ok && stripeData.checkout_url) {
+                window.location.href = stripeData.checkout_url;
+                return;
+            } else {
+                alert(stripeData.message || 'La réservation a été créée. Veuillez procéder au paiement depuis votre tableau de bord.');
+                window.location.href = '/dashboard';
             }
-
-            alert('Votre demande de réservation a été envoyée avec succès !');
-            window.location.href = '/dashboard';
         } catch(err) {
             console.error(err);
-            alert('Une erreur est survenue lors de la réservation.');
+            alert('Une erreur est survenue lors de l\'initialisation du paiement Stripe.');
             btnStripe.disabled = false;
-            btnLater.disabled = false;
             btnStripe.innerHTML = origStripeText;
-            btnLater.innerHTML = origLaterText;
         }
     }
 

@@ -158,23 +158,29 @@ class ProposalController extends Controller
                 ]);
             }
 
-            // 3. Create confirmed booking
+            // 3. Create confirmed booking with 10% platform commission
             $scheduledDate = $jobRequest->preferred_date ?? now()->addDays(max(1, (int) ($proposal->delivery_days ?? 1)));
+            $comm = Booking::calculateCommission((float) $proposal->price, 10.0);
 
             $newBooking = Booking::create([
-                'booking_number' => 'BK-' . strtoupper(Str::random(8)),
-                'client_id'      => $client->id,
-                'provider_id'    => $proposal->provider_id,
-                'service_id'     => null,
-                'service_title'  => $jobRequest->title,
-                'category'       => $jobRequest->category,
-                'status'         => 'confirmed',
-                'total_price'    => $proposal->price,
-                'scheduled_at'   => $scheduledDate,
-                'address'        => $jobRequest->address,
-                'city'           => $jobRequest->city,
-                'client_notes'   => "Generated from Job Request #{$jobRequest->request_number}: {$jobRequest->description}",
-                'provider_notes' => "Accepted Proposal #{$proposal->proposal_number} - Delivery timeline: {$proposal->delivery_time}",
+                'booking_number'    => 'BK-' . strtoupper(Str::random(8)),
+                'client_id'         => $client->id,
+                'provider_id'       => $proposal->provider_id,
+                'service_id'        => null,
+                'service_title'     => $jobRequest->title,
+                'category'          => $jobRequest->category,
+                'status'            => 'confirmed',
+                'payment_status'    => 'unpaid',
+                'payment_method'    => 'stripe',
+                'total_price'       => $proposal->price,
+                'commission_rate'   => $comm['commission_rate'],
+                'commission_amount' => $comm['commission_amount'],
+                'provider_amount'   => $comm['provider_amount'],
+                'scheduled_at'      => $scheduledDate,
+                'address'           => $jobRequest->address,
+                'city'              => $jobRequest->city,
+                'client_notes'      => "Generated from Job Request #{$jobRequest->request_number}: {$jobRequest->description}",
+                'provider_notes'    => "Accepted Proposal #{$proposal->proposal_number} - Delivery timeline: {$proposal->delivery_time}",
             ]);
 
             // 4. Update job request to awarded

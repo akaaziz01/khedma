@@ -41,7 +41,13 @@ class ProviderDashboardController extends Controller
             ->get();
 
         $completedBookings = $bookings->where('status', 'completed');
-        $totalRevenue = $completedBookings->sum('total_price');
+        $totalGrossRevenue = $completedBookings->sum('total_price');
+        $totalNetRevenue = $completedBookings->sum(function ($b) {
+            return (float) ($b->provider_amount > 0 ? $b->provider_amount : round($b->total_price * 0.90, 2));
+        });
+        $totalCommission = $completedBookings->sum(function ($b) {
+            return (float) ($b->commission_amount > 0 ? $b->commission_amount : round($b->total_price * 0.10, 2));
+        });
         $completedJobsCount = $completedBookings->count();
         $activeJobsCount = $bookings->whereIn('status', ['accepted', 'in_progress'])->count();
         $pendingLeadsCount = $bookings->where('status', 'pending')->count();
@@ -66,8 +72,10 @@ class ProviderDashboardController extends Controller
                 'profile' => $provider->providerProfile,
             ],
             'metrics' => [
-                'total_revenue' => (float) $totalRevenue,
-                'completed_jobs' => $completedJobsCount,
+                'total_revenue'       => (float) $totalGrossRevenue,
+                'net_revenue'         => (float) $totalNetRevenue,
+                'platform_commission' => (float) $totalCommission,
+                'completed_jobs'      => $completedJobsCount,
                 'active_jobs' => $activeJobsCount,
                 'pending_leads' => $pendingLeadsCount,
                 'average_rating' => (float) $averageRating,

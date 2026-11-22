@@ -2192,8 +2192,9 @@
 
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Montant</span>
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Montant Total</span>
                         <span class="text-base font-black text-slate-900 dark:text-white">${Number(b.total_price).toFixed(2)} TND</span>
+                        <span class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold block">Inclut 10% commission (${(Number(b.commission_amount || b.total_price * 0.10)).toFixed(2)} TND)</span>
                     </div>
                     <div>
                         ${paymentActionHtml}

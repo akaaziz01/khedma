@@ -116,12 +116,19 @@ class StripePaymentTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonPath('data.service_title', 'Emergency Leak Fix')
             ->assertJsonPath('data.status', 'pending')
-            ->assertJsonPath('data.payment_status', 'unpaid');
+            ->assertJsonPath('data.payment_status', 'unpaid')
+            ->assertJsonPath('data.total_price', '80.00')
+            ->assertJsonPath('data.commission_rate', '10.00')
+            ->assertJsonPath('data.commission_amount', '8.00')
+            ->assertJsonPath('data.provider_amount', '72.00');
 
         $this->assertDatabaseHas('bookings', [
-            'client_id'     => $this->client->id,
-            'provider_id'   => $this->provider->id,
-            'service_title' => 'Emergency Leak Fix',
+            'client_id'         => $this->client->id,
+            'provider_id'       => $this->provider->id,
+            'service_title'     => 'Emergency Leak Fix',
+            'commission_rate'   => 10.00,
+            'commission_amount' => 8.00,
+            'provider_amount'   => 72.00,
         ]);
     }
 

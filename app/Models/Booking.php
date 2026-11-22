@@ -20,6 +20,9 @@ class Booking extends Model
         'category',
         'status',
         'total_price',
+        'commission_rate',
+        'commission_amount',
+        'provider_amount',
         'scheduled_at',
         'address',
         'city',
@@ -39,12 +42,15 @@ class Booking extends Model
     protected function casts(): array
     {
         return [
-            'total_price'  => 'decimal:2',
-            'scheduled_at' => 'datetime',
-            'paid_at'      => 'datetime',
-            'completed_at' => 'datetime',
-            'accepted_at'  => 'datetime',
-            'declined_at'  => 'datetime',
+            'total_price'       => 'decimal:2',
+            'commission_rate'   => 'decimal:2',
+            'commission_amount' => 'decimal:2',
+            'provider_amount'   => 'decimal:2',
+            'scheduled_at'      => 'datetime',
+            'paid_at'           => 'datetime',
+            'completed_at'      => 'datetime',
+            'accepted_at'       => 'datetime',
+            'declined_at'       => 'datetime',
         ];
     }
 
@@ -80,6 +86,21 @@ class Booking extends Model
     public function isCancelled(): bool  { return $this->status === 'cancelled'; }
     public function isImmutable(): bool  { return in_array($this->status, ['completed', 'declined', 'cancelled']); }
     public function isPaid(): bool       { return $this->payment_status === 'paid'; }
+
+    /**
+     * Calculate 10% platform commission and provider net payout.
+     */
+    public static function calculateCommission(float $totalPrice, float $rate = 10.0): array
+    {
+        $commissionAmount = round($totalPrice * ($rate / 100), 2);
+        $providerAmount = round($totalPrice - $commissionAmount, 2);
+
+        return [
+            'commission_rate'   => $rate,
+            'commission_amount' => $commissionAmount,
+            'provider_amount'   => $providerAmount,
+        ];
+    }
 
     public function markAsPaid(string $paymentIntentId, ?string $sessionId = null): void
     {

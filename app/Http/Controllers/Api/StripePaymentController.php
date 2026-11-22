@@ -38,6 +38,9 @@ class StripePaymentController extends Controller
                     'payment_method'         => $b->payment_method,
                     'is_paid'                => $b->isPaid(),
                     'total_price'            => (float) $b->total_price,
+                    'commission_rate'        => (float) ($b->commission_rate ?? 10.0),
+                    'commission_amount'      => (float) ($b->commission_amount ?? round($b->total_price * 0.10, 2)),
+                    'provider_amount'        => (float) ($b->provider_amount ?? round($b->total_price * 0.90, 2)),
                     'scheduled_at'           => $b->scheduled_at?->toIso8601String(),
                     'scheduled_at_formatted' => $b->scheduled_at?->format('d M Y, H:i'),
                     'address'                => $b->address,
@@ -83,21 +86,27 @@ class StripePaymentController extends Controller
         }
 
         $bookingNumber = 'BKG-' . strtoupper(Str::random(8));
+        $totalPrice = (float) $validated['total_price'];
+        $commissionData = Booking::calculateCommission($totalPrice, 10.0);
 
         $booking = Booking::create([
-            'booking_number' => $bookingNumber,
-            'client_id'      => $client->id,
-            'provider_id'    => $validated['provider_id'],
-            'service_id'     => $validated['service_id'] ?? null,
-            'service_title'  => $validated['service_title'],
-            'category'       => $validated['category'] ?? 'General Maintenance',
-            'status'         => 'pending',
-            'payment_status' => 'unpaid',
-            'total_price'    => $validated['total_price'],
-            'scheduled_at'   => $validated['scheduled_at'],
-            'address'        => $validated['address'],
-            'city'           => $validated['city'] ?? 'Tunis',
-            'client_notes'   => $validated['client_notes'] ?? null,
+            'booking_number'    => $bookingNumber,
+            'client_id'         => $client->id,
+            'provider_id'       => $validated['provider_id'],
+            'service_id'        => $validated['service_id'] ?? null,
+            'service_title'     => $validated['service_title'],
+            'category'          => $validated['category'] ?? 'General Maintenance',
+            'status'            => 'pending',
+            'payment_status'    => 'unpaid',
+            'payment_method'    => 'stripe',
+            'total_price'       => $totalPrice,
+            'commission_rate'   => $commissionData['commission_rate'],
+            'commission_amount' => $commissionData['commission_amount'],
+            'provider_amount'   => $commissionData['provider_amount'],
+            'scheduled_at'      => $validated['scheduled_at'],
+            'address'           => $validated['address'],
+            'city'              => $validated['city'] ?? 'Tunis',
+            'client_notes'      => $validated['client_notes'] ?? null,
         ]);
 
         return response()->json([
@@ -172,10 +181,13 @@ class StripePaymentController extends Controller
                     'quantity'   => 1,
                 ]],
                 'metadata' => [
-                    'booking_id'     => (string) $booking->id,
-                    'booking_number' => (string) $booking->booking_number,
-                    'client_id'      => (string) $user->id,
-                    'provider_id'    => (string) $booking->provider_id,
+                    'booking_id'        => (string) $booking->id,
+                    'booking_number'    => (string) $booking->booking_number,
+                    'client_id'         => (string) $user->id,
+                    'provider_id'       => (string) $booking->provider_id,
+                    'commission_rate'   => '10%',
+                    'commission_amount' => (string) ($booking->commission_amount ?? round($booking->total_price * 0.10, 2)),
+                    'provider_amount'   => (string) ($booking->provider_amount ?? round($booking->total_price * 0.90, 2)),
                 ],
                 'success_url' => $successUrl,
                 'cancel_url'  => $cancelUrl,
