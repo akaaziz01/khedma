@@ -251,12 +251,13 @@
                         </div>
                     </div>
 
-                    <!-- Messages Dropdown -->
+                    <!-- Messages Link -->
                     <div class="relative hidden sm:block">
-                        <button type="button" onclick="alert('Live chat coming soon with WebSocket / Reverb!')"
+                        <a href="/messages" title="In-App Chat & Messages"
                             class="h-9 w-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition relative">
                             <i class="bi bi-chat-dots-fill text-sm"></i>
-                        </button>
+                            <span id="navChatUnreadBadge" class="hidden absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-blue-600 text-white font-extrabold text-[9px] flex items-center justify-center border border-white dark:border-slate-900">1</span>
+                        </a>
                     </div>
 
                     <!-- User Profile Dropdown Pill (Spotlight Style) -->
@@ -281,6 +282,10 @@
                             <a href="/profile" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition">
                                 <i class="bi bi-person-circle text-sm text-amber-500"></i>
                                 My Profile
+                            </a>
+                            <a href="/messages" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                <i class="bi bi-chat-dots-fill text-sm text-blue-500"></i>
+                                Messages & Chat
                             </a>
                             <a href="/dashboard" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
                                 <i class="bi bi-speedometer2 text-sm text-slate-500"></i>

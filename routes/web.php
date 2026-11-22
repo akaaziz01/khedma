@@ -47,6 +47,10 @@ Route::get('/profile', function () {
     return view('profile');
 })->name('profile');
 
+Route::get('/messages', function () {
+    return view('chat');
+})->name('chat');
+
 // Provider dedicated workspace pages
 Route::get('/provider/bookings', function () {
     return view('provider.bookings');
