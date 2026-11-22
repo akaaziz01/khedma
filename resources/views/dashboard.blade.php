@@ -1984,6 +1984,10 @@
                     <a href="${fav.profile_url}" class="flex-1 py-2 text-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition">
                         View Profile
                     </a>
+                    <button type="button" onclick="startChatWithUser(${fav.provider_id})" class="px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-400 font-bold text-xs transition flex items-center gap-1">
+                        <i class="bi bi-chat-dots-fill"></i>
+                        <span>Chat</span>
+                    </button>
                 </div>
             `;
 
@@ -2052,6 +2056,42 @@
         localStorage.removeItem('khedma_token');
         localStorage.removeItem('khedma_user');
         window.location.href = '/login';
+    }
+
+    // ── Direct Chat Helper ─────────────────────────────────────────────────────
+    async function startChatWithUser(recipientId, initialMessage = '') {
+        const token = localStorage.getItem('khedma_token');
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await fetch('/api/v1/conversations', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                },
+                body: JSON.stringify({
+                    recipient_id: recipientId,
+                    message: initialMessage || undefined
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.conversation) {
+                window.location.href = '/messages?conversation_id=' + data.conversation.id;
+            } else {
+                alert(data.message || 'Could not start conversation.');
+            }
+        } catch(e) {
+            console.error(e);
+            alert('Could not start conversation.');
+        }
     }
 </script>
 @endsection

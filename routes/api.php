@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ClientFavoriteController;
 use App\Http\Controllers\Api\JobRequestController;
 use App\Http\Controllers\Api\ProposalController;
@@ -42,6 +43,12 @@ Route::prefix('v1')->group(function () {
         Route::put('/profile/password', [AuthController::class, 'updatePassword']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
+
+        // In-App Chat API [C7]
+        Route::get('/conversations', [ChatController::class, 'conversations']);
+        Route::post('/conversations', [ChatController::class, 'startConversation']);
+        Route::get('/conversations/{id}/messages', [ChatController::class, 'messages']);
+        Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
 
         // Client Favorites & Job Requests / Proposals API
         Route::prefix('client')->group(function () {

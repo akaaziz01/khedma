@@ -99,6 +99,23 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'provider_id');
     }
 
+    public function clientConversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'client_id');
+    }
+
+    public function providerConversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'provider_id');
+    }
+
+    public function conversations(): HasMany
+    {
+        return $this->isClient()
+            ? $this->clientConversations()
+            : $this->providerConversations();
+    }
+
     /**
      * Providers saved by this client.
      */
