@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\ActivityNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -121,6 +122,7 @@ class ChatController extends Controller
             ]);
             $conversation->last_message_at = now();
             $conversation->save();
+            $this->notifyRecipient($conversation, $user);
         }
 
         return response()->json([
@@ -200,9 +202,24 @@ class ChatController extends Controller
 
         $conversation->last_message_at = now();
         $conversation->save();
+        $this->notifyRecipient($conversation, $user);
 
         return response()->json([
             'message' => $message->load('sender:id,name,avatar_path'),
         ], 201);
+    }
+
+    private function notifyRecipient(Conversation $conversation, User $sender): void
+    {
+        $recipient = $conversation->client_id === $sender->id
+            ? $conversation->provider
+            : $conversation->client;
+
+        $recipient->notify(new ActivityNotification(
+            'new_message',
+            'New message',
+            "{$sender->name} sent you a message.",
+            '/messages',
+        ));
     }
 }

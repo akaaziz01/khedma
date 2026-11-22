@@ -8,6 +8,7 @@ use App\Http\Resources\ProposalResource;
 use App\Models\Booking;
 use App\Models\JobRequest;
 use App\Models\Proposal;
+use App\Notifications\ActivityNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -80,6 +81,13 @@ class ProposalController extends Controller
                 $jobRequest->update(['status' => 'in_review']);
             }
 
+            $jobRequest->client->notify(new ActivityNotification(
+                'new_proposal',
+                'New proposal received',
+                "{$provider->name} sent a proposal for {$jobRequest->title}.",
+                '/dashboard',
+            ));
+
             $statusMessage = 'Your proposal has been submitted successfully to the client.';
         }
 
@@ -130,7 +138,7 @@ class ProposalController extends Controller
             ], 422);
         }
 
-        $booking = DB::transaction(function () use ($proposal, $jobRequest, $client) {
+        [$booking, $rejectedProposals] = DB::transaction(function () use ($proposal, $jobRequest, $client) {
             // 1. Mark this proposal accepted
             $proposal->update([
                 'status'      => 'accepted',
@@ -138,13 +146,17 @@ class ProposalController extends Controller
             ]);
 
             // 2. Reject all other pending proposals for this job request
-            Proposal::where('job_request_id', $jobRequest->id)
+            $rejectedProposals = Proposal::where('job_request_id', $jobRequest->id)
                 ->where('id', '!=', $proposal->id)
                 ->where('status', 'pending')
-                ->update([
+                ->get();
+
+            foreach ($rejectedProposals as $rejectedProposal) {
+                $rejectedProposal->update([
                     'status'           => 'rejected',
                     'rejection_reason' => 'Client accepted another proposal for this request.',
                 ]);
+            }
 
             // 3. Create confirmed booking
             $scheduledDate = $jobRequest->preferred_date ?? now()->addDays(max(1, (int) ($proposal->delivery_days ?? 1)));
@@ -172,8 +184,24 @@ class ProposalController extends Controller
                 'booking_id'           => $newBooking->id,
             ]);
 
-            return $newBooking;
+            return [$newBooking, $rejectedProposals];
         });
+
+        $proposal->provider->notify(new ActivityNotification(
+            'proposal_accepted',
+            'Your proposal was accepted',
+            "Your proposal for {$jobRequest->title} was accepted by the client.",
+            '/provider/bookings',
+        ));
+
+        foreach ($rejectedProposals as $rejectedProposal) {
+            $rejectedProposal->provider->notify(new ActivityNotification(
+                'proposal_rejected',
+                'Proposal status updated',
+                "Another proposal was selected for {$jobRequest->title}.",
+                '/dashboard',
+            ));
+        }
 
         $proposal->load([
             'provider.providerProfile',
@@ -228,6 +256,13 @@ class ProposalController extends Controller
             'status'           => 'rejected',
             'rejection_reason' => $reason,
         ]);
+
+        $proposal->provider->notify(new ActivityNotification(
+            'proposal_rejected',
+            'Your proposal was declined',
+            "Your proposal for {$jobRequest->title} was declined by the client.",
+            '/dashboard',
+        ));
 
         return response()->json([
             'message' => 'Proposal has been declined.',

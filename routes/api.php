@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ClientFavoriteController;
 use App\Http\Controllers\Api\IncidentReportController;
 use App\Http\Controllers\Api\JobRequestController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\ProviderCompareController;
 use App\Http\Controllers\Api\ProviderDashboardController;
@@ -46,6 +47,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
         Route::post('/reports', [IncidentReportController::class, 'store']);
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+        Route::post('/notifications/{notificationId}/read', [NotificationController::class, 'markRead']);
 
         // In-App Chat API [C7]
         Route::get('/conversations', [ChatController::class, 'conversations']);
