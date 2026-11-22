@@ -124,6 +124,7 @@
                     $isUsers = request()->is('admin/users*');
                     $isBookings = request()->is('admin/bookings*');
                     $isServices = request()->is('admin/services*') || request()->is('admin/catalog*');
+                    $isReports = request()->is('admin/reports*');
 
                     $activeClass = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 font-bold transition';
                     $inactiveClass = 'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition';
@@ -171,6 +172,15 @@
                                 <span>Services Catalog</span>
                             </div>
                             <span id="sidebarServicesBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">Active</span>
+                        </a>
+
+                        <a href="{{ route('admin.reports') }}" id="navLinkReports"
+                            class="{{ $isReports ? $activeClass : $inactiveClass }}">
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-flag-fill text-base text-red-500"></i>
+                                <span>Reports & Issues</span>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">Review</span>
                         </a>
                     </div>
                 </div>

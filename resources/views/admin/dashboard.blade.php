@@ -121,7 +121,7 @@
         </div>
 
         <!-- 3. Navigation Hub to Dedicated Management Pages -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Users & Moderation Page Card -->
             <a href="/admin/users" class="group bg-white dark:bg-slate-950 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-blue-500/50 hover:shadow-md transition">
                 <div class="flex items-center justify-between mb-4">
@@ -167,6 +167,21 @@
                 <h3 class="text-base font-extrabold text-slate-900 dark:text-white mb-1">Services Catalog</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                     Create service categories and review, approve, reject, or moderate provider service listings.
+                </p>
+            </a>
+
+            <a href="{{ route('admin.reports') }}" class="group bg-white dark:bg-slate-950 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-red-500/50 hover:shadow-md transition">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center text-xl group-hover:scale-105 transition">
+                        <i class="bi bi-flag-fill"></i>
+                    </div>
+                    <span class="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:translate-x-1 transition">
+                        Open Page <i class="bi bi-arrow-right"></i>
+                    </span>
+                </div>
+                <h3 class="text-base font-extrabold text-slate-900 dark:text-white mb-1">Reports & Issues</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Review client reports, investigate platform issues, and update report statuses.
                 </p>
             </a>
         </div>

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ClientFavoriteController;
+use App\Http\Controllers\Api\IncidentReportController;
 use App\Http\Controllers\Api\JobRequestController;
 use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\ProviderCompareController;
@@ -43,6 +44,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/profile/password', [AuthController::class, 'updatePassword']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
+        Route::post('/reports', [IncidentReportController::class, 'store']);
 
         // In-App Chat API [C7]
         Route::get('/conversations', [ChatController::class, 'conversations']);
@@ -94,6 +96,9 @@ Route::prefix('v1')->group(function () {
 
         // Admin Management Area (Secured with Admin Middleware)
         Route::middleware('admin')->prefix('admin')->group(function () {
+            Route::get('/reports', [IncidentReportController::class, 'index']);
+            Route::patch('/reports/{report}', [IncidentReportController::class, 'update']);
+
             // Dashboard & user management
             Route::get('/dashboard', [AdminController::class, 'data']);
             Route::get('/users', [AdminController::class, 'listUsers']);
