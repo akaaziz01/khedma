@@ -694,7 +694,7 @@
             <a id="compareModalSignInLink" href="/login" class="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition block">
                 Sign In to Schedule
             </a>
-            <a href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
+            <a id="compareModalRegisterLink" href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
                 New to Khedma? Create Free Account
             </a>
         </div>
@@ -713,6 +713,7 @@
         document.getElementById('compareModalProviderName').textContent = name;
         document.getElementById('compareModalRate').textContent = rate;
         document.getElementById('compareModalSignInLink').href = '/login?redirect=' + encodeURIComponent('/providers/' + providerId);
+        document.getElementById('compareModalRegisterLink').href = '/register?role=client&redirect=' + encodeURIComponent('/providers/' + providerId);
         document.getElementById('compareBookingModal').classList.remove('hidden');
     }
 

@@ -146,7 +146,7 @@
                 if (data.user.role === 'admin') {
                     window.location.href = '/admin/dashboard';
                 } else {
-                    window.location.href = '/dashboard';
+                    window.location.href = getSafePostAuthRedirect();
                 }
             } else {
                 errorMessage.textContent = data.message || 'Invalid email or password.';

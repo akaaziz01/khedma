@@ -362,7 +362,7 @@
             <a id="modalSignInLink" href="/login" class="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition block">
                 Sign In to Complete Booking
             </a>
-            <a href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
+            <a id="modalRegisterLink" href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
                 New to Khedma? Create Client Account
             </a>
         </div>
@@ -395,6 +395,7 @@
         }
 
         document.getElementById('modalSignInLink').href = '/login?redirect=' + encodeURIComponent('/services/' + serviceId);
+        document.getElementById('modalRegisterLink').href = '/register?role=client&redirect=' + encodeURIComponent('/services/' + serviceId);
         document.getElementById('guestBookingModal').classList.remove('hidden');
     }
 

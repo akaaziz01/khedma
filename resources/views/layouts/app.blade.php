@@ -468,6 +468,30 @@
         @yield('content')
     </main>
 
+    <div id="guestAuthPrompt" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="guestAuthPromptTitle">
+        <div class="w-full max-w-md space-y-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h2 id="guestAuthPromptTitle" class="text-lg font-black text-slate-900 dark:text-white">Join Khedma to continue</h2>
+                    <p id="guestAuthPromptMessage" class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                        Sign in or create a free client account to continue.
+                    </p>
+                </div>
+                <button type="button" onclick="closeGuestAuthPrompt()" aria-label="Close sign-in prompt" class="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <a id="guestAuthPromptLogin" href="/login" class="block w-full rounded-2xl bg-blue-600 px-4 py-3 text-center text-sm font-extrabold text-white transition hover:bg-blue-700">
+                    Sign In
+                </a>
+                <a id="guestAuthPromptRegister" href="/register?role=client" class="block w-full rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-bold text-slate-800 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+                    Create a Free Client Account
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- ======================================================== -->
     <!-- FLOATING CLIENT COMPARISON DOCK                          -->
     <!-- ======================================================== -->
@@ -498,6 +522,45 @@
 
     <!-- Header State & Dropdowns Script -->
     <script>
+        function getSafePostAuthRedirect(defaultPath = '/dashboard') {
+            const redirect = new URLSearchParams(window.location.search).get('redirect');
+            if (!redirect || !redirect.startsWith('/') || redirect.startsWith('//')) {
+                return defaultPath;
+            }
+
+            const target = new URL(redirect, window.location.origin);
+            return target.origin === window.location.origin
+                ? `${target.pathname}${target.search}${target.hash}`
+                : defaultPath;
+        }
+
+        function openGuestAuthPrompt(action) {
+            const modal = document.getElementById('guestAuthPrompt');
+            if (!modal) return;
+
+            const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+            document.getElementById('guestAuthPromptMessage').textContent =
+                `Sign in or create a free client account to ${action}.`;
+            document.getElementById('guestAuthPromptLogin').href =
+                `/login?redirect=${encodeURIComponent(returnTo)}`;
+            document.getElementById('guestAuthPromptRegister').href =
+                `/register?role=client&redirect=${encodeURIComponent(returnTo)}`;
+            modal.classList.remove('hidden');
+            document.getElementById('guestAuthPromptLogin').focus();
+        }
+
+        function closeGuestAuthPrompt() {
+            document.getElementById('guestAuthPrompt')?.classList.add('hidden');
+        }
+
+        document.getElementById('guestAuthPrompt')?.addEventListener('click', event => {
+            if (event.target === event.currentTarget) closeGuestAuthPrompt();
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeGuestAuthPrompt();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             initHeaderState();
         });

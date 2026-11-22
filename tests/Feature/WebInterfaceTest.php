@@ -32,6 +32,16 @@ class WebInterfaceTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Welcome Back');
         $response->assertSee('Quick-Fill Demo Accounts');
+        $response->assertSee('getSafePostAuthRedirect()', false);
+    }
+
+    public function test_registration_page_returns_to_the_requested_local_page_after_signup(): void
+    {
+        $response = $this->get('/register?role=client&redirect=%2Fservices%2F12');
+
+        $response->assertOk()
+            ->assertSee('getSafePostAuthRedirect()', false)
+            ->assertSee('Returning you to Khedma...');
     }
 
     public function test_dashboard_page_is_accessible(): void

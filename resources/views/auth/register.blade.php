@@ -384,11 +384,11 @@
                 localStorage.setItem('khedma_user', JSON.stringify(data.user));
 
                 // Also establish session via web bridge if needed
-                document.getElementById('successText').textContent = `${data.message} Redirecting to your dashboard...`;
+                document.getElementById('successText').textContent = `${data.message} Returning you to Khedma...`;
                 successAlert.classList.remove('hidden');
 
                 setTimeout(() => {
-                    window.location.href = '/dashboard';
+                    window.location.href = getSafePostAuthRedirect();
                 }, 1000);
             } else {
                 // Show errors

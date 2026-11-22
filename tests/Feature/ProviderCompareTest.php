@@ -119,5 +119,7 @@ class ProviderCompareTest extends TestCase
         $response->assertSee('Karim Heating');
         $response->assertSee('45');
         $response->assertSee('8 Years');
+        $response->assertSee('compareModalRegisterLink');
+        $response->assertSee("encodeURIComponent('/providers/' + providerId)", false);
     }
 }

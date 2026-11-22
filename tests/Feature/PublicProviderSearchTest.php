@@ -213,6 +213,8 @@ class PublicProviderSearchTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Find Skilled Pros in Tunisia')
-            ->assertSee('Pro Directory User');
+            ->assertSee('Pro Directory User')
+            ->assertSee("openGuestAuthPrompt('save this provider')", false)
+            ->assertSee('guestAuthPrompt');
     }
 }
