@@ -331,9 +331,9 @@ class JobRequestProposalTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('summary.proposals_count', 3)
-            ->assertJsonPath('summary.lowest_price', 60.0)
+            ->assertJsonPath('summary.lowest_price', 60)
             ->assertJsonPath('summary.fastest_days', 1)
-            ->assertJsonPath('summary.top_rating', 5.0);
+            ->assertJsonPath('summary.top_rating', 5);
 
         $proposals = $response->json('proposals');
 
