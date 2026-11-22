@@ -287,6 +287,10 @@
                                 <i class="bi bi-chat-dots-fill text-sm text-blue-500"></i>
                                 Messages & Chat
                             </a>
+                            <a href="{{ route('reports.create', ['type' => 'issue']) }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
+                                <i class="bi bi-flag-fill text-sm text-red-500"></i>
+                                Report an Issue
+                            </a>
                             <a href="/dashboard" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition">
                                 <i class="bi bi-speedometer2 text-sm text-slate-500"></i>
                                 My Dashboard
@@ -448,6 +452,11 @@
                     My Profile
                 </a>
 
+                <a href="{{ route('reports.create', ['type' => 'issue']) }}" id="mobileNavReport" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="bi bi-flag-fill text-red-500"></i>
+                    Report an Issue
+                </a>
+
                 <!-- Guest: Become a Provider -->
                 <a href="/register?role=provider" id="mobileNavBecomeProvider" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -522,6 +531,7 @@
             const mobileNavBookings = document.getElementById('mobileNavBookings');
             const mobileNavMyServices = document.getElementById('mobileNavMyServices');
             const mobileNavProfile = document.getElementById('mobileNavProfile');
+            const mobileNavReport = document.getElementById('mobileNavReport');
             const mobileNavBecomeProvider = document.getElementById('mobileNavBecomeProvider');
             const mobileFooter = document.getElementById('mobileDrawerFooter');
 
@@ -566,6 +576,7 @@
 
                     // Show Profile link in mobile drawer
                     if (mobileNavProfile) mobileNavProfile.classList.remove('hidden');
+                    if (mobileNavReport) mobileNavReport.classList.remove('hidden');
 
                     if (user.role === 'provider') {
                         document.getElementById('headerUserRole').textContent = '🛠️ Provider';

@@ -282,7 +282,12 @@
                         ${parseFloat(b.total_price || 0).toFixed(2)} <span class="text-[10px] text-amber-600 font-bold">TND</span>
                     </td>
                     <td class="py-4 px-4 sm:px-6">${badgeMap[b.status] || `<span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-800">${b.status}</span>`}</td>
-                    <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">${actionBtns}</td>
+                    <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
+                        <div class="flex flex-col items-end gap-2">
+                            ${actionBtns}
+                            <a href="/report?type=client&booking_id=${Number(b.id)}" class="text-[11px] font-bold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Report client</a>
+                        </div>
+                    </td>
                 </tr>`;
         }).join('');
     }

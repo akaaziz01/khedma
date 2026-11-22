@@ -51,6 +51,10 @@ Route::get('/messages', function () {
     return view('chat');
 })->name('chat');
 
+Route::get('/report', function () {
+    return view('reports.create');
+})->name('reports.create');
+
 // Provider dedicated workspace pages
 Route::get('/provider/bookings', function () {
     return view('provider.bookings');
@@ -91,6 +95,10 @@ Route::get('/admin/bookings', function () {
 Route::get('/admin/services', function () {
     return view('admin.services');
 })->name('admin.services');
+
+Route::get('/admin/reports', function () {
+    return view('admin.reports');
+})->name('admin.reports');
 
 Route::get('/admin/catalog', function () {
     return redirect('/admin/services');
