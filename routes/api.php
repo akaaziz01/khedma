@@ -73,8 +73,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/proposals/{id}/accept', [ProposalController::class, 'accept']);
             Route::post('/proposals/{id}/reject', [ProposalController::class, 'reject']);
 
-            // Stripe Online Payment API
+            // Client Bookings & Stripe Online Payment API
             Route::get('/bookings', [StripePaymentController::class, 'clientBookings']);
+            Route::post('/bookings', [StripePaymentController::class, 'storeBooking']);
             Route::post('/bookings/{id}/stripe-checkout', [StripePaymentController::class, 'createCheckoutSession']);
             Route::get('/bookings/{id}/payment-status', [StripePaymentController::class, 'checkStatus']);
         });

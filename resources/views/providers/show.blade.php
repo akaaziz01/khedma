@@ -276,7 +276,7 @@
                                             </a>
                                             <button type="button" 
                                                     data-service-book-btn
-                                                    onclick="openGuestBookingModal('{{ addslashes($provider->name) }}', '{{ number_format($service->price, 2) }} TND ({{ addslashes($service->title) }})', {{ $provider->is_verified ? 'true' : 'false' }})" 
+                                                    onclick="openGuestBookingModal('{{ addslashes($provider->name) }}', '{{ number_format($service->price, 2) }} TND ({{ addslashes($service->title) }})', {{ $provider->is_verified ? 'true' : 'false' }}, {{ (int) $service->id }}, '{{ addslashes($service->title) }}', {{ (float) $service->price }}, '{{ addslashes($service->category ?? '') }}')" 
                                                     class="pro-service-book-btn px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold transition">
                                                 Book
                                             </button>
@@ -546,7 +546,7 @@
                             <span>Schedule Appointment</span>
                         </button>
 
-                        <a href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
+                        <a href="/register?role=client" id="sidebarRegisterClientBtn" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
                             Create Client Account to Hire
                         </a>
                     </div>
@@ -630,23 +630,87 @@
             </div>
         </div>
 
-        <div class="space-y-2 text-center sm:text-left">
-            <h4 class="text-sm font-extrabold text-slate-900 dark:text-white">
-                Sign in or create an account to book
-            </h4>
-            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Connect directly with {{ $provider->name }} to schedule an appointment, share your address details, and receive updates.
-            </p>
+        <!-- GUEST VIEW: Sign in / Create account prompts -->
+        <div id="bookingModalGuestSection" class="space-y-4">
+            <div class="space-y-2 text-center sm:text-left">
+                <h4 class="text-sm font-extrabold text-slate-900 dark:text-white">
+                    Sign in or create an account to book
+                </h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Connect directly with {{ $provider->name }} to schedule an appointment, share your address details, and receive updates.
+                </p>
+            </div>
+
+            <div class="space-y-2 pt-1">
+                <a href="/login?redirect={{ urlencode(route('providers.show', $provider->id)) }}" class="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition block">
+                    Sign In to Hire
+                </a>
+                <a href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
+                    New to Khedma? Create Free Account
+                </a>
+            </div>
         </div>
 
-        <div class="space-y-2 pt-1">
-            <a href="/login?redirect={{ urlencode(route('providers.show', $provider->id)) }}" class="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs text-center shadow-md shadow-blue-500/20 transition block">
-                Sign In to Hire
-            </a>
-            <a href="/register?role=client" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
-                New to Khedma? Create Free Account
-            </a>
-        </div>
+        <!-- LOGGED-IN CLIENT VIEW: Actual Booking Form -->
+        <form id="bookingModalClientSection" onsubmit="handleClientBookingSubmit(event)" class="hidden space-y-4">
+            <input type="hidden" id="bookInputServiceId" value="">
+            <input type="hidden" id="bookInputServiceTitle" value="Direct Consultation">
+            <input type="hidden" id="bookInputPrice" value="{{ $profile?->hourly_rate ?? 50.00 }}">
+            <input type="hidden" id="bookInputCategory" value="{{ $profile?->primary_category ?? 'General' }}">
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    <i class="bi bi-clock-fill text-blue-600 mr-1"></i> Date & Heure du rendez-vous *
+                </label>
+                <input type="datetime-local" id="bookInputScheduledAt" required
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        <i class="bi bi-geo-alt-fill text-rose-500 mr-1"></i> Adresse d'intervention *
+                    </label>
+                    <input type="text" id="bookInputAddress" required placeholder="Ex: 12 Rue Habib Bourguiba"
+                        class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Ville *</label>
+                    <select id="bookInputCity" required
+                        class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="Tunis" selected>Tunis</option>
+                        <option value="Ariana">Ariana</option>
+                        <option value="Ben Arous">Ben Arous</option>
+                        <option value="Manouba">Manouba</option>
+                        <option value="Sousse">Sousse</option>
+                        <option value="Sfax">Sfax</option>
+                        <option value="Bizerte">Bizerte</option>
+                        <option value="Nabeul">Nabeul</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    <i class="bi bi-chat-left-text-fill text-slate-400 mr-1"></i> Remarques / Instructions (optionnel)
+                </label>
+                <textarea id="bookInputNotes" rows="2" placeholder="Décrivez votre besoin ou consignes d'accès..."
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"></textarea>
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <button type="submit" id="btnBookAndPayStripe"
+                    class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs text-center shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
+                    <i class="bi bi-credit-card-2-front-fill text-sm"></i>
+                    <span>Réserver & Payer avec Stripe</span>
+                </button>
+                <button type="button" onclick="submitBookingWithoutStripe()" id="btnBookPayLater"
+                    class="w-full py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs text-center transition flex items-center justify-center gap-1.5">
+                    <i class="bi bi-calendar-check text-xs"></i>
+                    <span>Réserver (Paiement sur place)</span>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -670,21 +734,61 @@
     });
 
     // Booking Modal
-    function openGuestBookingModal(name, rate, isVerified) {
-        try {
-            const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
-            if (user.id === {{ (int) $provider->id }}) {
-                alert('You cannot book your own service.');
-                return;
-            }
-            if (user.role === 'provider') {
-                alert('You are logged in as a Provider. To book services, please use a Client account.');
-                return;
-            }
-        } catch(e) {}
+    function openGuestBookingModal(name, rate, isVerified, serviceId = null, serviceTitle = '', servicePrice = 0, category = '') {
+        const user = JSON.parse(localStorage.getItem('khedma_user') || '{}');
+        const token = localStorage.getItem('khedma_token');
+
+        if (user && user.id === {{ (int) $provider->id }}) {
+            alert('You cannot book your own service.');
+            return;
+        }
+        if (user && user.role === 'provider') {
+            alert('You are logged in as a Provider. To book services, please use a Client account.');
+            return;
+        }
 
         document.getElementById('bookingModalProviderName').textContent = name;
         document.getElementById('bookingModalRate').textContent = rate;
+
+        const guestSection = document.getElementById('bookingModalGuestSection');
+        const clientSection = document.getElementById('bookingModalClientSection');
+
+        if (token && user && user.role === 'client') {
+            guestSection?.classList.add('hidden');
+            clientSection?.classList.remove('hidden');
+
+            // Setup fields
+            document.getElementById('bookInputServiceId').value = serviceId || '';
+            document.getElementById('bookInputServiceTitle').value = serviceTitle || (rate.includes('(') ? rate.split('(')[1].replace(')', '') : 'Direct Consultation');
+            
+            let priceNum = servicePrice;
+            if (!priceNum) {
+                const parsed = parseFloat(rate);
+                priceNum = !isNaN(parsed) && parsed > 0 ? parsed : {{ (float) ($profile?->hourly_rate ?? 50.00) }};
+            }
+            document.getElementById('bookInputPrice').value = priceNum;
+            document.getElementById('bookInputCategory').value = category || '{{ addslashes($profile?->primary_category ?? "General Maintenance") }}';
+
+            // Pre-fill address
+            const addrInput = document.getElementById('bookInputAddress');
+            if (addrInput && !addrInput.value) {
+                addrInput.value = user.client_profile?.address || user.address || '';
+            }
+
+            // Min date
+            const dateInput = document.getElementById('bookInputScheduledAt');
+            if (dateInput && !dateInput.value) {
+                const now = new Date();
+                now.setHours(now.getHours() + 2);
+                now.setMinutes(0);
+                dateInput.min = new Date().toISOString().slice(0, 16);
+                dateInput.value = now.toISOString().slice(0, 16);
+            }
+        } else {
+            guestSection?.classList.remove('hidden');
+            clientSection?.classList.add('hidden');
+        }
+
         document.getElementById('providerBookingModal').classList.remove('hidden');
     }
 
@@ -697,6 +801,112 @@
             closeGuestBookingModal();
         }
     });
+
+    async function handleClientBookingSubmit(e) {
+        e.preventDefault();
+        await doCreateBooking(true);
+    }
+
+    async function submitBookingWithoutStripe() {
+        const form = document.getElementById('bookingModalClientSection');
+        if (!form.reportValidity()) return;
+        await doCreateBooking(false);
+    }
+
+    async function doCreateBooking(redirectToStripe) {
+        const token = localStorage.getItem('khedma_token');
+        if (!token) {
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href);
+            return;
+        }
+
+        const btnStripe = document.getElementById('btnBookAndPayStripe');
+        const btnLater = document.getElementById('btnBookPayLater');
+        const origStripeText = btnStripe.innerHTML;
+        const origLaterText = btnLater.innerHTML;
+
+        btnStripe.disabled = true;
+        btnLater.disabled = true;
+
+        if (redirectToStripe) {
+            btnStripe.innerHTML = '<span class="inline-block animate-spin mr-1.5"><i class="bi bi-arrow-repeat"></i></span> Redirection Stripe...';
+        } else {
+            btnLater.innerHTML = '<span class="inline-block animate-spin mr-1.5"><i class="bi bi-arrow-repeat"></i></span> Enregistrement...';
+        }
+
+        const scheduledAt = document.getElementById('bookInputScheduledAt').value;
+        const address = document.getElementById('bookInputAddress').value;
+        const city = document.getElementById('bookInputCity').value;
+        const notes = document.getElementById('bookInputNotes').value;
+        const serviceId = document.getElementById('bookInputServiceId').value;
+        const serviceTitle = document.getElementById('bookInputServiceTitle').value;
+        const price = document.getElementById('bookInputPrice').value;
+        const category = document.getElementById('bookInputCategory').value;
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await fetch('/api/v1/client/bookings', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                },
+                body: JSON.stringify({
+                    provider_id: {{ (int) $provider->id }},
+                    service_id: serviceId ? parseInt(serviceId) : null,
+                    service_title: serviceTitle,
+                    category: category,
+                    total_price: parseFloat(price) || 50,
+                    scheduled_at: scheduledAt,
+                    address: address,
+                    city: city,
+                    client_notes: notes || null
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.message || 'Impossible de créer la réservation.');
+                btnStripe.disabled = false;
+                btnLater.disabled = false;
+                btnStripe.innerHTML = origStripeText;
+                btnLater.innerHTML = origLaterText;
+                return;
+            }
+
+            const booking = data.data;
+
+            if (redirectToStripe) {
+                // Call stripe checkout immediately
+                const stripeRes = await fetch(`/api/v1/client/bookings/${booking.id}/stripe-checkout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || ''
+                    }
+                });
+                const stripeData = await stripeRes.json();
+                if (stripeRes.ok && stripeData.checkout_url) {
+                    window.location.href = stripeData.checkout_url;
+                    return;
+                }
+            }
+
+            alert('Votre demande de réservation a été envoyée avec succès !');
+            window.location.href = '/dashboard';
+        } catch(err) {
+            console.error(err);
+            alert('Une erreur est survenue lors de la réservation.');
+            btnStripe.disabled = false;
+            btnLater.disabled = false;
+            btnStripe.innerHTML = origStripeText;
+            btnLater.innerHTML = origLaterText;
+        }
+    }
 
     // Favorite / Bookmark Provider
     let isCurrentlyFavorited = {{ ($isFavorited ?? false) ? 'true' : 'false' }};
@@ -739,6 +949,11 @@
                 const favBtn = document.getElementById('favoriteBtn');
                 if (favBtn) favBtn.classList.add('hidden');
                 document.querySelectorAll('.pro-service-book-btn').forEach(b => b.classList.add('hidden'));
+            }
+
+            if (user && user.role === 'client') {
+                const sidebarRegisterBtn = document.getElementById('sidebarRegisterClientBtn');
+                if (sidebarRegisterBtn) sidebarRegisterBtn.classList.add('hidden');
             }
 
             if (user && user.role === 'provider') {

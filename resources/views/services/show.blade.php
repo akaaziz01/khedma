@@ -248,12 +248,19 @@
                         Secure your booking request directly with {{ $provider?->name }}. No upfront payment required to request an appointment.
                     </p>
 
-                    <div class="pt-2 space-y-2">
+                    <div id="serviceGuestActionBtns" class="pt-2 space-y-2">
                         <a href="/login?redirect={{ urlencode(route('services.show', $service->id)) }}" class="w-full py-3 px-4 rounded-2xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs text-center shadow-sm transition block">
                             Sign In to Book This Service
                         </a>
                         <a href="/register?role=client" class="w-full py-2.5 px-4 rounded-2xl bg-blue-700/60 hover:bg-blue-700 text-white font-bold text-xs text-center border border-blue-500/50 transition block">
                             New Client? Create Account
+                        </a>
+                    </div>
+
+                    <div id="serviceClientActionBtns" class="hidden pt-2 space-y-2">
+                        <a href="{{ route('providers.show', $service->provider_id) }}" class="w-full py-3 px-4 rounded-2xl bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs text-center shadow-sm transition flex items-center justify-center gap-2">
+                            <i class="bi bi-calendar-check-fill"></i>
+                            <span>Réserver ce service</span>
                         </a>
                     </div>
                 </div>
@@ -285,6 +292,9 @@
                     if (guestBox) guestBox.classList.add('hidden');
                     if (ownerBox) ownerBox.classList.add('hidden');
                     if (otherProviderBox) otherProviderBox.classList.remove('hidden');
+                } else if (user.role === 'client') {
+                    document.getElementById('serviceGuestActionBtns')?.classList.add('hidden');
+                    document.getElementById('serviceClientActionBtns')?.classList.remove('hidden');
                 }
             }
         } catch(e) {

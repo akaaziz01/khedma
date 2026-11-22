@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Stripe\Checkout\Session as StripeSession;
 use Stripe\Stripe;
 use Stripe\StripeClient;
@@ -53,6 +54,56 @@ class StripePaymentController extends Controller
         return response()->json([
             'data' => $bookings,
         ]);
+    }
+
+    /**
+     * Create a new booking request as a client.
+     */
+    public function storeBooking(Request $request): JsonResponse
+    {
+        $client = $request->user();
+        if (! $client->isClient()) {
+            return response()->json(['message' => 'Only clients can book services.'], 403);
+        }
+
+        $validated = $request->validate([
+            'provider_id'   => 'required|exists:users,id',
+            'service_id'    => 'nullable|exists:services,id',
+            'service_title' => 'required|string|max:255',
+            'category'      => 'nullable|string|max:255',
+            'total_price'   => 'required|numeric|min:1',
+            'scheduled_at'  => 'required|date',
+            'address'       => 'required|string|max:255',
+            'city'          => 'nullable|string|max:255',
+            'client_notes'  => 'nullable|string|max:1000',
+        ]);
+
+        if ((int) $validated['provider_id'] === $client->id) {
+            return response()->json(['message' => 'You cannot book your own service.'], 422);
+        }
+
+        $bookingNumber = 'BKG-' . strtoupper(Str::random(8));
+
+        $booking = Booking::create([
+            'booking_number' => $bookingNumber,
+            'client_id'      => $client->id,
+            'provider_id'    => $validated['provider_id'],
+            'service_id'     => $validated['service_id'] ?? null,
+            'service_title'  => $validated['service_title'],
+            'category'       => $validated['category'] ?? 'General Maintenance',
+            'status'         => 'pending',
+            'payment_status' => 'unpaid',
+            'total_price'    => $validated['total_price'],
+            'scheduled_at'   => $validated['scheduled_at'],
+            'address'        => $validated['address'],
+            'city'           => $validated['city'] ?? 'Tunis',
+            'client_notes'   => $validated['client_notes'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Booking request submitted successfully!',
+            'data'    => $booking,
+        ], 201);
     }
 
     /**
@@ -161,7 +212,7 @@ class StripePaymentController extends Controller
             return response()->json(['message' => 'Booking not found.'], 404);
         }
 
-        if ($booking->client_id !== $user->id && $booking->provider_id !== $user->id && $user->role !== 'admin') {
+        if ($booking->client_id !== $user->id && $booking->provider_id !== $user->id && ! $user->isAdmin()) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 

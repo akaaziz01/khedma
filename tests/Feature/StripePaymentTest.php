@@ -99,6 +99,32 @@ class StripePaymentTest extends TestCase
             ]);
     }
 
+    public function test_client_can_create_a_direct_booking(): void
+    {
+        $response = $this->actingAs($this->client, 'sanctum')
+            ->postJson('/api/v1/client/bookings', [
+                'provider_id'   => $this->provider->id,
+                'service_title' => 'Emergency Leak Fix',
+                'category'      => 'Plumbing',
+                'total_price'   => 80.00,
+                'scheduled_at'  => now()->addDays(1)->toIso8601String(),
+                'address'       => '15 Avenue de Paris',
+                'city'          => 'Tunis',
+                'client_notes'  => 'Urgent please',
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.service_title', 'Emergency Leak Fix')
+            ->assertJsonPath('data.status', 'pending')
+            ->assertJsonPath('data.payment_status', 'unpaid');
+
+        $this->assertDatabaseHas('bookings', [
+            'client_id'     => $this->client->id,
+            'provider_id'   => $this->provider->id,
+            'service_title' => 'Emergency Leak Fix',
+        ]);
+    }
+
     public function test_another_user_cannot_view_or_pay_foreign_booking(): void
     {
         $intruder = User::factory()->create(['role' => 'client']);
