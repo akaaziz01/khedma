@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProviderCompareWebController;
 use App\Http\Controllers\PublicProviderWebController;
 use App\Http\Controllers\PublicServiceWebController;
+use App\Http\Controllers\Api\StripePaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -103,3 +104,15 @@ Route::get('/admin/reports', function () {
 Route::get('/admin/catalog', function () {
     return redirect('/admin/services');
 })->name('admin.catalog');
+
+// Stripe Payments & Webhook
+Route::post('/stripe/webhook', [StripePaymentController::class, 'handleWebhook'])->name('stripe.webhook');
+
+Route::get('/payment/success', function () {
+    return view('payment.success');
+})->name('payment.success');
+
+Route::get('/payment/cancel', function () {
+    return view('payment.cancel');
+})->name('payment.cancel');
+

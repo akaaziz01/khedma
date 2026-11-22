@@ -302,8 +302,8 @@
                 </div>
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                     <span class="text-xs font-bold uppercase text-slate-400 dark:text-slate-500 block mb-1">Current Active Bookings</span>
-                    <p class="text-3xl font-black text-slate-900 dark:text-white mt-2">2</p>
-                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-semibold">1 urgent leak repair in progress</p>
+                    <p id="clientActiveBookingsCount" class="text-3xl font-black text-slate-900 dark:text-white mt-2">0</p>
+                    <p id="clientActiveBookingsSub" class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-semibold">Live status from bookings</p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
                     <div>
@@ -313,6 +313,53 @@
                     <a href="/services" class="mt-4 text-center py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition">
                         Explore Verified Pros
                     </a>
+                </div>
+            </div>
+
+            <!-- Client Bookings & Stripe Payments Section -->
+            <div id="clientBookingsSection" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                                <i class="bi bi-calendar-check-fill text-indigo-600"></i>
+                                <span>Mes Réservations & Paiements en Ligne</span>
+                            </h2>
+                            <span id="clientBookingsCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/40">
+                                0 Réservation
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            Consultez vos rendez-vous et réglez vos prestations en toute sécurité via Stripe par carte bancaire.
+                        </p>
+                    </div>
+
+                    <a href="/services" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-extrabold transition shrink-0">
+                        <i class="bi bi-search text-sm"></i>
+                        <span>Réserver un service</span>
+                    </a>
+                </div>
+
+                <!-- Loading spinner for client bookings -->
+                <div id="clientBookingsLoadingState" class="py-12 text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-3 border-indigo-600 border-t-transparent mb-2"></div>
+                    <p class="text-xs text-slate-400 font-semibold">Chargement de vos réservations...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="clientBookingsEmpty" class="hidden py-12 text-center max-w-sm mx-auto space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 flex items-center justify-center mx-auto text-2xl shadow-inner">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Aucune Réservation Trouvée</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Vous n'avez pas encore de réservation active. Réservez une prestation ou acceptez une proposition pour commencer.
+                    </p>
+                </div>
+
+                <!-- Client Bookings Grid -->
+                <div id="clientBookingsGrid" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Populated dynamically via JS -->
                 </div>
             </div>
 
@@ -1735,6 +1782,7 @@
 
         const token = localStorage.getItem('khedma_token');
         if (token) {
+            await loadClientBookings(token);
             await loadClientJobRequests(token);
             await loadClientFavorites(token);
         }
@@ -2036,6 +2084,171 @@
             }
         } catch(e) {
             console.error(e);
+        }
+    }
+
+    // ── Load & Render Client Bookings (Stripe Payments) ────────────────────────
+    let clientBookingsList = [];
+
+    async function loadClientBookings(token) {
+        const loading = document.getElementById('clientBookingsLoadingState');
+        const empty = document.getElementById('clientBookingsEmpty');
+        const grid = document.getElementById('clientBookingsGrid');
+        const badge = document.getElementById('clientBookingsCountBadge');
+
+        try {
+            const res = await fetch('/api/v1/client/bookings', {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!res.ok) throw new Error('Could not fetch bookings');
+
+            const json = await res.json();
+            clientBookingsList = json.data || [];
+
+            const activeCount = clientBookingsList.filter(b => ['pending', 'accepted', 'in_progress'].includes(b.status)).length;
+            const activeElem = document.getElementById('clientActiveBookingsCount');
+            const subElem = document.getElementById('clientActiveBookingsSub');
+            if (activeElem) activeElem.textContent = activeCount;
+            if (subElem) {
+                subElem.textContent = activeCount > 0 ? `${activeCount} réservation(s) en cours` : 'Aucune réservation en cours';
+            }
+
+            if (badge) {
+                badge.textContent = `${clientBookingsList.length} Réservation${clientBookingsList.length > 1 ? 's' : ''}`;
+            }
+            loading?.classList.add('hidden');
+
+            if (clientBookingsList.length === 0) {
+                empty?.classList.remove('hidden');
+                grid?.classList.add('hidden');
+                return;
+            }
+
+            empty?.classList.add('hidden');
+            grid?.classList.remove('hidden');
+            renderClientBookingsGrid(clientBookingsList);
+        } catch(e) {
+            console.error('Error loading client bookings:', e);
+            loading?.classList.add('hidden');
+            empty?.classList.remove('hidden');
+        }
+    }
+
+    function renderClientBookingsGrid(bookings) {
+        const grid = document.getElementById('clientBookingsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        bookings.forEach(b => {
+            const card = document.createElement('div');
+            card.className = 'p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between space-y-4 shadow-sm hover:shadow transition';
+
+            let statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">En attente</span>';
+            if (b.status === 'accepted') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">Confirmé</span>';
+            if (b.status === 'in_progress') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800">En cours</span>';
+            if (b.status === 'completed') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Terminé</span>';
+            if (b.status === 'declined') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">Refusé</span>';
+
+            let paymentActionHtml = '';
+            if (b.is_paid) {
+                paymentActionHtml = `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+                        <i class="bi bi-shield-fill-check text-emerald-600"></i>
+                        <span>Payé via Stripe</span>
+                    </span>
+                `;
+            } else {
+                paymentActionHtml = `
+                    <button onclick="payWithStripe(${b.id})" id="payBtn_${b.id}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 transition">
+                        <i class="bi bi-credit-card-2-front-fill"></i>
+                        <span>Payer avec Stripe</span>
+                    </button>
+                `;
+            }
+
+            card.innerHTML = `
+                <div>
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <span class="text-[10px] font-mono text-slate-400 font-semibold">${b.booking_number}</span>
+                            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">${b.service_title}</h3>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="mt-3 flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
+                        <span class="flex items-center gap-1"><i class="bi bi-person-fill text-blue-500"></i> ${b.provider?.name || 'Prestataire'}</span>
+                        <span>•</span>
+                        <span class="flex items-center gap-1"><i class="bi bi-calendar-event text-amber-500"></i> ${b.scheduled_at_formatted || 'Date convenue'}</span>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <i class="bi bi-geo-alt-fill text-red-400"></i>
+                        <span>${b.address || ''}, ${b.city || 'Tunis'}</span>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Montant</span>
+                        <span class="text-base font-black text-slate-900 dark:text-white">${Number(b.total_price).toFixed(2)} TND</span>
+                    </div>
+                    <div>
+                        ${paymentActionHtml}
+                    </div>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        });
+    }
+
+    async function payWithStripe(bookingId) {
+        const token = localStorage.getItem('khedma_token');
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const btn = document.getElementById('payBtn_' + bookingId);
+        const originalText = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="inline-block animate-spin mr-1.5"><i class="bi bi-arrow-repeat"></i></span> Redirection...';
+        }
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await fetch(`/api/v1/client/bookings/${bookingId}/stripe-checkout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
+
+            const data = await res.json();
+            if (res.ok && data.checkout_url) {
+                // Redirect user to Stripe hosted checkout
+                window.location.href = data.checkout_url;
+            } else {
+                alert(data.message || 'Impossible de créer la session de paiement Stripe.');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            }
+        } catch (err) {
+            console.error('Stripe Checkout Error:', err);
+            alert('Une erreur est survenue lors de l\'initialisation du paiement Stripe.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     }
 

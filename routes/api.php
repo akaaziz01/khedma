@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ProviderDashboardController;
 use App\Http\Controllers\Api\PublicProviderController;
 use App\Http\Controllers\Api\PublicServiceController;
 use App\Http\Controllers\Api\ServiceCategoryController;
+use App\Http\Controllers\Api\StripePaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -67,6 +68,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/job-requests/{id}/compare', [JobRequestController::class, 'compare']);
             Route::post('/proposals/{id}/accept', [ProposalController::class, 'accept']);
             Route::post('/proposals/{id}/reject', [ProposalController::class, 'reject']);
+
+            // Stripe Online Payment API
+            Route::get('/bookings', [StripePaymentController::class, 'clientBookings']);
+            Route::post('/bookings/{id}/stripe-checkout', [StripePaymentController::class, 'createCheckoutSession']);
+            Route::get('/bookings/{id}/payment-status', [StripePaymentController::class, 'checkStatus']);
         });
 
         // Provider Dashboard API (Spotlight inspired with real DB data)
@@ -132,3 +138,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+// Stripe Webhook Endpoint (Public, signature-verified)
+Route::post('/stripe/webhook', [StripePaymentController::class, 'handleWebhook']);
+

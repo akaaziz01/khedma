@@ -26,6 +26,11 @@ class Booking extends Model
         'client_notes',
         'provider_notes',
         'declined_reason',
+        'payment_status',
+        'payment_method',
+        'stripe_session_id',
+        'stripe_payment_intent_id',
+        'paid_at',
         'completed_at',
         'accepted_at',
         'declined_at',
@@ -36,6 +41,7 @@ class Booking extends Model
         return [
             'total_price'  => 'decimal:2',
             'scheduled_at' => 'datetime',
+            'paid_at'      => 'datetime',
             'completed_at' => 'datetime',
             'accepted_at'  => 'datetime',
             'declined_at'  => 'datetime',
@@ -73,6 +79,18 @@ class Booking extends Model
     public function isDeclined(): bool   { return $this->status === 'declined'; }
     public function isCancelled(): bool  { return $this->status === 'cancelled'; }
     public function isImmutable(): bool  { return in_array($this->status, ['completed', 'declined', 'cancelled']); }
+    public function isPaid(): bool       { return $this->payment_status === 'paid'; }
+
+    public function markAsPaid(string $paymentIntentId, ?string $sessionId = null): void
+    {
+        $this->update([
+            'payment_status'           => 'paid',
+            'payment_method'           => 'stripe',
+            'stripe_payment_intent_id' => $paymentIntentId,
+            'stripe_session_id'        => $sessionId ?? $this->stripe_session_id,
+            'paid_at'                  => now(),
+        ]);
+    }
 
     /**
      * Valid status transitions from each state.
