@@ -147,9 +147,13 @@ class StripePaymentController extends Controller
             $amountInCents = 50; // Minimum Stripe transaction amount (0.50 EUR/USD)
         }
 
-        $appUrl = config('app.url', url('/'));
-        $successUrl = "{$appUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}&booking_id={$booking->id}";
-        $cancelUrl = "{$appUrl}/payment/cancel?booking_id={$booking->id}";
+        $baseUrl = rtrim($request->header('Origin') ?: $request->getSchemeAndHttpHost(), '/');
+        if (empty($baseUrl) || str_contains($baseUrl, 'null')) {
+            $baseUrl = rtrim(config('app.url', url('/')), '/');
+        }
+
+        $successUrl = "{$baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}&booking_id={$booking->id}";
+        $cancelUrl = "{$baseUrl}/payment/cancel?booking_id={$booking->id}";
 
         try {
             $session = $stripe->checkout->sessions->create([
