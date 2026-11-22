@@ -286,6 +286,11 @@
 
                         <!-- Card Footer / Actions -->
                         <div class="p-4 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                            <a href="{{ route('chat', ['provider_id' => $service->provider_id]) }}" 
+                               class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition flex items-center justify-center shrink-0" 
+                               title="Envoyer un message au prestataire">
+                                <i class="bi bi-chat-dots-fill text-sm"></i>
+                            </a>
                             <a href="{{ route('services.show', $service->id) }}" class="flex-1 py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold text-center transition">
                                 Details
                             </a>

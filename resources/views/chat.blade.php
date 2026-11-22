@@ -94,7 +94,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
         const token = localStorage.getItem('khedma_token');
         if (!token) {
-            window.location.href = '/login';
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
             return;
         }
 
@@ -108,11 +108,20 @@
             // Check URL query parameters for direct conversation navigation
             const urlParams = new URLSearchParams(window.location.search);
             const targetConvId = urlParams.get('conversation_id');
+            const targetProviderId = urlParams.get('provider_id');
 
             await loadConversations();
 
             if (targetConvId) {
                 openConversation(parseInt(targetConvId, 10));
+            } else if (targetProviderId) {
+                const provId = parseInt(targetProviderId, 10);
+                const existing = conversationsData.find(c => c.participant && c.participant.id === provId);
+                if (existing) {
+                    openConversation(existing.id);
+                } else {
+                    await startConversationWithProvider(provId);
+                }
             } else if (conversationsData.length > 0) {
                 openConversation(conversationsData[0].id);
             }
@@ -148,6 +157,33 @@
             console.error(e);
         } finally {
             document.getElementById('conversationsLoading').classList.add('hidden');
+        }
+    }
+
+    async function startConversationWithProvider(providerId) {
+        const token = localStorage.getItem('khedma_token');
+        try {
+            const res = await fetch('/api/v1/conversations', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ provider_id: providerId })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.conversation) {
+                    await loadConversations();
+                    openConversation(data.conversation.id);
+                }
+            } else {
+                console.error('Failed to start conversation with provider', await res.text());
+            }
+        } catch (e) {
+            console.error('Error starting conversation:', e);
         }
     }
 

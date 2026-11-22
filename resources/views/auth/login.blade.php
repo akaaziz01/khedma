@@ -146,7 +146,13 @@
                 if (data.user.role === 'admin') {
                     window.location.href = '/admin/dashboard';
                 } else {
-                    window.location.href = '/dashboard';
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectUrl = urlParams.get('redirect');
+                    if (redirectUrl && redirectUrl.startsWith('/')) {
+                        window.location.href = redirectUrl;
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
                 }
             } else {
                 errorMessage.textContent = data.message || 'Invalid email or password.';

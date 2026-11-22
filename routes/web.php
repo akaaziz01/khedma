@@ -52,6 +52,10 @@ Route::get('/messages', function () {
     return view('chat');
 })->name('chat');
 
+Route::get('/chat', function () {
+    return redirect()->route('chat', request()->query());
+});
+
 Route::get('/report', function () {
     return view('reports.create');
 })->name('reports.create');

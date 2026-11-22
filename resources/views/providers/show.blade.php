@@ -114,6 +114,13 @@
                             <span>Request Booking</span>
                         </button>
 
+                        <a href="{{ route('chat', ['provider_id' => $provider->id]) }}" 
+                           id="heroChatBtn"
+                           class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-2">
+                            <i class="bi bi-chat-dots-fill text-blue-600 dark:text-blue-400 text-sm"></i>
+                            <span>Envoyer un message</span>
+                        </a>
+
                         <!-- Provider Owner Actions (Shown when viewing own profile) -->
                         <a href="/profile" id="ownerHeroEditBtn" class="hidden w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-md">
                             <i class="bi bi-pencil-square"></i>
@@ -271,6 +278,9 @@
                                         </span>
 
                                         <div class="flex items-center gap-1.5">
+                                            <a href="{{ route('chat', ['provider_id' => $provider->id]) }}" class="pro-service-chat-btn p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold hover:text-blue-600 hover:bg-slate-100 transition" title="Message Provider">
+                                                <i class="bi bi-chat-dots-fill"></i>
+                                            </a>
                                             <a href="{{ route('services.show', $service->id) }}" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-100 transition">
                                                 View
                                             </a>
@@ -545,6 +555,13 @@
                             <i class="bi bi-calendar-check text-sm"></i>
                             <span>Schedule Appointment</span>
                         </button>
+
+                        <a href="{{ route('chat', ['provider_id' => $provider->id]) }}" 
+                           id="sidebarChatBtn"
+                           class="w-full py-3 px-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-xs text-center transition flex items-center justify-center gap-2">
+                            <i class="bi bi-chat-dots-fill text-blue-600 dark:text-blue-400"></i>
+                            <span>Discuter avec {{ $provider->name }}</span>
+                        </a>
 
                         <a href="/register?role=client" id="sidebarRegisterClientBtn" class="w-full py-3 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs text-center transition block">
                             Create Client Account to Hire
@@ -922,6 +939,12 @@
                 const heroBooking = document.getElementById('heroBookingBtn');
                 if (heroBooking) heroBooking.classList.add('hidden');
 
+                const heroChat = document.getElementById('heroChatBtn');
+                if (heroChat) heroChat.classList.add('hidden');
+
+                const sidebarChat = document.getElementById('sidebarChatBtn');
+                if (sidebarChat) sidebarChat.classList.add('hidden');
+
                 const ownerEdit = document.getElementById('ownerHeroEditBtn');
                 if (ownerEdit) ownerEdit.classList.remove('hidden');
 
@@ -943,8 +966,9 @@
                 const favBtn = document.getElementById('favoriteBtn');
                 if (favBtn) favBtn.classList.add('hidden');
 
-                // Hide individual booking buttons on their services
+                // Hide individual booking & chat buttons on their services
                 document.querySelectorAll('.pro-service-book-btn').forEach(b => b.classList.add('hidden'));
+                document.querySelectorAll('.pro-service-chat-btn').forEach(b => b.classList.add('hidden'));
             } else if (user.role === 'provider') {
                 // Another provider is viewing
                 const favBtn = document.getElementById('favoriteBtn');

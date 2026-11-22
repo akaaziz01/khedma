@@ -132,4 +132,78 @@ class ChatTest extends TestCase
             'body' => 'Intruder message',
         ])->assertStatus(403);
     }
+
+    public function test_client_can_initialize_conversation_without_message(): void
+    {
+        $client = User::create([
+            'name' => 'Sara Client',
+            'email' => 'sara@example.com',
+            'password' => 'Secret123!',
+            'role' => UserRole::CLIENT,
+        ]);
+
+        $provider = User::create([
+            'name' => 'Amine Pro',
+            'email' => 'amine@example.com',
+            'password' => 'Secret123!',
+            'role' => UserRole::PROVIDER,
+        ]);
+
+        Sanctum::actingAs($client);
+
+        $res = $this->postJson('/api/v1/conversations', [
+            'provider_id' => $provider->id,
+        ]);
+
+        $res->assertStatus(201)
+            ->assertJsonPath('conversation.client_id', $client->id)
+            ->assertJsonPath('conversation.provider_id', $provider->id);
+
+        $this->assertDatabaseHas('conversations', [
+            'client_id' => $client->id,
+            'provider_id' => $provider->id,
+        ]);
+    }
+
+    public function test_chat_buttons_and_icons_are_rendered_across_cards_and_detail_pages(): void
+    {
+        $provider = User::create([
+            'name' => 'Walid Pro',
+            'email' => 'walid@example.com',
+            'password' => 'Secret123!',
+            'role' => UserRole::PROVIDER,
+            'status' => 'active',
+        ]);
+
+        $service = \App\Models\Service::create([
+            'provider_id' => $provider->id,
+            'title' => 'Electrical Inspection',
+            'description' => 'Fast electrical diagnostics and fixes.',
+            'category' => 'Electricity',
+            'price' => 80.00,
+            'duration_hours' => 1,
+            'status' => 'approved',
+            'is_active' => true,
+        ]);
+
+        // 1. Service Card in Catalog (services.index)
+        $servicesResponse = $this->get(route('services.index'));
+        $servicesResponse->assertStatus(200);
+        $servicesResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+
+        // 2. Service Detail Page (services.show)
+        $serviceShowResponse = $this->get(route('services.show', $service->id));
+        $serviceShowResponse->assertStatus(200);
+        $serviceShowResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+
+        // 3. Provider Card in Directory (providers.index)
+        $providersResponse = $this->get(route('providers.index'));
+        $providersResponse->assertStatus(200);
+        $providersResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+
+        // 4. Provider Profile Page (providers.show)
+        $providerShowResponse = $this->get(route('providers.show', $provider->id));
+        $providerShowResponse->assertStatus(200);
+        $providerShowResponse->assertSee(route('chat', ['provider_id' => $provider->id]));
+    }
 }
