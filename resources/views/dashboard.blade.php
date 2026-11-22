@@ -1434,7 +1434,7 @@
             if (b.status === 'pending') {
                 actionsHtml = `
                     <div class="flex items-center justify-end gap-1.5">
-                        <button onclick="acceptBooking(${b.id}, '${(b.booking_number||'').replace(/'/g,"\\'")}', '${(b.client?.name||'Client').replace(/'/g,"\\'")}')}"
+                        <button onclick="acceptBooking(${b.id}, '${(b.booking_number||'').replace(/'/g,"\\'")}', '${(b.client?.name||'Client').replace(/'/g,"\\'")}')"
                             class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center gap-1">
                             <i class="bi bi-check-lg text-[11px]"></i> Accept
                         </button>
