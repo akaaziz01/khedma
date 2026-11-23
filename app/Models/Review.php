@@ -16,12 +16,17 @@ class Review extends Model
         'provider_id',
         'rating',
         'comment',
+        'status',
+        'moderation_reason',
+        'moderated_by',
+        'moderated_at',
     ];
 
     protected function casts(): array
     {
         return [
             'rating' => 'integer',
+            'moderated_at' => 'datetime',
         ];
     }
 
@@ -38,5 +43,10 @@ class Review extends Model
     public function provider(): BelongsTo
     {
         return $this->belongsTo(User::class, 'provider_id');
+    }
+
+    public function moderator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'moderated_by');
     }
 }

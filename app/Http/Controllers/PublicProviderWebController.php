@@ -145,7 +145,7 @@ class PublicProviderWebController extends Controller
             ])
             ->firstOrFail();
 
-        $reviews = $provider->providerReviews;
+        $reviews = $provider->providerReviews()->where('status', 'approved')->get();
         $reviewsCount = $reviews->count();
         $averageRating = $reviewsCount > 0 ? round($reviews->avg('rating'), 1) : 5.0;
 

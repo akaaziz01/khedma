@@ -66,7 +66,7 @@ class ProviderCompareController extends Controller
         // Calculate comparison data for each provider
         $providerData = $providers->map(function (User $provider) {
             $profile = $provider->providerProfile;
-            $reviews = $provider->providerReviews;
+            $reviews = $provider->providerReviews()->where('status', 'approved')->get();
             $services = $provider->services;
 
             $reviewsCount = $reviews->count();

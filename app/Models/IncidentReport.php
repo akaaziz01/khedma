@@ -15,6 +15,7 @@ class IncidentReport extends Model
     protected $fillable = [
         'reporter_id',
         'reported_client_id',
+        'reported_provider_id',
         'booking_id',
         'type',
         'subject',
@@ -36,5 +37,10 @@ class IncidentReport extends Model
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function reportedProvider(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reported_provider_id');
     }
 }

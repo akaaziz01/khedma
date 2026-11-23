@@ -17,11 +17,15 @@ class IncidentReportController extends Controller
             return response()->json(['message' => 'Only providers can report a client.'], 403);
         }
 
+        if ($request->input('type') === 'provider' && ! $request->user()->isClient()) {
+            return response()->json(['message' => 'Only clients can report a provider.'], 403);
+        }
+
         $validated = $request->validate([
-            'type' => ['required', Rule::in(['client', 'issue'])],
+            'type' => ['required', Rule::in(['client', 'provider', 'issue'])],
             'booking_id' => [
-                'required_if:type,client',
-                'prohibited_unless:type,client',
+                'required_if:type,client,provider',
+                'prohibited_unless:type,client,provider',
                 'integer',
                 'exists:bookings,id',
             ],
@@ -35,10 +39,16 @@ class IncidentReportController extends Controller
                 ->where('provider_id', $request->user()->id)
                 ->findOrFail($validated['booking_id']);
         }
+        if ($validated['type'] === 'provider') {
+            $booking = Booking::query()
+                ->where('client_id', $request->user()->id)
+                ->findOrFail($validated['booking_id']);
+        }
 
         $report = IncidentReport::create([
             'reporter_id' => $request->user()->id,
-            'reported_client_id' => $booking?->client_id,
+            'reported_client_id' => $validated['type'] === 'client' ? $booking?->client_id : null,
+            'reported_provider_id' => $validated['type'] === 'provider' ? $booking?->provider_id : null,
             'booking_id' => $booking?->id,
             'type' => $validated['type'],
             'subject' => $validated['subject'],
@@ -58,6 +68,7 @@ class IncidentReportController extends Controller
             ->with([
                 'reporter:id,name,email',
                 'reportedClient:id,name,email',
+                'reportedProvider:id,name,email',
                 'booking:id,booking_number',
             ])
             ->latest()

@@ -17,7 +17,7 @@ class FavoriteProviderResource extends JsonResource
         // When resolving through FavoriteProvider model
         $provider = $this->provider ?? $this->resource;
         $profile = $provider->providerProfile;
-        $reviews = $provider->providerReviews;
+        $reviews = $provider->providerReviews()->where('status', 'approved')->get();
         $reviewsCount = $reviews ? $reviews->count() : 0;
         $avgRating = $reviewsCount > 0 ? round($reviews->avg('rating'), 1) : 5.0;
 
