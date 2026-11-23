@@ -24,7 +24,9 @@ class ProposalResource extends JsonResource
         $profile = $provider?->providerProfile;
 
         // Compute rating from reviews
-        $reviewsCount = $provider?->providerReviews?->count() ?? 0;
+        $reviewsCount = $provider
+            ? $provider->providerReviews()->where('status', 'approved')->count()
+            : 0;
         $avgRating = $reviewsCount > 0
             ? round((float) $provider->providerReviews->avg('rating'), 1)
             : 0.0;

@@ -29,6 +29,7 @@ class Booking extends Model
         'completed_at',
         'accepted_at',
         'declined_at',
+        'client_confirmed_at',
     ];
 
     protected function casts(): array
@@ -39,6 +40,7 @@ class Booking extends Model
             'completed_at' => 'datetime',
             'accepted_at'  => 'datetime',
             'declined_at'  => 'datetime',
+            'client_confirmed_at' => 'datetime',
         ];
     }
 
@@ -64,6 +66,7 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+
     // ── Status Helpers ────────────────────────────────────────────────────────
 
     public function isPending(): bool    { return $this->status === 'pending'; }
@@ -80,6 +83,7 @@ class Booking extends Model
     public static function allowedTransitions(): array
     {
         return [
+            'confirmed'   => ['accepted', 'declined', 'cancelled'],
             'pending'     => ['accepted', 'declined'],
             'accepted'    => ['in_progress', 'cancelled'],
             'in_progress' => ['completed'],

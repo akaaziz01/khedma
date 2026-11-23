@@ -22,8 +22,8 @@ class PublicProviderController extends Controller
             ->where('role', 'provider')
             ->where('status', 'active')
             ->with(['providerProfile'])
-            ->withCount('providerReviews')
-            ->withAvg('providerReviews', 'rating')
+            ->withCount(['providerReviews as provider_reviews_count' => fn ($q) => $q->where('status', 'approved')])
+            ->withAvg(['providerReviews as provider_reviews_avg_rating' => fn ($q) => $q->where('status', 'approved')], 'rating')
             ->withCount(['providerBookings as completed_jobs_count' => function ($q) {
                 $q->where('status', 'completed');
             }])
@@ -180,6 +180,7 @@ class PublicProviderController extends Controller
                 },
                 'providerReviews' => function ($q) {
                     $q->with('client:id,name')
+                        ->where('status', 'approved')
                         ->orderBy('created_at', 'desc');
                 },
             ])

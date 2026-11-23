@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\ProviderCompareController;
 use App\Http\Controllers\Api\ProviderDashboardController;
+use App\Http\Controllers\Api\ClientBookingController;
+use App\Http\Controllers\Api\ReviewModerationController;
 use App\Http\Controllers\Api\PublicProviderController;
 use App\Http\Controllers\Api\PublicServiceController;
 use App\Http\Controllers\Api\ServiceCategoryController;
@@ -49,6 +51,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
         Route::post('/notifications/{notificationId}/read', [NotificationController::class, 'markRead']);
+        Route::get('/client/bookings', [ClientBookingController::class, 'index']);
+        Route::get('/client/bookings/{id}', [ClientBookingController::class, 'show']);
+        Route::post('/client/bookings/{id}/confirm', [ClientBookingController::class, 'confirm']);
+        Route::post('/client/bookings/{id}/review', [ClientBookingController::class, 'review']);
+        Route::get('/client/receipts', [ClientBookingController::class, 'receipts']);
+        Route::get('/client/bookings/{id}/receipt', [ClientBookingController::class, 'receipt']);
 
         // In-App Chat API [C7]
         Route::get('/conversations', [ChatController::class, 'conversations']);
@@ -76,6 +84,7 @@ Route::prefix('v1')->group(function () {
         // Provider Dashboard API (Spotlight inspired with real DB data)
         Route::prefix('provider')->group(function () {
             Route::get('/dashboard', [ProviderDashboardController::class, 'data']);
+            Route::get('/earnings', [ProviderDashboardController::class, 'earnings']);
             Route::post('/bookings/{id}/status', [ProviderDashboardController::class, 'updateBookingStatus']);
             Route::post('/availability', [ProviderDashboardController::class, 'toggleAvailability']);
             Route::post('/services', [ProviderDashboardController::class, 'createService']);
@@ -110,6 +119,9 @@ Route::prefix('v1')->group(function () {
             Route::patch('/users/{id}/verify', [AdminController::class, 'verifyUser']);
             Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
             Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+            Route::get('/reviews', [ReviewModerationController::class, 'index']);
+            Route::patch('/reviews/{review}', [ReviewModerationController::class, 'moderate']);
+            Route::post('/reviews/{review}/moderate', [ReviewModerationController::class, 'moderate']);
 
             // Service Categories (full CRUD)
             Route::post('/categories', [ServiceCategoryController::class, 'store']);

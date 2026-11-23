@@ -14,6 +14,40 @@ use Illuminate\Validation\Rule;
 
 class ProviderDashboardController extends Controller
 {
+    public function earnings(Request $request): JsonResponse
+    {
+        $provider = $request->user();
+
+        if (! $provider->isProvider()) {
+            return response()->json([
+                'message' => 'Unauthorized: User is not a provider.',
+            ], 403);
+        }
+
+        $completedRevenue = Booking::where('provider_id', $provider->id)
+            ->where('status', 'completed')
+            ->sum('total_price');
+
+        $completedBookings = Booking::where('provider_id', $provider->id)
+            ->where('status', 'completed')
+            ->with(['client:id,name'])
+            ->latest('completed_at')
+            ->paginate(15);
+
+        return response()->json([
+            'summary' => [
+                'completed_revenue' => (float) $completedRevenue,
+                'currency' => 'TND',
+            ],
+            'data' => $completedBookings->items(),
+            'meta' => [
+                'current_page' => $completedBookings->currentPage(),
+                'last_page' => $completedBookings->lastPage(),
+                'per_page' => $completedBookings->perPage(),
+                'total' => $completedBookings->total(),
+            ],
+        ]);
+    }
     /**
      * Get real provider dashboard metrics and data.
      */
